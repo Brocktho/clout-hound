@@ -1,0 +1,140 @@
+[gd_scene load_steps=13 format=3 uid="uid://dtlxuyo830w2f"]
+
+[ext_resource type="Script" uid="uid://b34qrfkbx43q5" path="res://player.gd" id="1_4flbx"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_f4bln"]
+points = PackedVector3Array(-0.12520654, -0.532801, -0.4805069, 0.022783129, 0.4760704, 0.49888408, 0.16971254, 0.5591441, 0.46417162, 0.23105091, -0.8035912, 0.32045516, 0.40741014, 0.651043, -0.24352328, -0.4827893, 0.59484255, 0.082213186, -0.3628679, -0.68231165, 0.2896967, 0.46904355, -0.65452886, -0.06627126, -0.12744367, 0.8427015, -0.33810276, -0.39343542, -0.6839421, -0.24471663, 0.43825462, 0.62330925, 0.20084947, 0.0841477, 0.977454, 0.11479468, -0.06820232, -0.9764576, -0.12927033, 0.20054972, -0.56312895, -0.4514544, -0.18552664, 0.59545326, -0.4534751, -0.27336287, 0.59226835, 0.40775412, -0.0069364863, -0.47682306, 0.49966025, 0.37582088, -0.5886136, 0.31695515, 0.111579016, 0.5630594, -0.48117727, -0.41725034, 0.5278656, -0.27049688, -0.48454633, -0.59697217, -0.06650971, -0.27974695, 0.90856135, 0.05333608, -0.25019687, -0.8807117, 0.20531891, 0.263647, -0.90277094, -0.1273943, 0.29336792, 0.8715263, -0.15719566, 0.3734115, -0.5263189, -0.32824618, 0.4996626, 0.47664148, -0.0068885577, 0.053105574, 0.8750009, 0.32470253, -0.15454252, -0.5908538, 0.4658794, -0.09727988, -0.7823577, -0.39818847, -0.3876489, -0.49817133, 0.31564978, -0.30067965, -0.58799505, -0.38890144)
+
+[sub_resource type="Shader" id="Shader_speed_lines"]
+code = "shader_type canvas_item;
+
+uniform float line_count : hint_range(0.0, 500.0) = 120.0;
+uniform float line_density : hint_range(0.0, 1.0) = 0.5;
+uniform float line_width : hint_range(0.0, 1.0) = 0.25;
+uniform float mask_size : hint_range(0.0, 1.0) = 0.1;
+uniform float mask_edge : hint_range(0.0, 1.0) = 0.5;
+uniform float animation_speed : hint_range(0.0, 20.0) = 10.0;
+uniform vec4 line_color : source_color = vec4(1.0, 1.0, 1.0, 0.3);
+
+float random(vec2 st) {
+    return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+}
+
+void fragment() {
+    vec2 uv = UV - 0.5;
+    float angle = atan(uv.y, uv.x);
+    float radius = length(uv);
+    
+    float angle_segment = angle * line_count;
+    float angle_id = floor(angle_segment);
+    float angle_fract = fract(angle_segment);
+    
+    float time = floor(TIME * animation_speed);
+    float n = random(vec2(angle_id, time));
+    
+    // Determine if this segment has a spike
+    float has_spike = step(1.0 - line_density, n);
+    
+    // Spike shape: narrow at center, wide at edge
+    // dist from center of the angular segment
+    float dist = abs(angle_fract - 0.5) * 2.0;
+    
+    // The spike is visible if dist is small. 
+    // We want it to be sharper, so we use a small line_width.
+    // And we want it to taper: it should be visible over a larger 'dist' when radius is large.
+    float taper = smoothstep(0.0, 1.0, radius);
+    float spike = smoothstep(line_width * taper, (line_width * 0.5) * taper, dist);
+    
+    // Fade the spike as it goes towards the center
+    float radial_fade = smoothstep(mask_size, mask_size + mask_edge, radius);
+    
+    float final_alpha = has_spike * spike * radial_fade * line_color.a;
+    
+    COLOR = vec4(line_color.rgb, final_alpha);
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_speed_lines"]
+shader = SubResource("Shader_speed_lines")
+shader_parameter/line_count = 120.0
+shader_parameter/line_density = 0.5
+shader_parameter/line_width = 0.25
+shader_parameter/mask_size = 0.1
+shader_parameter/mask_edge = 0.5
+shader_parameter/animation_speed = 20.0
+shader_parameter/line_color = Color(1, 1, 1, 0.3)
+
+[sub_resource type="Curve" id="Curve_f4bln"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_xl0jw"]
+curve = SubResource("Curve_f4bln")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_f4bln"]
+spread = 20.0
+initial_velocity_min = 2.0
+initial_velocity_max = 5.0
+scale_curve = SubResource("CurveTexture_xl0jw")
+color = Color(1, 0.75686276, 0, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0p32d"]
+shading_mode = 0
+
+[sub_resource type="BoxMesh" id="BoxMesh_3b8a5"]
+material = SubResource("StandardMaterial3D_0p32d")
+size = Vector3(0.05, 0.05, 0.05)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_f4bln"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xl0jw"]
+albedo_color = Color(1, 0, 0, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_xl0jw"]
+size = Vector2(1, 2)
+
+[node name="CharacterBody3D" type="CharacterBody3D"]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
+floor_stop_on_slope = false
+floor_max_angle = 1.5882496
+floor_snap_length = 0.5
+script = ExtResource("1_4flbx")
+max_speed = 5.0
+acceleration = 10.0
+friction = 60.0
+
+[node name="BodyCollision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8322363, 0)
+shape = SubResource("ConvexPolygonShape3D_f4bln")
+
+[node name="SpringArm3D" type="SpringArm3D" parent="."]
+
+[node name="Camera3D" type="Camera3D" parent="SpringArm3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.66992, 2.464325)
+current = true
+
+[node name="SpeedLines" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_speed_lines")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="GrindSparks" type="GPUParticles3D" parent="."]
+emitting = false
+process_material = SubResource("ParticleProcessMaterial_f4bln")
+draw_pass_1 = SubResource("BoxMesh_3b8a5")
+
+[node name="Visual" type="Node3D" parent="."]
+
+[node name="Body" type="MeshInstance3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9811945, 0)
+mesh = SubResource("CapsuleMesh_f4bln")
+skeleton = NodePath("../..")
+
+[node name="Board" type="MeshInstance3D" parent="Visual"]
+material_override = SubResource("StandardMaterial3D_xl0jw")
+mesh = SubResource("PlaneMesh_xl0jw")
+skeleton = NodePath("../..")

@@ -4,23 +4,32 @@ extends CharacterBody3D
 @export var max_speed: float = 10.0
 @export var acceleration: float = 20.0 # Reaches max_speed in ~0.5s if 20
 @export var friction: float = 50.0
-@export var air_resistance: float = 2.0
+@export var air_resistance: float = 1.0
 @export var jump_velocity: float = 4.5
+@export var diagonal_boost: float = 4.0
+@export var jump_buffer_time: float = 0.15 # Time before landing that a jump press is still registered
+@export var landing_grace_time: float = 0.1 # Time after landing where friction is reduced
+
 
 
 @export_group("Slide")
 @export var slide_friction: float = 0.5 # Very low friction
-@export var slide_control: float = 0.1 # Heavily restricted movement input
+@export var slide_control: float = 0.02 # Heavily restricted movement input
+@export var steering_weight: float = 4.0 # How quickly the board carves in standard movement
 @export var slope_slide_gravity_modifier: float = 10.0
+@export var slope_regular_gravity_modifier: float = 2.0
 
 @export_group("Grind")
 @export var grind_snap_distance: float = 0.5
 @export var grind_min_speed: float = 2.0
 
 @export_group("Camera Settings")
-@export var mouse_sensitivity: float = 0.002
+@export var mouse_sensitivity: float = 0.0005
 @export var camera_height: float = 0.7 # Offset from the player's center
 @export var camera_distance: float = 0.1 # Very slight backward offset to avoid clipping inside the head
+@export var base_fov: float = 75.0
+@export var max_fov_boost: float = 50.0
+@export var speed_for_max_fov: float = 50.0
 
 @export_group("Third Person Settings")
 @export var third_person_distance: float = 4.0
@@ -28,8 +37,17 @@ extends CharacterBody3D
 
 @export_group("Trick Settings")
 @export var spin_increment_deg: float = 45.0 # Degrees per frame-ish, or radians
+@export var lean_intensity_player: float = 0.05 # How much the player leans
+@export var lean_intensity_board: float = 0.005 # How much the board tilts
+@export var lean_speed: float = 8.0 # How fast the lean responds
 @export var ragdoll_friction: float = 25.0
 @export var reset_speed_threshold: float = 0.5
+
+@export_group("Debug Items")
+@export var stand_height: float = 1.0;
+@export var slide_height: float = 0.5;
+@export var stand_offset: float = 1.0;
+@export var slide_offset: float = 0.5;
 
 var is_third_person: bool = false
 var is_sliding: bool = false
@@ -47,13 +65,19 @@ var ragdoll_rot_vel: Vector3 = Vector3.ZERO
 var board_velocity: Vector3 = Vector3.ZERO
 var initial_spawn_pos: Vector3
 
+var jump_buffer_timer: float = 0.0
+var landing_grace_timer: float = 0.0
+var was_on_floor: bool = false
+
 
 @onready var camera: Camera3D = $SpringArm3D/Camera3D
 @onready var spring_arm: SpringArm3D = $SpringArm3D
-@onready var board_mesh: MeshInstance3D = $Board
-
-
-
+@onready var board_mesh: MeshInstance3D = $Visual/Board
+@onready var body_mesh: MeshInstance3D = $Visual/Body
+@onready var visual : Node3D = $Visual
+@onready var body_collision: CollisionShape3D = $BodyCollision
+@onready var grind_sparks: GPUParticles3D = $GrindSparks
+@onready var speed_lines: ColorRect = $SpeedLines
 
 @export_group("Rail Settings")
 @export var rail_jump_force: float = 10.0
@@ -61,6 +85,7 @@ var initial_spawn_pos: Vector3
 
 var rail_cooldown_timer: float = 0.0
 var last_rail_direction: Vector3 = Vector3.FORWARD
+var smoothed_floor_normal: Vector3 = Vector3.UP
 
 
 
@@ -106,16 +131,42 @@ func _physics_process(delta: float) -> void:
 	if is_ragdolling:
 		apply_ragdoll_physics(delta)
 		return	
+		
+	update_visual_alignment(delta)	
 
 	if rail_cooldown_timer > 0:
 		rail_cooldown_timer -= delta
 
+	if jump_buffer_timer > 0:
+		jump_buffer_timer -= delta
+	
+	if landing_grace_timer > 0:
+		landing_grace_timer -= delta
+
 	if Input.is_action_just_pressed("jump"):
+		jump_buffer_timer = jump_buffer_time
+
+	if jump_buffer_timer > 0:
 		if is_grinding:
+			jump_buffer_timer = 0
 			jump_exit_rail()
 			velocity.y = jump_velocity
 		elif is_on_floor():
+			jump_buffer_timer = 0
 			velocity.y = jump_velocity
+			if !is_sliding:
+				# Diagonal Momentum Exploit
+				var input_dir: Vector2 = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
+				if abs(input_dir.x) > 0.5 and abs(input_dir.y) > 0.5:
+					var current_hor_vel: Vector3 = Vector3(velocity.x, 0, velocity.z)
+					var boost_vec: Vector3 = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+					velocity += boost_vec * diagonal_boost	
+
+	# Landing detection for grace period
+	if is_on_floor() and not was_on_floor:
+		landing_grace_timer = landing_grace_time
+	
+	was_on_floor = is_on_floor()
 
 	# Grinding logic is here, but honestly I feel like a good portion of it should be in the GrindRail script.
 	# But thats what game jamming is all about. Sloppy code to get it out the door.
@@ -133,7 +184,7 @@ func _physics_process(delta: float) -> void:
 			if rail_cooldown_timer <= 0 and is_falling_on_rail():
 				check_for_rails()	
 			else:
-				var success = check_landing_alignment()	
+				var success: bool = check_landing_alignment()	
 				if !success: return
 				
 	if rail_cooldown_timer <= 0:
@@ -170,6 +221,94 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 	
+	update_speed_effects(delta)
+
+func update_speed_effects(delta: float) -> void:
+	var current_speed = velocity.length()
+	var speed_ratio = 0.0;
+	if(current_speed > max_speed):
+		speed_ratio = clamp(current_speed / speed_for_max_fov, 0.0, 1.0)
+	
+	# FOV Zoom
+	var target_fov = base_fov + (max_fov_boost * speed_ratio)
+	camera.fov = lerp(camera.fov, target_fov, 5.0 * delta)
+	
+	# Speed Lines
+	if speed_lines:
+		var speed_threshold = max_speed * 1.5
+		if current_speed > speed_threshold:
+			speed_lines.visible = true
+			var wind_ratio = clamp((current_speed - speed_threshold) / (speed_for_max_fov - speed_threshold), 0.0, 1.0)
+			# We can animate the line density or alpha via shader parameters
+			speed_lines.material.set_shader_parameter("line_color", Color(1.0, 1.0, 1.0, wind_ratio * 0.3))
+		else:
+			speed_lines.visible = false
+
+func update_visual_alignment(delta: float) -> void:
+	var target_up: Vector3 = Vector3.UP
+	var rail_fwd_dir: Vector3 = Vector3.ZERO
+	
+	if is_grinding and current_rail:
+		# Get the rail's forward direction
+		var rail_fwd = current_rail.get_direction_at_offset(rail_offset).normalized()
+		rail_fwd_dir = rail_fwd * rail_direction
+		# Use the world UP to find a consistent 'right' vector for the rail
+		var rail_right = rail_fwd.cross(Vector3.UP).normalized()
+		# Re-calculate 'up' based on the rail's forward and right
+		target_up = rail_right.cross(rail_fwd).normalized()
+	elif is_on_floor():
+		var raw_normal = get_floor_normal()
+		# Smooth the normal to prevent "spasms" on bumpy terrain
+		smoothed_floor_normal = smoothed_floor_normal.lerp(raw_normal, 10.0 * delta).normalized()
+		target_up = smoothed_floor_normal
+	else:
+		smoothed_floor_normal = smoothed_floor_normal.lerp(Vector3.UP, 2.0 * delta).normalized()
+		target_up = smoothed_floor_normal	
+	
+	# Create a basis that points 'up' towards the surface normal 
+	# but keeps our forward direction as much as possible
+	var curr_basis: Basis = visual.global_basis
+	var target_basis: Basis = Basis()
+	
+	# Determine the "Forward" direction based on input
+	var target_fwd: Vector3 = -transform.basis.z # Default to forward	
+	
+	if is_grinding and current_rail:
+		target_fwd = rail_fwd_dir
+	else:
+		var input_dir: Vector2 = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
+		if input_dir.length() > 0.1:
+			# Map the 2D input to the player's 3D orientation
+			var world_input := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+			target_fwd = world_input
+	
+	# Calculate the new right and forward vectors based on the new Up
+	target_basis.y = target_up
+	target_basis.x = target_basis.y.cross(target_fwd).normalized()
+	target_basis.z = target_basis.x.cross(target_basis.y).normalized()
+	
+	# Smoothly interpolate the rotation
+	var lerp_speed: float = 15.0
+	visual.global_basis = curr_basis.slerp(target_basis, lerp_speed * delta).orthonormalized()
+
+	var input_x: float = Input.get_action_strength("move_right") - Input.get_action_strength("move_left")
+	
+	# If we're sliding, we might want to invert or dampen the lean, 
+	# but for standard movement, tilting into the turn feels best.
+	var target_lean_player: float = -input_x * lean_intensity_player
+	var target_lean_board: float = -input_x * lean_intensity_board
+
+	# Apply lean to the body (heavier)
+	body_mesh.rotation.z = lerp_angle(body_mesh.rotation.z, target_lean_player, lean_speed * delta)
+
+	# Apply lean to the board (subtle)
+	board_mesh.rotation.z = lerp_angle(board_mesh.rotation.z, target_lean_board, lean_speed * delta)
+	
+	var target_height: float = slide_height if is_sliding else stand_height
+	var target_y_pos: float = slide_offset if is_sliding else stand_offset # Adjust to keep feet on board
+
+	body_mesh.scale.y = lerp(body_mesh.scale.y, target_height, 10.0 * delta)
+	body_mesh.position.y = lerp(body_mesh.position.y, target_y_pos, 10.0 * delta)	
 	
 func handle_dynamic_snapping() -> void:
 	var current_speed: float = velocity.length()
@@ -189,7 +328,7 @@ func handle_dynamic_snapping() -> void:
 			var plane_velocity: Vector3 = velocity.slide(floor_normal).normalized()
 			velocity = plane_velocity * current_speed
 			
-			floor_snap_length = 0.0
+			floor_snap_length = clamp(current_speed * 0.1, 0.2, 0.9)
 
 
 	
@@ -216,27 +355,29 @@ func apply_slope_gravity(delta: float) -> void:
 			
 			if is_sliding:
 				base_slide *= slope_slide_gravity_modifier
+			else:
+				base_slide *= slope_regular_gravity_modifier
 			
 			velocity += base_slide
 
 
 func handle_trick_input() -> void:
-	var spin_input = 0.0
+	var spin_input: float = 0.0
 	if Input.is_action_just_pressed("spin_left"):
 		spin_input += 1.0
 	if Input.is_action_just_pressed("spin_right"):
 		spin_input -= 1.0
 	
 	if spin_input != 0:
-		var rotation_step = deg_to_rad(spin_increment_deg) * spin_input
+		var rotation_step: float = deg_to_rad(spin_increment_deg) * spin_input
 		current_spin += rotation_step
 		board_mesh.rotate_y(rotation_step)
 
 func check_landing_alignment() -> bool:
 	# Check if rotation is a multiple of 180 degrees (PI radians)
 	# We use a small epsilon (0.2) to be forgiving
-	var normalized_spin = fmod(abs(current_spin), PI)
-	var is_aligned = normalized_spin < 0.2 or normalized_spin > PI - 0.2
+	var normalized_spin: float = fmod(abs(current_spin), PI)
+	var is_aligned: bool = normalized_spin < 0.2 or normalized_spin > PI - 0.2
 	
 	if not is_aligned and current_spin != 0:
 		start_ragdoll()
@@ -249,7 +390,7 @@ func check_landing_alignment() -> bool:
 		
 func is_falling_on_rail() -> bool:
 	var space_state: PhysicsDirectSpaceState3D = get_world_3d().direct_space_state
-	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(global_position, global_position + Vector3.DOWN * grind_snap_distance)
+	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(board_mesh.global_position, board_mesh.global_position + Vector3.DOWN * grind_snap_distance)
 	var result: Dictionary = space_state.intersect_ray(query)
 
 	if result:
@@ -260,7 +401,7 @@ func is_falling_on_rail() -> bool:
 
 func start_ragdoll() -> void:
 	is_ragdolling = true
-	var horizontal_speed = Vector2(velocity.x, velocity.z).length()
+	var horizontal_speed: float = Vector2(velocity.x, velocity.z).length()
 	
 	# 1. Calculate how "bad" the landing was (0.0 to 1.0)
 	# sin() of the spin is maxed at 90/270 degrees and 0 at 0/180
@@ -278,9 +419,9 @@ func start_ragdoll() -> void:
 	board_velocity = velocity * -0.4 # Make it go inverse to the player
 	
 	# Reparent to the world so it doesn't move with the player
-	var world = get_parent()
-	var current_board_pos = board_mesh.global_position
-	var current_board_rot = board_mesh.global_rotation
+	var world: Node = get_parent()
+	var current_board_pos: Vector3 = board_mesh.global_position
+	var current_board_rot: Vector3 = board_mesh.global_rotation
 	
 	board_mesh.get_parent().remove_child(board_mesh)
 	world.add_child(board_mesh)
@@ -303,16 +444,18 @@ func apply_ragdoll_physics(delta: float) -> void:
 	
 	# 1. Apply rotational momentum while in the air
 	if not is_on_floor():
-		$Body.rotate_x(ragdoll_rot_vel.x * delta)
-		$Body.rotate_z(ragdoll_rot_vel.z * delta)
+		body_mesh.rotate_x(ragdoll_rot_vel.x * delta)
+		body_mesh.rotate_z(ragdoll_rot_vel.z * delta)
 		# Match collision to visual
-		$BodyCollision.rotation = $Body.rotation
+		body_collision.rotation = body_mesh.rotation
 	
-	var horizontal_vel = Vector2(velocity.x, velocity.z)
+	var horizontal_vel: Vector2 = Vector2(velocity.x, velocity.z)
 	# Only apply heavy friction if we are grinding against the floor
-	# Otherwise, use light air resistance to preserve the fling
-	var current_friction = ragdoll_friction if is_on_floor() else air_resistance
-	horizontal_vel = horizontal_vel.move_toward(Vector2.ZERO, current_friction * delta)
+	# Otherwise, no friction to preserve the fling
+	var current_friction: float = ragdoll_friction if is_on_floor() else 0.0
+	
+	if current_friction > 0:
+		horizontal_vel = horizontal_vel.move_toward(Vector2.ZERO, current_friction * delta)
 	
 	velocity.x = horizontal_vel.x
 	velocity.z = horizontal_vel.y
@@ -326,15 +469,15 @@ func apply_ragdoll_physics(delta: float) -> void:
 func reset_player() -> void:
 	is_ragdolling = false
 	current_spin = 0.0
-	if board_mesh.get_parent() != self:
+	if board_mesh.get_parent() != visual:
 		board_mesh.get_parent().remove_child(board_mesh)
-		add_child(board_mesh)
+		visual.add_child(board_mesh)
 		
 	board_mesh.position = Vector3.ZERO # Reset to original local position
 	board_mesh.rotation = Vector3.ZERO
 	
-	$Body.rotation = Vector3.ZERO
-	$BodyCollision.rotation = Vector3.ZERO
+	body_mesh.rotation = Vector3.ZERO
+	body_collision.rotation = Vector3.ZERO
 	velocity = Vector3.ZERO
 	global_position = initial_spawn_pos # Or nearest checkpoint
 	print("Resetting...")
@@ -345,23 +488,58 @@ func apply_standard_movement(direction: Vector3, delta: float) -> void:
 	apply_slope_gravity(delta)
 	
 	if direction:
-		var target_velocity: Vector3 = direction * max_speed
 		var horizontal_vel: Vector2 = Vector2(velocity.x, velocity.z)
+		var current_speed: float = horizontal_vel.length()
+		
+		var target_velocity: Vector3 = direction * max_speed
 		var target_vel_2d: Vector2 = Vector2(target_velocity.x, target_velocity.z)
 		
 		var current_acceleration: float = acceleration
 		
+		# While airborne, we don't want to lose speed magnitude if we're already above max_speed
+		if not is_on_floor():
+			if current_speed > max_speed:
+				# If we are airborne and moving fast, we don't want to drag the speed down to max_speed.
+				# We adjust target_vel_2d length to match current_speed if airborne and fast.
+				# This allows steering without losing momentum.
+				target_vel_2d = target_vel_2d.normalized() * current_speed
+		
 		# Check if we are on the ground and trying to pivot/turn sharply
 		if is_on_floor():
+			var floor_normal: Vector3 = get_floor_normal()
 			# dot product: 1 if same direction, 0 if perpendicular, -1 if opposite
 			var movement_dot: float = horizontal_vel.normalized().dot(target_vel_2d.normalized())
 			
 			# If dot < 0.2 (perpendicular or opposing), we apply a massive acceleration boost
-			if movement_dot < 0.2:
-				current_acceleration *= 5.0 # Snappy pivot factor
+			if movement_dot < 0.0:
+				current_acceleration *= 2.0 # Snappy pivot factor
+			
+			# SLOPE MOMENTUM LOGIC:
+			# If we are moving fast (near or above max_speed)
+			if current_speed > max_speed * 0.9:
+				var slope_dir: Vector3 = Vector3(0, -1, 0).slide(floor_normal).normalized()
+				var slope_dot: float = direction.dot(slope_dir)
+
+				# If we are pushing in the direction of the downward slope
+				if slope_dot > 0.2:
+					# Increase max speed target to allow building momentum
+					var slope_steepness: float = 1.0 - floor_normal.dot(Vector3.UP)
+					var boost_factor: float = 1.0 + (slope_steepness * 2.0)
+					target_vel_2d = target_vel_2d * boost_factor
 		
 		horizontal_vel = horizontal_vel.move_toward(target_vel_2d, current_acceleration * delta)
-		
+	
+		# Apply grace period to preserve momentum even with input
+		if landing_grace_timer > 0:
+			var speed_before: float = Vector2(velocity.x, velocity.z).length()
+			if speed_before > target_vel_2d.length():
+				# If we are in grace period and moving faster than target speed, 
+				# use air resistance instead of standard acceleration to slow down.
+				var momentum_preserved_vel = Vector2(velocity.x, velocity.z).move_toward(target_vel_2d, air_resistance * delta)
+				# Only apply if it actually preserves more speed (which it should since air_resistance < acceleration)
+				if momentum_preserved_vel.length() > horizontal_vel.length():
+					horizontal_vel = momentum_preserved_vel
+
 		velocity.x = horizontal_vel.x
 		velocity.z = horizontal_vel.y
 	else:
@@ -369,9 +547,14 @@ func apply_standard_movement(direction: Vector3, delta: float) -> void:
 		var horizontal_vel: Vector2 = Vector2(velocity.x, velocity.z)
 		
 		# Choose between ground friction and air resistance
-		var friction_to_apply: float = friction if is_on_floor() else air_resistance
+		var friction_to_apply: float = friction if is_on_floor() else 0.0
 		
-		horizontal_vel = horizontal_vel.move_toward(Vector2.ZERO, friction_to_apply * delta)
+		# Skip/reduce friction during landing grace period
+		if landing_grace_timer > 0:
+			friction_to_apply = 0.0 # No friction during grace period
+		
+		if friction_to_apply > 0:
+			horizontal_vel = horizontal_vel.move_toward(Vector2.ZERO, friction_to_apply * delta)
 		velocity.x = horizontal_vel.x
 		velocity.z = horizontal_vel.y
 
@@ -416,7 +599,7 @@ func check_for_rails() -> void:
 	# The rail object should have a StaticBody3D child (or be one) that we hit.
 	
 	var space_state: PhysicsDirectSpaceState3D = get_world_3d().direct_space_state
-	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(global_position, global_position + Vector3.DOWN * grind_snap_distance)
+	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(board_mesh.global_position, board_mesh.global_position + Vector3.DOWN * grind_snap_distance)
 	var result: Dictionary = space_state.intersect_ray(query)
 	
 	if result:
@@ -453,6 +636,17 @@ func apply_grind_movement(delta: float) -> void:
 		
 	rail_offset += rail_speed * rail_direction * delta
 	
+	# Update sparks
+	if grind_sparks:
+		grind_sparks.emitting = true
+		# Point sparks opposite to velocity
+		if velocity.length() > 0.1:
+			grind_sparks.look_at(global_position - velocity.normalized(), Vector3.UP)
+		
+		# Scale amount of sparks with speed (ratio is 0.0 to 1.0)
+		var speed_factor = clamp(rail_speed / max_speed, 0.2, 1.0)
+		grind_sparks.amount_ratio = speed_factor	
+	
 	# Check if we've reached the end of the rail
 	if rail_offset < 0 or rail_offset > current_rail.curve.get_baked_length():
 		exit_rail()
@@ -472,6 +666,8 @@ func apply_grind_movement(delta: float) -> void:
 
 func exit_rail() -> void:
 	if is_grinding:
+		if grind_sparks:
+			grind_sparks.emitting = false	
 		velocity = last_rail_direction
 		print(velocity)
 		# Prevent clipping: Lift player slightly off the rail
@@ -482,7 +678,8 @@ func exit_rail() -> void:
 
 func jump_exit_rail() -> void:
 	if is_grinding:
-		
+		if grind_sparks:
+			grind_sparks.emitting = false	
 		# 1. Start with forward momentum
 		var exit_velocity: Vector3 = last_rail_direction
 		
