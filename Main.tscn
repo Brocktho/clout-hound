@@ -1,0 +1,60 @@
+[gd_scene load_steps=4 format=3 uid="uid://o8r5uvc2o6hy"]
+
+[ext_resource type="Script" uid="uid://dnas1bh428a6j" path="res://main.gd" id="1_main"]
+[ext_resource type="PackedScene" uid="uid://tfwgupmgqimd" path="res://Playground.tscn" id="2_r0du0"]
+[ext_resource type="PackedScene" uid="uid://bsmmtqqe1kdn6" path="res://Desert.tscn" id="3_cm0pq"]
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_main")
+playground_scene = ExtResource("2_r0du0")
+desert_scene = ExtResource("3_cm0pq")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 4)
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="MainMenu" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/MainMenu"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -50.0
+offset_right = 100.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="PlaygroundButton" type="Button" parent="UI/MainMenu/VBoxContainer"]
+layout_mode = 2
+text = "Playground"
+
+[node name="DesertButton" type="Button" parent="UI/MainMenu/VBoxContainer"]
+layout_mode = 2
+text = "Desert"
+
+[node name="ControlsButton" type="Button" parent="UI/MainMenu/VBoxContainer"]
+layout_mode = 2
+text = "Controls"
+
+[connection signal="pressed" from="UI/MainMenu/VBoxContainer/PlaygroundButton" to="." method="_on_playground_button_pressed"]
+[connection signal="pressed" from="UI/MainMenu/VBoxContainer/DesertButton" to="." method="_on_desert_button_pressed"]
+[connection signal="pressed" from="UI/MainMenu/VBoxContainer/ControlsButton" to="." method="_on_controls_button_pressed"]
