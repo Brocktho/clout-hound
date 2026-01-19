@@ -10,7 +10,6 @@ config_version=5
 
 [application]
 
-config/name="CloutHound"
 run/main_scene="uid://o8r5uvc2o6hy"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 config/icon="res://icon.svg"
