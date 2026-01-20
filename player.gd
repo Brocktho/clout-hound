@@ -37,6 +37,7 @@ extends CharacterBody3D
 
 @export_group("Trick Settings")
 @export var spin_increment_deg: float = 45.0 # Degrees per frame-ish, or radians
+@export var spin_boost_amount: float = 5.0 # Speed added per 180 flip
 @export var lean_intensity_player: float = 0.05 # How much the player leans
 @export var lean_intensity_board: float = 0.005 # How much the board tilts
 @export var lean_speed: float = 8.0 # How fast the lean responds
@@ -60,6 +61,7 @@ var rail_speed: float = 0.0
 var rail_direction: int = 1 # 1 or -1
 
 var current_spin: float = 0.0 # Cumulative rotation in radians
+var last_spin_threshold: float = 0.0 # Tracks the last 180-degree mark rewarded
 var is_ragdolling: bool = false
 var ragdoll_rot_vel: Vector3 = Vector3.ZERO
 var board_velocity: Vector3 = Vector3.ZERO
@@ -79,6 +81,8 @@ var was_on_floor: bool = false
 @onready var grind_sparks: GPUParticles3D = $GrindSparks
 @onready var speed_lines: ColorRect = $SpeedLines
 
+var outline_material: ShaderMaterial
+
 @export_group("Rail Settings")
 @export var rail_jump_force: float = 10.0
 @export var rail_reacquisition_time: float = 0.5
@@ -86,6 +90,7 @@ var was_on_floor: bool = false
 var rail_cooldown_timer: float = 0.0
 var last_rail_direction: Vector3 = Vector3.FORWARD
 var smoothed_floor_normal: Vector3 = Vector3.UP
+var started_spin : bool = false
 
 
 
@@ -97,6 +102,29 @@ func _ready() -> void:
 	initial_spawn_pos = global_position
 	# Initialize camera position relative to player
 	update_camera_position()
+	setup_outline()
+
+func setup_outline() -> void:
+	outline_material = ShaderMaterial.new()
+	outline_material.shader = load("res://outline.gdshader")
+	outline_material.set_shader_parameter("outline_color", Color.GREEN)
+	outline_material.set_shader_parameter("outline_width", 4)
+	
+	# Add as a second pass to the board mesh's material
+	var material = board_mesh.get_active_material(0)
+	if not material:
+		# If no material exists, create a simple StandardMaterial3D to hold the next_pass
+		material = StandardMaterial3D.new()
+		board_mesh.set_surface_override_material(0, material)
+	else:
+		# If the material is shared, we should probably duplicate it to avoid affecting other objects
+		# but for a player board it's likely unique or fine to modify.
+		# However, next_pass modification on a shared material will affect all instances.
+		# To be safe, we use a unique material.
+		board_mesh.set_surface_override_material(0, material.duplicate())
+		material = board_mesh.get_active_material(0)
+		
+	material.next_pass = outline_material
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
@@ -107,7 +135,16 @@ func _unhandled_input(event: InputEvent) -> void:
 		camera.rotation.x = clamp(camera.rotation.x, deg_to_rad(-80), deg_to_rad(80))
 
 	if event.is_action_pressed("toggle_camera"):
-		toggle_camera_mode()	
+		toggle_camera_mode()
+
+	if event.is_action_pressed("ui_cancel"):
+		show_controls()
+
+func show_controls() -> void:
+	var controls_scene = load("res://Controls.tscn")
+	if controls_scene:
+		var controls_instance = controls_scene.instantiate()
+		add_sibling(controls_instance) # Add to parent so it's not affected by player's transform
 		
 func toggle_camera_mode() -> void:
 		is_third_person = !is_third_person
@@ -173,6 +210,7 @@ func _physics_process(delta: float) -> void:
 	if is_grinding:
 		apply_grind_movement(delta)
 		handle_trick_input() # Allow rotation while grinding
+		update_outline_color()
 		return
 	else:
 		if not is_on_floor():
@@ -222,6 +260,22 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	
 	update_speed_effects(delta)
+	update_outline_color()
+
+func update_outline_color() -> void:
+	if not outline_material:
+		return
+		
+	var target_color: Color = Color.GREEN
+	
+	if not is_on_floor() and started_spin:
+		var remainder = fmod(abs(current_spin),PI)
+		if remainder < 0.1 or remainder > PI - 0.1: 
+			target_color = Color.GOLD
+		else:
+			target_color = Color.DARK_GRAY
+	
+	outline_material.set_shader_parameter("outline_color", target_color)
 
 func update_speed_effects(delta: float) -> void:
 	var current_speed = velocity.length()
@@ -369,15 +423,47 @@ func handle_trick_input() -> void:
 		spin_input -= 1.0
 	
 	if spin_input != 0:
+		started_spin = true
 		var rotation_step: float = deg_to_rad(spin_increment_deg) * spin_input
 		current_spin += rotation_step
 		board_mesh.rotate_y(rotation_step)
 
+		# Speed Boost Logic
+		if abs(current_spin) >= last_spin_threshold + PI:
+			apply_spin_boost()
+			last_spin_threshold += PI
+
+			# PREVENTION: Normalize to prevent precision loss over long grinds
+			# If we've passed the threshold, we can subtract PI from both 
+			# to keep the numbers small without affecting the logic.
+			var wrap_sign = sign(current_spin)
+			current_spin -= PI * wrap_sign
+			last_spin_threshold -= PI 
+		elif abs(current_spin) < last_spin_threshold:
+			# If they reverse direction and drop below the last threshold,
+			# we reset it so they can't "double dip" by oscillating.
+			last_spin_threshold = floor(abs(current_spin) / PI) * PI
+			
+func apply_spin_boost() -> void:
+	if is_grinding:
+		# Boost the speed specifically on the rail path
+		rail_speed += spin_boost_amount
+		# Update velocity immediately so visual effects/physics stay in sync
+		velocity = velocity.normalized() * rail_speed
+	else:
+		# Apply standard air boost
+		var boost_dir = velocity.normalized()
+		if boost_dir == Vector3.ZERO:
+			boost_dir = -transform.basis.z
+		velocity += boost_dir * spin_boost_amount
+	
 func check_landing_alignment() -> bool:
 	# Check if rotation is a multiple of 180 degrees (PI radians)
 	# We use a small epsilon (0.2) to be forgiving
 	var normalized_spin: float = fmod(abs(current_spin), PI)
 	var is_aligned: bool = normalized_spin < 0.2 or normalized_spin > PI - 0.2
+	started_spin = false
+	last_spin_threshold = 0.0
 	
 	if not is_aligned and current_spin != 0:
 		start_ragdoll()
@@ -648,9 +734,15 @@ func apply_grind_movement(delta: float) -> void:
 		grind_sparks.amount_ratio = speed_factor	
 	
 	# Check if we've reached the end of the rail
-	if rail_offset < 0 or rail_offset > current_rail.curve.get_baked_length():
-		exit_rail()
-		return
+	var rail_length = current_rail.curve.get_baked_length()
+	
+	if rail_offset < 0 or rail_offset > rail_length:
+		# If the path is closed (looped), wrap the offset instead of exiting
+		if current_rail.curve.is_closed():
+			rail_offset = fposmod(rail_offset, rail_length)
+		else:
+			exit_rail()
+			return
 	
 	
 	var next_pos = current_rail.get_pos_at_offset(rail_offset)
