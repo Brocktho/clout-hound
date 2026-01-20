@@ -1,5 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://cpnmrqralmrqt"]
-
-[ext_resource type="PackedScene" uid="uid://ga7tru6rbxry" path="res://assets/models/halfpipe.glb" id="1_jj1dn"]
-
-[node name="halfpipe" instance=ExtResource("1_jj1dn")]
