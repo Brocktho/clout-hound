@@ -37,6 +37,7 @@ extends CharacterBody3D
 
 @export_group("Trick Settings")
 @export var spin_increment_deg: float = 45.0 # Degrees per frame-ish, or radians
+@export var flip_speed: float = 720.0 # Degrees per second for kickflip
 @export var spin_boost_amount: float = 5.0 # Speed added per 180 flip
 @export var lean_intensity_player: float = 0.05 # How much the player leans
 @export var lean_intensity_board: float = 0.005 # How much the board tilts
@@ -61,6 +62,8 @@ var rail_speed: float = 0.0
 var rail_direction: int = 1 # 1 or -1
 
 var current_spin: float = 0.0 # Cumulative rotation in radians
+var current_flip: float = 0.0 # Cumulative flip rotation
+var current_board_lean: float = 0.0 # Tilt of board during turning or rotating
 var last_spin_threshold: float = 0.0 # Tracks the last 180-degree mark rewarded
 var is_ragdolling: bool = false
 var ragdoll_rot_vel: Vector3 = Vector3.ZERO
@@ -272,7 +275,8 @@ func update_outline_color() -> void:
 	
 	if not is_on_floor() and started_spin:
 		var remainder = fmod(abs(current_spin),PI)
-		if remainder < 0.1 or remainder > PI - 0.1: 
+		var flip_rem = fmod(abs(current_flip), TAU)
+		if (remainder < 0.1 or remainder > PI - 0.1) and (flip_rem < 0.1 or flip_rem > TAU - 0.1): 
 			target_color = Color.GOLD
 		else:
 			target_color = Color.DARK_GRAY
@@ -368,7 +372,8 @@ func update_visual_alignment(delta: float) -> void:
 	body_mesh.rotation.z = lerp_angle(body_mesh.rotation.z, target_lean_player, lean_speed * delta)
 
 	# Apply lean to the board (subtle)
-	board_mesh.rotation.z = lerp_angle(board_mesh.rotation.z, target_lean_board, lean_speed * delta)
+	current_board_lean = lerp_angle(current_board_lean, target_lean_board, lean_speed * delta)
+	board_mesh.rotation.z = current_board_lean + current_flip
 	
 	var target_height: float = slide_height if is_sliding else stand_height
 	var target_y_pos: float = slide_offset if is_sliding else stand_offset # Adjust to keep feet on board
@@ -456,6 +461,10 @@ func handle_trick_input() -> void:
 			# we reset it so they can't "double dip" by oscillating.
 			last_spin_threshold = floor(abs(current_spin) / PI) * PI
 			
+	if Input.is_action_pressed("kickflip"):
+		started_spin = true
+		current_flip += deg_to_rad(flip_speed) * get_physics_process_delta_time()
+			
 func apply_spin_boost() -> void:
 	if is_grinding:
 		# Boost the speed specifically on the rail path
@@ -474,15 +483,21 @@ func check_landing_alignment() -> bool:
 	# We use a small epsilon (0.2) to be forgiving
 	var normalized_spin: float = fmod(abs(current_spin), PI)
 	var is_aligned: bool = normalized_spin < 0.2 or normalized_spin > PI - 0.2
+	
+	var normalized_flip: float = fmod(abs(current_flip), TAU)
+	if normalized_flip > 0.2 and normalized_flip < TAU - 0.2:
+		is_aligned = false
+	
 	started_spin = false
 	last_spin_threshold = 0.0
 	
-	if not is_aligned and current_spin != 0:
+	if not is_aligned and (current_spin != 0 or current_flip != 0):
 		start_ragdoll()
 		return false
 	else:
 		# Landed successfully: Snap board to nearest 180 and reset counter
 		current_spin = 0.0
+		current_flip = 0.0
 		board_mesh.rotation.y = 0 # Or snap to PI if facing backward
 		return true
 		
@@ -567,6 +582,7 @@ func apply_ragdoll_physics(delta: float) -> void:
 func reset_player() -> void:
 	is_ragdolling = false
 	current_spin = 0.0
+	current_flip = 0.0
 	if board_mesh.get_parent() != visual:
 		board_mesh.get_parent().remove_child(board_mesh)
 		visual.add_child(board_mesh)
@@ -804,4 +820,4 @@ func jump_exit_rail() -> void:
 		global_position += Vector3.UP * 0.2
 		
 		is_grinding = false
-		current_rail = null	
+		current_rail = null

@@ -2,20 +2,24 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ct03j5iu5dkkx"
-path="res://.godot/imported/Player_Shorts.png-e73fcf2d1e8eef26a39307defdf97527.ctex"
+uid="uid://cury4pgc8lvq7"
+path.s3tc="res://.godot/imported/window_wall_BrickTexture_Baked_Window.png-2a58d07926cb54d0f8e316c32fd0d702.s3tc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc"],
+"vram_texture": true
+}
+generator_parameters={
+"md5": "c5c15ca5446b669b9555dca1572ffab7"
 }
 
 [deps]
 
-source_file="res://assets/Player_Shorts.png"
-dest_files=["res://.godot/imported/Player_Shorts.png-e73fcf2d1e8eef26a39307defdf97527.ctex"]
+source_file="res://assets/models/window_wall_BrickTexture_Baked_Window.png"
+dest_files=["res://.godot/imported/window_wall_BrickTexture_Baked_Window.png-2a58d07926cb54d0f8e316c32fd0d702.s3tc.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
@@ -23,7 +27,7 @@ compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
-mipmaps/generate=false
+mipmaps/generate=true
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""
@@ -37,4 +41,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=1
+detect_3d/compress_to=0

@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b5d6v6cmmmutm"
-path.s3tc="res://.godot/imported/Pug_Player_Hoodie.png-d3b69340b1dd6560e1b4409efad590da.s3tc.ctex"
+path.s3tc="res://.godot/imported/Pug_Player_Hoodie.png-0a5f35b768789b24327bc1764844a33d.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -14,8 +14,8 @@ generator_parameters={
 
 [deps]
 
-source_file="res://Assets/Pug_Player_Hoodie.png"
-dest_files=["res://.godot/imported/Pug_Player_Hoodie.png-d3b69340b1dd6560e1b4409efad590da.s3tc.ctex"]
+source_file="res://assets/Pug_Player_Hoodie.png"
+dest_files=["res://.godot/imported/Pug_Player_Hoodie.png-0a5f35b768789b24327bc1764844a33d.s3tc.ctex"]
 
 [params]
 
