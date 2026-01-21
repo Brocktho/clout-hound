@@ -25,7 +25,7 @@ extends CharacterBody3D
 
 @export_group("Camera Settings")
 @export var mouse_sensitivity: float = 0.0005
-@export var camera_height: float = 0.7 # Offset from the player's center
+@export var camera_height: float = 1.5 # Offset from the player's center
 @export var camera_distance: float = 0.1 # Very slight backward offset to avoid clipping inside the head
 @export var base_fov: float = 75.0
 @export var max_fov_boost: float = 50.0
@@ -75,7 +75,7 @@ var was_on_floor: bool = false
 @onready var camera: Camera3D = $SpringArm3D/Camera3D
 @onready var spring_arm: SpringArm3D = $SpringArm3D
 @onready var board_mesh: MeshInstance3D = $Visual/Board
-@onready var body_mesh: MeshInstance3D = $Visual/Body
+@onready var body_mesh: MeshInstance3D = $Visual/Body/Dog
 @onready var visual : Node3D = $Visual
 @onready var body_collision: CollisionShape3D = $BodyCollision
 @onready var grind_sparks: GPUParticles3D = $GrindSparks
@@ -106,7 +106,7 @@ func _ready() -> void:
 
 func setup_outline() -> void:
 	outline_material = ShaderMaterial.new()
-	outline_material.shader = load("res://outline.gdshader")
+	outline_material.shader = load("res://Assets/Shaders/outline.gdshader")
 	outline_material.set_shader_parameter("outline_color", Color.GREEN)
 	outline_material.set_shader_parameter("outline_width", 4)
 	
@@ -128,11 +128,13 @@ func setup_outline() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
-		# Rotate the player horizontally (yaw)
-		rotate_y(-event.relative.x * mouse_sensitivity)
-		# Rotate the camera vertically (pitch)
-		camera.rotate_x(-event.relative.y * mouse_sensitivity)
-		camera.rotation.x = clamp(camera.rotation.x, deg_to_rad(-80), deg_to_rad(80))
+		if is_third_person:
+			# Rotate the player horizontally (yaw)
+			rotate_y(-event.relative.x * mouse_sensitivity)
+			
+			# Rotate the camera vertically (pitch)
+			camera.rotate_x(-event.relative.y * mouse_sensitivity)
+			camera.rotation.x = clamp(camera.rotation.x, deg_to_rad(-80), deg_to_rad(80))
 
 	if event.is_action_pressed("toggle_camera"):
 		toggle_camera_mode()
@@ -344,6 +346,16 @@ func update_visual_alignment(delta: float) -> void:
 	# Smoothly interpolate the rotation
 	var lerp_speed: float = 15.0
 	visual.global_basis = curr_basis.slerp(target_basis, lerp_speed * delta).orthonormalized()
+	if !is_third_person:
+		var camera_basis: Basis = camera.global_basis
+		# Create a basis specifically for the camera where Forward is -target_fwd
+		# This aligns the camera's -Z with the player's intended forward direction
+		var cam_target: Basis = Basis()
+		cam_target.y = target_up
+		cam_target.x = cam_target.y.cross(-target_fwd).normalized()
+		cam_target.z = cam_target.x.cross(cam_target.y).normalized()
+
+		camera.global_basis = camera_basis.slerp(cam_target, lerp_speed * delta).orthonormalized()
 
 	var input_x: float = Input.get_action_strength("move_right") - Input.get_action_strength("move_left")
 	

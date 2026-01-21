@@ -2,17 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cpxol7rfov5ah"
-path.s3tc="res://.godot/imported/PugProfile.jpg-a43f05a46082bd0d7c0b1a4066221dc0.s3tc.ctex"
+uid="uid://bvwxqhtjsh1em"
+path.s3tc="res://.godot/imported/Pug_Player_Face.png-c92f4d2bbb9d7f0155d52b54128ed85c.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
+generator_parameters={
+"md5": "66aed76980a5b7242164bc3f5efae2bc"
+}
 
 [deps]
 
-source_file="res://assets/PugProfile.jpg"
-dest_files=["res://.godot/imported/PugProfile.jpg-a43f05a46082bd0d7c0b1a4066221dc0.s3tc.ctex"]
+source_file="res://Assets/Pug_Player_Face.png"
+dest_files=["res://.godot/imported/Pug_Player_Face.png-c92f4d2bbb9d7f0155d52b54128ed85c.s3tc.ctex"]
 
 [params]
 

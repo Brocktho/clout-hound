@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://beyytm8kd3m8p"
-path="res://.godot/imported/halfpipe.glb-f3b36b53dd32d37d6a8873effdda558c.scn"
+uid="uid://brf7iybkll5mr"
+path="res://.godot/imported/windowless_wall.glb-73188173d60069ce5b07342a1eb78d5f.scn"
 
 [deps]
 
-source_file="res://assets/models/halfpipe.glb"
-dest_files=["res://.godot/imported/halfpipe.glb-f3b36b53dd32d37d6a8873effdda558c.scn"]
+source_file="res://assets/models/windowless_wall.glb"
+dest_files=["res://.godot/imported/windowless_wall.glb-73188173d60069ce5b07342a1eb78d5f.scn"]
 
 [params]
 

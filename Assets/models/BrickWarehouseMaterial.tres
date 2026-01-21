@@ -1,0 +1,6 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://c7nsq4wc02y2w"]
+
+[resource]
+resource_name = "BrickWarehouseMaterial"
+cull_mode = 2
+roughness = 0.9
