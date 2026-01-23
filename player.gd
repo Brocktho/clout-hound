@@ -51,7 +51,7 @@ extends CharacterBody3D
 @export var stand_offset: float = 1.0;
 @export var slide_offset: float = 0.5;
 
-var is_third_person: bool = false
+var is_third_person: bool = true
 var is_sliding: bool = false
 var camera_look_input: Vector2 = Vector2.ZERO
 
@@ -131,13 +131,12 @@ func setup_outline() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
-		if is_third_person:
-			# Rotate the player horizontally (yaw)
-			rotate_y(-event.relative.x * mouse_sensitivity)
-			
-			# Rotate the camera vertically (pitch)
-			camera.rotate_x(-event.relative.y * mouse_sensitivity)
-			camera.rotation.x = clamp(camera.rotation.x, deg_to_rad(-80), deg_to_rad(80))
+		# Rotate the player horizontally (yaw)
+		rotate_y(-event.relative.x * mouse_sensitivity)
+		
+		# Rotate the camera vertically (pitch)
+		camera.rotate_x(-event.relative.y * mouse_sensitivity)
+		camera.rotation.x = clamp(camera.rotation.x, deg_to_rad(-80), deg_to_rad(80))
 
 	if event.is_action_pressed("toggle_camera"):
 		toggle_camera_mode()

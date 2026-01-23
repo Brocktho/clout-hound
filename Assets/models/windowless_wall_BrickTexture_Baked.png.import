@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://xxt64jfh5k0j"
-path.s3tc="res://.godot/imported/windowless_wall_BrickTexture_Baked.png-419737616e43d77ea0c918e5949b612b.s3tc.ctex"
+path.s3tc="res://.godot/imported/windowless_wall_BrickTexture_Baked.png-e4080c58be701957e6302f506ccbb2fc.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -14,8 +14,8 @@ generator_parameters={
 
 [deps]
 
-source_file="res://assets/models/windowless_wall_BrickTexture_Baked.png"
-dest_files=["res://.godot/imported/windowless_wall_BrickTexture_Baked.png-419737616e43d77ea0c918e5949b612b.s3tc.ctex"]
+source_file="res://Assets/models/windowless_wall_BrickTexture_Baked.png"
+dest_files=["res://.godot/imported/windowless_wall_BrickTexture_Baked.png-e4080c58be701957e6302f506ccbb2fc.s3tc.ctex"]
 
 [params]
 

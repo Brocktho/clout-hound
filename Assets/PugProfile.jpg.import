@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cpxol7rfov5ah"
-path.s3tc="res://.godot/imported/PugProfile.jpg-a43f05a46082bd0d7c0b1a4066221dc0.s3tc.ctex"
+path.s3tc="res://.godot/imported/PugProfile.jpg-7276fb4ca9dccd743eda4e5646925efa.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://assets/PugProfile.jpg"
-dest_files=["res://.godot/imported/PugProfile.jpg-a43f05a46082bd0d7c0b1a4066221dc0.s3tc.ctex"]
+source_file="res://Assets/PugProfile.jpg"
+dest_files=["res://.godot/imported/PugProfile.jpg-7276fb4ca9dccd743eda4e5646925efa.s3tc.ctex"]
 
 [params]
 

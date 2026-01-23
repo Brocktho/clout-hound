@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c81arrhgbbyra"
-path.s3tc="res://.godot/imported/Pug_Player_Shorts.png-8add0323795a44f9923559f01718d49e.s3tc.ctex"
+path.s3tc="res://.godot/imported/Pug_Player_Shorts.png-95bbd1ffd817b55fc807982e0d4b368b.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -14,8 +14,8 @@ generator_parameters={
 
 [deps]
 
-source_file="res://assets/Pug_Player_Shorts.png"
-dest_files=["res://.godot/imported/Pug_Player_Shorts.png-8add0323795a44f9923559f01718d49e.s3tc.ctex"]
+source_file="res://Assets/Pug_Player_Shorts.png"
+dest_files=["res://.godot/imported/Pug_Player_Shorts.png-95bbd1ffd817b55fc807982e0d4b368b.s3tc.ctex"]
 
 [params]
 

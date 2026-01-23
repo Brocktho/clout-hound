@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b1k02wsdib2ej"
-path.s3tc="res://.godot/imported/PugFace.png-fd3272d84c75aa0579693bb37efa9e61.s3tc.ctex"
+path.s3tc="res://.godot/imported/PugFace.png-a3b20ba24d4327169475f25877844b07.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://assets/PugFace.png"
-dest_files=["res://.godot/imported/PugFace.png-fd3272d84c75aa0579693bb37efa9e61.s3tc.ctex"]
+source_file="res://Assets/PugFace.png"
+dest_files=["res://.godot/imported/PugFace.png-a3b20ba24d4327169475f25877844b07.s3tc.ctex"]
 
 [params]
 

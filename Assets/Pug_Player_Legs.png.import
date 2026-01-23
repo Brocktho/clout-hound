@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bo4gyleu1r4c"
-path.s3tc="res://.godot/imported/Pug_Player_Legs.png-aadbbe3f7fa337d9565289607876e7cd.s3tc.ctex"
+path.s3tc="res://.godot/imported/Pug_Player_Legs.png-d29ea42ac953cdc3f347a3b313abc33c.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -14,8 +14,8 @@ generator_parameters={
 
 [deps]
 
-source_file="res://assets/Pug_Player_Legs.png"
-dest_files=["res://.godot/imported/Pug_Player_Legs.png-aadbbe3f7fa337d9565289607876e7cd.s3tc.ctex"]
+source_file="res://Assets/Pug_Player_Legs.png"
+dest_files=["res://.godot/imported/Pug_Player_Legs.png-d29ea42ac953cdc3f347a3b313abc33c.s3tc.ctex"]
 
 [params]
 
