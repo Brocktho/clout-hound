@@ -1,9 +1,11 @@
-[gd_scene load_steps=13 format=3 uid="uid://dtlxuyo830w2f"]
+[gd_scene load_steps=12 format=3 uid="uid://dtlxuyo830w2f"]
 
 [ext_resource type="Script" uid="uid://b34qrfkbx43q5" path="res://player.gd" id="1_4flbx"]
-[ext_resource type="PackedScene" uid="uid://bmwqugsuw6c4u" path="res://Assets/Pug.glb" id="2_onrkg"]
+[ext_resource type="ArrayMesh" uid="uid://djvoga0acqib2" path="res://Assets/models/Board.res" id="2_i3pqv"]
+[ext_resource type="ArrayMesh" uid="uid://bhjvh3vj2grbx" path="res://Assets/models/Dog_Default.res" id="3_hqtel"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_i3pqv"]
+radius = 0.3
 
 [sub_resource type="Shader" id="Shader_speed_lines"]
 code = "shader_type canvas_item;
@@ -85,12 +87,6 @@ shading_mode = 0
 material = SubResource("StandardMaterial3D_0p32d")
 size = Vector3(0.05, 0.05, 0.05)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xl0jw"]
-albedo_color = Color(1, 0, 0, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_xl0jw"]
-size = Vector3(1, 0.05, 2)
-
 [node name="CharacterBody3D" type="CharacterBody3D"]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
 floor_stop_on_slope = false
@@ -103,8 +99,9 @@ friction = 60.0
 stand_offset = 0.6
 
 [node name="BodyCollision" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.75, 0, 0, 0, 1, 0, 0.5964686, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.404948e-08, 0.75587094, -0.7326406)
 shape = SubResource("CapsuleShape3D_i3pqv")
+debug_fill = false
 
 [node name="SpringArm3D" type="SpringArm3D" parent="."]
 
@@ -121,6 +118,42 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="SlowMoContainer" type="Control" parent="HUD"]
+layout_mode = 3
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -160.0
+offset_top = -40.0
+offset_right = 160.0
+offset_bottom = -32.0
+mouse_filter = 2
+
+[node name="SlowMoBase" type="ColorRect" parent="HUD/SlowMoContainer"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.2, 0.2, 0.2, 0.4)
+
+[node name="SlowMoLeft" type="ColorRect" parent="HUD/SlowMoContainer"]
+layout_mode = 0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.9, 0.95, 1, 0.85)
+
+[node name="SlowMoRight" type="ColorRect" parent="HUD/SlowMoContainer"]
+layout_mode = 0
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.9, 0.95, 1, 0.85)
+
 [node name="GrindSparks" type="GPUParticles3D" parent="."]
 emitting = false
 process_material = SubResource("ParticleProcessMaterial_f4bln")
@@ -128,10 +161,13 @@ draw_pass_1 = SubResource("BoxMesh_3b8a5")
 
 [node name="Visual" type="Node3D" parent="."]
 
-[node name="Board" type="MeshInstance3D" parent="Visual"]
-material_override = SubResource("StandardMaterial3D_xl0jw")
-mesh = SubResource("BoxMesh_xl0jw")
-skeleton = NodePath("../..")
+[node name="BoardVisual" type="Node3D" parent="Visual"]
 
-[node name="Body" parent="Visual" instance=ExtResource("2_onrkg")]
-transform = Transform3D(-2.185569e-08, 0, 0.5, 0, 0.5, 0, -0.5, 0, -2.185569e-08, 1.55, 0.25, -0.25)
+[node name="Board" type="MeshInstance3D" parent="Visual/BoardVisual"]
+transform = Transform3D(-4.371139e-08, 2.1855698e-08, -0.5, -0.5, 2.1855694e-08, 4.371139e-08, 2.1855696e-08, 0.5, 2.185569e-08, 0, 0, 0)
+mesh = ExtResource("2_i3pqv")
+skeleton = NodePath("../../..")
+
+[node name="Body" type="MeshInstance3D" parent="Visual"]
+transform = Transform3D(-2.185569e-08, 0.5, -2.1855694e-08, 0, -2.1855694e-08, -0.5, -0.5, -2.185569e-08, 9.553428e-16, -0.0070000524, 0.6473949, 0.26882905)
+mesh = ExtResource("3_hqtel")

@@ -20,7 +20,7 @@ extends CharacterBody3D
 @export var slope_regular_gravity_modifier: float = 2.0
 
 @export_group("Grind")
-@export var grind_snap_distance: float = 0.5
+@export var grind_snap_distance: float = 1.0
 @export var grind_min_speed: float = 2.0
 
 @export_group("Camera Settings")
@@ -36,7 +36,7 @@ extends CharacterBody3D
 @export var third_person_offset: Vector3 = Vector3(0.5, 0.5, 0) # Over-the-shoulder look
 
 @export_group("Trick Settings")
-@export var spin_increment_deg: float = 45.0 # Degrees per frame-ish, or radians
+@export var spin_increment_deg: float = 90.0 # Degrees per frame-ish, or radians
 @export var flip_speed: float = 720.0 # Degrees per second for kickflip
 @export var spin_boost_amount: float = 5.0 # Speed added per 180 flip
 @export var lean_intensity_player: float = 0.05 # How much the player leans
@@ -44,6 +44,11 @@ extends CharacterBody3D
 @export var lean_speed: float = 8.0 # How fast the lean responds
 @export var ragdoll_friction: float = 25.0
 @export var reset_speed_threshold: float = 0.5
+
+@export_group("Slow Mo")
+@export var slowmo_time_scale: float = 0.1
+@export var slowmo_max_time: float = 1.5
+@export var slowmo_recharge_rate: float = 0.75
 
 @export_group("Debug Items")
 @export var stand_height: float = 1.0;
@@ -65,6 +70,7 @@ var current_spin: float = 0.0 # Cumulative rotation in radians
 var current_flip: float = 0.0 # Cumulative flip rotation
 var current_board_lean: float = 0.0 # Tilt of board during turning or rotating
 var last_spin_threshold: float = 0.0 # Tracks the last 180-degree mark rewarded
+var last_flip_threshold: float = 0.0
 var is_ragdolling: bool = false
 var ragdoll_rot_vel: Vector3 = Vector3.ZERO
 var board_velocity: Vector3 = Vector3.ZERO
@@ -73,18 +79,27 @@ var initial_spawn_pos: Vector3
 var jump_buffer_timer: float = 0.0
 var landing_grace_timer: float = 0.0
 var was_on_floor: bool = false
+var slowmo_time_left: float = 0.0
+var slowmo_active: bool = false
+var slowmo_last_ticks: int = 0
 
 
 @onready var camera: Camera3D = $SpringArm3D/Camera3D
 @onready var spring_arm: SpringArm3D = $SpringArm3D
-@onready var board_mesh: MeshInstance3D = $Visual/Board
-@onready var body_mesh: MeshInstance3D = $Visual/Body/Dog
+@onready var board_node: Node3D = $Visual/BoardVisual
+@onready var board_mesh: MeshInstance3D = $Visual/BoardVisual/Board
+@onready var body_mesh: MeshInstance3D = $Visual/Body
 @onready var visual : Node3D = $Visual
 @onready var body_collision: CollisionShape3D = $BodyCollision
 @onready var grind_sparks: GPUParticles3D = $GrindSparks
 @onready var speed_lines: ColorRect = $SpeedLines
+@onready var slowmo_container: Control = $HUD/SlowMoContainer
+@onready var slowmo_left: ColorRect = $HUD/SlowMoContainer/SlowMoLeft
+@onready var slowmo_right: ColorRect = $HUD/SlowMoContainer/SlowMoRight
+@onready var slowmo_base: ColorRect = $HUD/SlowMoContainer/SlowMoBase
 
 var outline_material: ShaderMaterial
+var trick_outline_material: ShaderMaterial
 
 @export_group("Rail Settings")
 @export var rail_jump_force: float = 10.0
@@ -94,6 +109,28 @@ var rail_cooldown_timer: float = 0.0
 var last_rail_direction: Vector3 = Vector3.FORWARD
 var smoothed_floor_normal: Vector3 = Vector3.UP
 var started_spin : bool = false
+var default_body_rotation: Vector3 = Vector3.ZERO
+var default_board_rotation: Vector3 = Vector3.ZERO
+var default_body_scale: Vector3 = Vector3.ONE
+var default_camera_basis: Basis = Basis.IDENTITY
+
+
+@export_group("Animation Settings")
+@export var fps: float = 6.0
+@export var idle_frames : Array[Mesh] = []
+@export var walk_frames : Array[Mesh] = []
+@export var trick_frames : Array[Mesh] = []
+
+enum AnimState { IDLE, WALK }
+var state: AnimState = AnimState.IDLE
+
+var _frame_index: int = 0
+var _time_accum: float = 0.0
+var trick_pose_active: bool = false
+var trick_pose_end_us: int = 0
+var trick_rng: RandomNumberGenerator = RandomNumberGenerator.new()
+
+
 
 
 
@@ -103,15 +140,87 @@ var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	initial_spawn_pos = global_position
+	default_body_rotation = body_mesh.rotation
+	default_board_rotation = board_node.rotation
+	default_camera_basis = camera.global_basis
+	default_body_scale = body_mesh.scale
+	slowmo_time_left = slowmo_max_time
+	slowmo_last_ticks = Time.get_ticks_usec()
+	trick_rng.randomize()
+	
+	_set_state(AnimState.IDLE)
+	
+	var default_mesh = preload("res://Assets/models/Dog_Default.res")
+	
+	if(idle_frames.size() == 0): 
+		idle_frames = [
+			default_mesh,
+			preload("res://Assets/models/Dog_Idle_1.res"),
+			default_mesh,
+			preload("res://Assets/models/Dog_Idle_2.res")
+		]
+		
+	if(walk_frames.size() == 0): 
+		walk_frames = [
+			preload("res://Assets/models/Dog_Walk_1.res"),
+			preload("res://Assets/models/Dog_Walk_2.res"),
+			preload("res://Assets/models/Dog_Walk_3.res")
+		]
+		
+	if(trick_frames.size() == 0):
+		trick_frames = [
+			preload("res://Assets/models/Dog_Trick_1.res"),
+			preload("res://Assets/models/Dog_Trick_2.res"),
+			preload("res://Assets/models/Dog_Trick_3.res"),
+			preload("res://Assets/models/Dog_Trick_4.res")
+		]
+		
 	# Initialize camera position relative to player
 	update_camera_position()
 	setup_outline()
+	
+	
+func _set_state(new_state: AnimState) -> void:
+	if new_state == state:
+		return
 
+	state = new_state
+	_frame_index = 0
+	_time_accum = 0.0
+
+	var frames := _get_active_frames()
+	_apply_frame(frames)	
+	
+func _get_active_frames() -> Array[Mesh]:
+	if state == AnimState.IDLE:
+		return idle_frames
+	if state == AnimState.WALK:
+		return walk_frames
+		
+	return idle_frames	
+	
+	
+	
+func _apply_frame(frames: Array[Mesh]) -> void:
+	
+	if is_ragdolling:
+		return
+		
+	if frames.is_empty():
+		return
+	_frame_index = clampi(_frame_index, 0, frames.size() - 1)
+	body_mesh.mesh = frames[_frame_index]
+	body_mesh.scale = default_body_scale
+	
 func setup_outline() -> void:
 	outline_material = ShaderMaterial.new()
 	outline_material.shader = load("res://Assets/Shaders/outline.gdshader")
 	outline_material.set_shader_parameter("outline_color", Color.GREEN)
 	outline_material.set_shader_parameter("outline_width", 4)
+	trick_outline_material = ShaderMaterial.new()
+	trick_outline_material.shader = outline_material.shader
+	trick_outline_material.set_shader_parameter("outline_color", Color.GOLD)
+	trick_outline_material.set_shader_parameter("outline_width", 4)
 	
 	# Add as a second pass to the board mesh's material
 	var material = board_mesh.get_active_material(0)
@@ -166,8 +275,40 @@ func update_camera_position() -> void:
 			spring_arm.spring_length = 0.0
 			# Reset to 1st person
 			camera.position = Vector3(0, 0, -camera_distance)	
+			
+func _process(delta: float) -> void:
+	if trick_pose_active:
+		if Time.get_ticks_usec() < trick_pose_end_us:
+			_update_slowmo_ui()
+			return
+		trick_pose_active = false
+		_time_accum = 0.0
+		_set_body_outline(false)
+
+	# 1) Decide which animation should be active based on input
+	var input_dir: Vector2 = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
+	var wants_walk := input_dir.length() > 0.1
+
+	_set_state(AnimState.WALK if wants_walk && !is_grinding else AnimState.IDLE)
+
+	# 2) Advance frame timer and update the mesh at ~12 FPS
+	var frames := _get_active_frames()
+	if frames.is_empty():
+		return
+
+	_time_accum += delta
+	var frame_time := 1.0 / maxf(fps, 0.001)
+
+	# Advance as many frames as needed (handles low FPS without slowing animation time)
+	while _time_accum >= frame_time:
+		_time_accum -= frame_time
+		_frame_index = (_frame_index + 1) % frames.size()
+
+	_apply_frame(frames)
+	_update_slowmo_ui()
 
 func _physics_process(delta: float) -> void:
+	_update_slowmo(delta)
 
 	if is_ragdolling:
 		apply_ragdoll_physics(delta)
@@ -213,12 +354,12 @@ func _physics_process(delta: float) -> void:
 	# But thats what game jamming is all about. Sloppy code to get it out the door.
 	if is_grinding:
 		apply_grind_movement(delta)
-		handle_trick_input() # Allow rotation while grinding
+		handle_trick_input(delta) # Allow rotation while grinding
 		update_outline_color()
 		return
 	else:
 		if not is_on_floor():
-			handle_trick_input()
+			handle_trick_input(delta)
 		
 		# Landing check
 		if is_on_floor() and not is_grinding:
@@ -349,16 +490,16 @@ func update_visual_alignment(delta: float) -> void:
 	# Smoothly interpolate the rotation
 	var lerp_speed: float = 15.0
 	visual.global_basis = curr_basis.slerp(target_basis, lerp_speed * delta).orthonormalized()
-	if !is_third_person:
-		var camera_basis: Basis = camera.global_basis
-		# Create a basis specifically for the camera where Forward is -target_fwd
-		# This aligns the camera's -Z with the player's intended forward direction
-		var cam_target: Basis = Basis()
-		cam_target.y = target_up
-		cam_target.x = cam_target.y.cross(-target_fwd).normalized()
-		cam_target.z = cam_target.x.cross(cam_target.y).normalized()
-
-		camera.global_basis = camera_basis.slerp(cam_target, lerp_speed * delta).orthonormalized()
+#	if !is_third_person:
+#		var camera_basis: Basis = camera.global_basis
+#		# Create a basis specifically for the camera where Forward is -target_fwd
+#		# This aligns the camera's -Z with the player's intended forward direction
+#		var cam_target: Basis = Basis()
+#		cam_target.y = target_up
+#		cam_target.x = cam_target.y.cross(-target_fwd).normalized()
+#		cam_target.z = cam_target.x.cross(cam_target.y).normalized()
+#
+#		camera.global_basis = camera_basis.slerp(cam_target, lerp_speed * delta).orthonormalized()
 
 	var input_x: float = Input.get_action_strength("move_right") - Input.get_action_strength("move_left")
 	
@@ -372,13 +513,13 @@ func update_visual_alignment(delta: float) -> void:
 
 	# Apply lean to the board (subtle)
 	current_board_lean = lerp_angle(current_board_lean, target_lean_board, lean_speed * delta)
-	board_mesh.rotation.z = current_board_lean + current_flip
+	board_node.rotation.z = current_board_lean + current_flip
 	
-	var target_height: float = slide_height if is_sliding else stand_height
-	var target_y_pos: float = slide_offset if is_sliding else stand_offset # Adjust to keep feet on board
+	#var target_height: float = slide_height if is_sliding else stand_height
+	#var target_y_pos: float = slide_offset if is_sliding else stand_offset # Adjust to keep feet on board
 
-	body_mesh.scale.y = lerp(body_mesh.scale.y, target_height, 10.0 * delta)
-	body_mesh.position.y = lerp(body_mesh.position.y, target_y_pos, 10.0 * delta)	
+	#body_mesh.scale.y = lerp(body_mesh.scale.y, target_height, 10.0 * delta)
+	#body_mesh.position.y = lerp(body_mesh.position.y, target_y_pos, 10.0 * delta)	
 	
 func handle_dynamic_snapping() -> void:
 	var current_speed: float = velocity.length()
@@ -431,7 +572,7 @@ func apply_slope_gravity(delta: float) -> void:
 			velocity += base_slide
 
 
-func handle_trick_input() -> void:
+func handle_trick_input(delta: float) -> void:
 	var spin_input: float = 0.0
 	if Input.is_action_just_pressed("spin_left"):
 		spin_input += 1.0
@@ -442,7 +583,7 @@ func handle_trick_input() -> void:
 		started_spin = true
 		var rotation_step: float = deg_to_rad(spin_increment_deg) * spin_input
 		current_spin += rotation_step
-		board_mesh.rotate_y(rotation_step)
+		board_node.rotate_y(rotation_step)
 
 		# Speed Boost Logic
 		if abs(current_spin) >= last_spin_threshold + PI:
@@ -460,9 +601,19 @@ func handle_trick_input() -> void:
 			# we reset it so they can't "double dip" by oscillating.
 			last_spin_threshold = floor(abs(current_spin) / PI) * PI
 			
-	if Input.is_action_pressed("kickflip"):
+	if Input.is_action_just_pressed("kickflip"):
 		started_spin = true
-		current_flip += deg_to_rad(flip_speed) * get_physics_process_delta_time()
+		current_flip += deg_to_rad(spin_increment_deg) 
+	
+	if abs(current_flip) >= last_flip_threshold + TAU:
+		apply_spin_boost()
+		last_flip_threshold += TAU
+		
+		var wrap_sign = sign(current_flip)
+		current_flip -= TAU * wrap_sign
+		last_flip_threshold -= TAU
+	elif abs(current_flip) < last_flip_threshold:
+		last_flip_threshold = floor(abs(current_flip) / TAU) * TAU
 			
 func apply_spin_boost() -> void:
 	if is_grinding:
@@ -476,6 +627,33 @@ func apply_spin_boost() -> void:
 		if boost_dir == Vector3.ZERO:
 			boost_dir = -transform.basis.z
 		velocity += boost_dir * spin_boost_amount
+	start_trick_pose()
+
+func start_trick_pose() -> void:
+	if is_ragdolling or trick_frames.is_empty():
+		return
+	trick_pose_active = true
+	trick_pose_end_us = Time.get_ticks_usec() + 500_000
+	var frame_index := trick_rng.randi_range(0, trick_frames.size() - 1)
+	body_mesh.mesh = trick_frames[frame_index]
+	body_mesh.scale = default_body_scale
+	_set_body_outline(true)
+
+func _set_body_outline(active: bool) -> void:
+	if not trick_outline_material:
+		return
+	var mesh := body_mesh.mesh
+	var surface_count := mesh.get_surface_count() if mesh else 1
+	for surface_idx in range(surface_count):
+		var material = body_mesh.get_surface_override_material(surface_idx)
+		if not material:
+			material = body_mesh.get_active_material(surface_idx)
+			material = material.duplicate() if material else StandardMaterial3D.new()
+			body_mesh.set_surface_override_material(surface_idx, material)
+		if active:
+			material.next_pass = trick_outline_material
+		else:
+			material.next_pass = null
 	
 func check_landing_alignment() -> bool:
 	# Check if rotation is a multiple of 180 degrees (PI radians)
@@ -497,7 +675,7 @@ func check_landing_alignment() -> bool:
 		# Landed successfully: Snap board to nearest 180 and reset counter
 		current_spin = 0.0
 		current_flip = 0.0
-		board_mesh.rotation.y = 0 # Or snap to PI if facing backward
+		board_node.rotation.y = default_board_rotation.y # Or snap to PI if facing backward
 		return true
 		
 func is_falling_on_rail() -> bool:
@@ -532,14 +710,14 @@ func start_ragdoll() -> void:
 	
 	# Reparent to the world so it doesn't move with the player
 	var world: Node = get_parent()
-	var current_board_pos: Vector3 = board_mesh.global_position
-	var current_board_rot: Vector3 = board_mesh.global_rotation
+	var current_board_pos: Vector3 = board_node.global_position
+	var current_board_rot: Vector3 = board_node.global_rotation
 	
-	board_mesh.get_parent().remove_child(board_mesh)
-	world.add_child(board_mesh)
+	board_node.get_parent().remove_child(board_node)
+	world.add_child(board_node)
 	
-	board_mesh.global_position = current_board_pos
-	board_mesh.global_rotation = current_board_rot	
+	board_node.global_position = current_board_pos
+	board_node.global_rotation = current_board_rot	
 	
 	# 3. Apply the fling
 	velocity.y = (horizontal_speed * 0.2) + 2.0
@@ -551,8 +729,8 @@ func apply_ragdoll_physics(delta: float) -> void:
 	velocity.y -= gravity * delta
 	
 	board_velocity.y -= gravity * delta
-	board_mesh.global_position += board_velocity * delta
-	board_mesh.rotate_x(10.0 * delta) # Just make it spin wildly	
+	board_node.global_position += board_velocity * delta
+	board_node.rotate_x(10.0 * delta) # Just make it spin wildly	
 	
 	# 1. Apply rotational momentum while in the air
 	if not is_on_floor():
@@ -582,14 +760,14 @@ func reset_player() -> void:
 	is_ragdolling = false
 	current_spin = 0.0
 	current_flip = 0.0
-	if board_mesh.get_parent() != visual:
-		board_mesh.get_parent().remove_child(board_mesh)
-		visual.add_child(board_mesh)
+	if board_node.get_parent() != visual:
+		board_node.get_parent().remove_child(board_node)
+		visual.add_child(board_node)
 		
-	board_mesh.position = Vector3.ZERO # Reset to original local position
-	board_mesh.rotation = Vector3.ZERO
+	board_node.position = Vector3.ZERO # Reset to original local position
+	board_node.rotation = default_board_rotation
 	
-	body_mesh.rotation = Vector3.ZERO
+	body_mesh.rotation = default_body_rotation
 	body_collision.rotation = Vector3.ZERO
 	velocity = Vector3.ZERO
 	global_position = initial_spawn_pos # Or nearest checkpoint
@@ -712,7 +890,7 @@ func check_for_rails() -> void:
 	# The rail object should have a StaticBody3D child (or be one) that we hit.
 	
 	var space_state: PhysicsDirectSpaceState3D = get_world_3d().direct_space_state
-	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(board_mesh.global_position, board_mesh.global_position + Vector3.DOWN * grind_snap_distance)
+	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(board_node.global_position, board_node.global_position + Vector3.DOWN * grind_snap_distance)
 	var result: Dictionary = space_state.intersect_ray(query)
 	
 	if result:
@@ -820,3 +998,59 @@ func jump_exit_rail() -> void:
 		
 		is_grinding = false
 		current_rail = null
+
+func _update_slowmo(delta: float) -> void:
+	var now_ticks = Time.get_ticks_usec()
+	var real_delta = float(now_ticks - slowmo_last_ticks) / 1000000.0
+	slowmo_last_ticks = now_ticks
+	if real_delta < 0.0 or real_delta > 0.5:
+		real_delta = delta
+
+	if Input.is_action_just_pressed("slow_mo"):
+		if slowmo_active:
+			slowmo_active = false
+		elif slowmo_time_left > 0.0:
+			slowmo_active = true
+
+	if slowmo_active:
+		slowmo_time_left = max(slowmo_time_left - real_delta, 0.0)
+		if slowmo_time_left <= 0.0:
+			slowmo_active = false
+	else:
+		slowmo_time_left = min(slowmo_time_left + (slowmo_recharge_rate * real_delta), slowmo_max_time)
+
+	var target_scale = slowmo_time_scale if slowmo_active else 1.0
+	if Engine.time_scale != target_scale:
+		Engine.time_scale = target_scale
+
+func _update_slowmo_ui() -> void:
+	if not slowmo_container:
+		return
+	var max_time = max(slowmo_max_time, 0.001)
+	var ratio = clamp(slowmo_time_left / max_time, 0.0, 1.0)
+	var total_width = slowmo_container.size.x
+	var bar_width = (total_width * 0.5) * ratio
+	var bar_height = slowmo_container.size.y
+
+	if slowmo_base:
+		slowmo_base.size = slowmo_container.size
+
+	if slowmo_left:
+		slowmo_left.size = Vector2(bar_width, bar_height)
+		slowmo_left.position = Vector2.ZERO
+
+	if slowmo_right:
+		slowmo_right.size = Vector2(bar_width, bar_height)
+		slowmo_right.position = Vector2(total_width - bar_width, 0.0)
+
+	var empty_color = Color(0.4, 0.4, 0.4, 0.35)
+	var ready_color = Color(0.9, 0.95, 1.0, 0.85)
+	var bar_color = empty_color.lerp(ready_color, ratio)
+	if slowmo_left:
+		slowmo_left.color = bar_color
+	if slowmo_right:
+		slowmo_right.color = bar_color
+
+func _exit_tree() -> void:
+	if Engine.time_scale != 1.0:
+		Engine.time_scale = 1.0
