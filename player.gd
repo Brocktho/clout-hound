@@ -49,12 +49,17 @@ extends CharacterBody3D
 @export var slowmo_time_scale: float = 0.1
 @export var slowmo_max_time: float = 1.5
 @export var slowmo_recharge_rate: float = 0.75
+@export var slowmo_ui_fade_speed: float = 6.0
+@export var slowmo_ui_inset_ratio: float = 0.03
+@export var slowmo_fov_zoom: float = 10.0
+@export var slowmo_wave_fade_speed: float = 6.0
 
 @export_group("Debug Items")
 @export var stand_height: float = 1.0;
 @export var slide_height: float = 0.5;
 @export var stand_offset: float = 1.0;
 @export var slide_offset: float = 0.5;
+@export var grind_visual_offset: float = 0.0
 
 var is_third_person: bool = true
 var is_sliding: bool = false
@@ -82,6 +87,8 @@ var was_on_floor: bool = false
 var slowmo_time_left: float = 0.0
 var slowmo_active: bool = false
 var slowmo_last_ticks: int = 0
+var slowmo_last_ratio: float = 1.0
+var slowmo_wave_alpha: float = 0.0
 
 
 @onready var camera: Camera3D = $SpringArm3D/Camera3D
@@ -93,10 +100,13 @@ var slowmo_last_ticks: int = 0
 @onready var body_collision: CollisionShape3D = $BodyCollision
 @onready var grind_sparks: GPUParticles3D = $GrindSparks
 @onready var speed_lines: ColorRect = $SpeedLines
+@onready var slowmo_waves: ColorRect = $SlowMoWaves
 @onready var slowmo_container: Control = $HUD/SlowMoContainer
 @onready var slowmo_left: ColorRect = $HUD/SlowMoContainer/SlowMoLeft
 @onready var slowmo_right: ColorRect = $HUD/SlowMoContainer/SlowMoRight
 @onready var slowmo_base: ColorRect = $HUD/SlowMoContainer/SlowMoBase
+@onready var slowmo_left_sparks: GPUParticles2D = $HUD/SlowMoContainer/SlowMoLeftSparks
+@onready var slowmo_right_sparks: GPUParticles2D = $HUD/SlowMoContainer/SlowMoRightSparks
 
 var outline_material: ShaderMaterial
 var trick_outline_material: ShaderMaterial
@@ -113,6 +123,7 @@ var default_body_rotation: Vector3 = Vector3.ZERO
 var default_board_rotation: Vector3 = Vector3.ZERO
 var default_body_scale: Vector3 = Vector3.ONE
 var default_camera_basis: Basis = Basis.IDENTITY
+var default_visual_pos: Vector3 = Vector3.ZERO
 
 
 @export_group("Animation Settings")
@@ -144,6 +155,7 @@ func _ready() -> void:
 	default_board_rotation = board_node.rotation
 	default_camera_basis = camera.global_basis
 	default_body_scale = body_mesh.scale
+	default_visual_pos = visual.position
 	slowmo_time_left = slowmo_max_time
 	slowmo_last_ticks = Time.get_ticks_usec()
 	trick_rng.randomize()
@@ -279,7 +291,7 @@ func update_camera_position() -> void:
 func _process(delta: float) -> void:
 	if trick_pose_active:
 		if Time.get_ticks_usec() < trick_pose_end_us:
-			_update_slowmo_ui()
+			_update_slowmo_ui(delta)
 			return
 		trick_pose_active = false
 		_time_accum = 0.0
@@ -305,7 +317,7 @@ func _process(delta: float) -> void:
 		_frame_index = (_frame_index + 1) % frames.size()
 
 	_apply_frame(frames)
-	_update_slowmo_ui()
+	_update_slowmo_ui(delta)
 
 func _physics_process(delta: float) -> void:
 	_update_slowmo(delta)
@@ -431,18 +443,29 @@ func update_speed_effects(delta: float) -> void:
 	
 	# FOV Zoom
 	var target_fov = base_fov + (max_fov_boost * speed_ratio)
+	if slowmo_active:
+		target_fov -= slowmo_fov_zoom
 	camera.fov = lerp(camera.fov, target_fov, 5.0 * delta)
 	
 	# Speed Lines
 	if speed_lines:
-		var speed_threshold = max_speed * 1.5
-		if current_speed > speed_threshold:
-			speed_lines.visible = true
-			var wind_ratio = clamp((current_speed - speed_threshold) / (speed_for_max_fov - speed_threshold), 0.0, 1.0)
-			# We can animate the line density or alpha via shader parameters
-			speed_lines.material.set_shader_parameter("line_color", Color(1.0, 1.0, 1.0, wind_ratio * 0.3))
-		else:
+		if slowmo_active:
 			speed_lines.visible = false
+		else:
+			var speed_threshold = max_speed * 1.5
+			if current_speed > speed_threshold:
+				speed_lines.visible = true
+				var wind_ratio = clamp((current_speed - speed_threshold) / (speed_for_max_fov - speed_threshold), 0.0, 1.0)
+				# We can animate the line density or alpha via shader parameters
+				speed_lines.material.set_shader_parameter("line_color", Color(1.0, 1.0, 1.0, wind_ratio * 0.3))
+			else:
+				speed_lines.visible = false
+
+	if slowmo_waves:
+		var target_alpha := 1.0 if slowmo_active else 0.0
+		slowmo_wave_alpha = move_toward(slowmo_wave_alpha, target_alpha, slowmo_wave_fade_speed * delta)
+		slowmo_waves.visible = slowmo_wave_alpha > 0.001
+		slowmo_waves.modulate = Color(1.0, 1.0, 1.0, slowmo_wave_alpha)
 
 func update_visual_alignment(delta: float) -> void:
 	var target_up: Vector3 = Vector3.UP
@@ -490,6 +513,14 @@ func update_visual_alignment(delta: float) -> void:
 	# Smoothly interpolate the rotation
 	var lerp_speed: float = 15.0
 	visual.global_basis = curr_basis.slerp(target_basis, lerp_speed * delta).orthonormalized()
+
+	var target_visual_global_pos: Vector3 = global_position + (global_basis * default_visual_pos)
+	if is_grinding and current_rail:
+		var rail_radius: float = 0.0
+		if current_rail.has_method("get_rail_radius"):
+			rail_radius = current_rail.get_rail_radius()
+		target_visual_global_pos = global_position + (target_up * (rail_radius + grind_visual_offset))
+	visual.global_position = target_visual_global_pos
 #	if !is_third_person:
 #		var camera_basis: Basis = camera.global_basis
 #		# Create a basis specifically for the camera where Forward is -target_fwd
@@ -1023,13 +1054,22 @@ func _update_slowmo(delta: float) -> void:
 	if Engine.time_scale != target_scale:
 		Engine.time_scale = target_scale
 
-func _update_slowmo_ui() -> void:
+func _update_slowmo_ui(delta: float) -> void:
 	if not slowmo_container:
 		return
+	var viewport_size = get_viewport().get_visible_rect().size
+	var inset = round(viewport_size.x * clamp(slowmo_ui_inset_ratio, 0.0, 0.2))
+	slowmo_container.offset_left = inset
+	slowmo_container.offset_right = -inset
 	var max_time = max(slowmo_max_time, 0.001)
-	var ratio = clamp(slowmo_time_left / max_time, 0.0, 1.0)
+	var ratio : float = clamp(slowmo_time_left / max_time, 0.0, 1.0)
+	var is_draining := ratio < (slowmo_last_ratio - 0.0005)
+	slowmo_last_ratio = ratio
 	var total_width = slowmo_container.size.x
 	var bar_width = (total_width * 0.5) * ratio
+	var has_bar := ratio > 0.0005
+	if not has_bar:
+		bar_width = 0.0
 	var bar_height = slowmo_container.size.y
 
 	if slowmo_base:
@@ -1037,11 +1077,13 @@ func _update_slowmo_ui() -> void:
 
 	if slowmo_left:
 		slowmo_left.size = Vector2(bar_width, bar_height)
-		slowmo_left.position = Vector2.ZERO
+		slowmo_left.position = Vector2((total_width * 0.5) - bar_width, 0.0)
+		slowmo_left.visible = has_bar
 
 	if slowmo_right:
 		slowmo_right.size = Vector2(bar_width, bar_height)
-		slowmo_right.position = Vector2(total_width - bar_width, 0.0)
+		slowmo_right.position = Vector2(total_width * 0.5, 0.0)
+		slowmo_right.visible = has_bar
 
 	var empty_color = Color(0.4, 0.4, 0.4, 0.35)
 	var ready_color = Color(0.9, 0.95, 1.0, 0.85)
@@ -1050,6 +1092,26 @@ func _update_slowmo_ui() -> void:
 		slowmo_left.color = bar_color
 	if slowmo_right:
 		slowmo_right.color = bar_color
+
+	var is_recharging := slowmo_time_left < (slowmo_max_time - 0.001)
+	var show_ui := slowmo_active or is_recharging
+	var target_alpha := 1.0 if show_ui else 0.0
+	var current_alpha := slowmo_container.modulate.a
+	var new_alpha := move_toward(current_alpha, target_alpha, slowmo_ui_fade_speed * delta)
+	slowmo_container.modulate = Color(1.0, 1.0, 1.0, new_alpha)
+
+	var center_x = total_width * 0.5
+	var spark_speed_scale = 1.0
+	if Engine.time_scale > 0.01:
+		spark_speed_scale = 1.0 / Engine.time_scale
+	if slowmo_left_sparks:
+		slowmo_left_sparks.position = Vector2(center_x - bar_width, bar_height * 0.5)
+		slowmo_left_sparks.speed_scale = spark_speed_scale
+		slowmo_left_sparks.emitting = slowmo_active and is_draining and ratio > 0.02
+	if slowmo_right_sparks:
+		slowmo_right_sparks.position = Vector2(center_x + bar_width, bar_height * 0.5)
+		slowmo_right_sparks.speed_scale = spark_speed_scale
+		slowmo_right_sparks.emitting = slowmo_active and is_draining and ratio > 0.02
 
 func _exit_tree() -> void:
 	if Engine.time_scale != 1.0:

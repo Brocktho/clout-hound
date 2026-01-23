@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://dtlxuyo830w2f"]
+[gd_scene load_steps=14 format=3 uid="uid://dtlxuyo830w2f"]
 
 [ext_resource type="Script" uid="uid://b34qrfkbx43q5" path="res://player.gd" id="1_4flbx"]
 [ext_resource type="ArrayMesh" uid="uid://djvoga0acqib2" path="res://Assets/models/Board.res" id="2_i3pqv"]
@@ -66,6 +66,153 @@ shader_parameter/mask_edge = 0.5
 shader_parameter/animation_speed = 20.0
 shader_parameter/line_color = Color(1, 1, 1, 0.3)
 
+[sub_resource type="Shader" id="Shader_slowmo_waves"]
+code = "shader_type canvas_item;
+render_mode unshaded;
+
+uniform sampler2D screen_texture : hint_screen_texture;
+uniform float intensity : hint_range(0.0, 0.05) = 0.012;
+uniform float edge_width : hint_range(0.0, 0.5) = 0.22;
+uniform float wave_scale : hint_range(0.0, 40.0) = 16.0;
+uniform float wave_speed : hint_range(0.0, 10.0) = 1.6;
+
+float edge_mask(vec2 uv) {
+    vec2 centered = uv - vec2(0.5);
+    vec2 abs_center = abs(centered);
+    float edge_x = smoothstep(0.5 - edge_width, 0.5, abs_center.x);
+    float edge_y = smoothstep(0.5 - edge_width, 0.5, abs_center.y);
+    return clamp(max(edge_x, edge_y), 0.0, 1.0);
+}
+
+void fragment() {
+    vec2 uv = SCREEN_UV;
+    float edge = edge_mask(uv);
+    vec2 centered = uv - vec2(0.5);
+    float wave = sin((centered.x + centered.y) * wave_scale + TIME * wave_speed);
+    vec2 offset = centered * (wave * intensity) * edge;
+    vec4 base_color = texture(screen_texture, uv);
+    vec4 wave_color = texture(screen_texture, uv + offset);
+    COLOR = mix(base_color, wave_color, edge);
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_slowmo_waves"]
+shader = SubResource("Shader_slowmo_waves")
+shader_parameter/intensity = 0.012
+shader_parameter/edge_width = 0.22
+shader_parameter/wave_scale = 16.0
+shader_parameter/wave_speed = 1.6
+
+[sub_resource type="Shader" id="Shader_slowmo_bar"]
+code = "shader_type canvas_item;
+
+uniform float taper : hint_range(0.0, 0.5) = 0.35;
+uniform float outer_roundness : hint_range(0.0, 0.5) = 0.5;
+uniform float inner_roundness : hint_range(0.0, 0.5) = 0.0;
+uniform float edge_softness : hint_range(0.0, 0.05) = 0.01;
+uniform int taper_side = 2;
+
+void fragment() {
+	vec2 uv = UV;
+	vec2 p = uv - vec2(0.5);
+	float half_width = 0.5;
+	float half_height = 0.5;
+
+	float x = 0.0;
+	if (taper_side == 0) {
+		x = 1.0 - uv.x;
+	} else if (taper_side == 1) {
+		x = uv.x;
+	} else if (taper_side == 2) {
+		x = abs(p.x) / half_width;
+	}
+	float height_scale = mix(1.0, 1.0 - taper, smoothstep(0.3, 1.0, x));
+	float hh = half_height * height_scale;
+	float r_tl = inner_roundness;
+	float r_bl = inner_roundness;
+	float r_tr = inner_roundness;
+	float r_br = inner_roundness;
+	if (taper_side == 0) {
+		r_tl = outer_roundness;
+		r_bl = outer_roundness;
+	} else if (taper_side == 1) {
+		r_tr = outer_roundness;
+		r_br = outer_roundness;
+	} else if (taper_side == 2) {
+		r_tl = outer_roundness;
+		r_bl = outer_roundness;
+		r_tr = outer_roundness;
+		r_br = outer_roundness;
+	}
+
+	vec4 r = vec4(r_tl, r_bl, r_tr, r_br);
+	if (p.x > 0.0) {
+		r.xy = r.zw;
+	}
+	float rr = (p.y > 0.0) ? r.x : r.y;
+	rr = min(rr, min(half_width, hh));
+
+	vec2 q = abs(p) - vec2(half_width, hh) + vec2(rr);
+	float dist = length(max(q, vec2(0.0))) + min(max(q.x, q.y), 0.0) - rr;
+	float aa = fwidth(dist) + edge_softness;
+	float alpha = 1.0 - smoothstep(0.0, aa, dist);
+
+	vec4 base = COLOR;
+	COLOR = vec4(base.rgb, base.a * alpha);
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_slowmo_bar_left"]
+shader = SubResource("Shader_slowmo_bar")
+shader_parameter/taper = 0.35
+shader_parameter/outer_roundness = 0.5
+shader_parameter/inner_roundness = 0.0
+shader_parameter/edge_softness = 0.01
+shader_parameter/taper_side = 0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_slowmo_bar_right"]
+shader = SubResource("Shader_slowmo_bar")
+shader_parameter/taper = 0.35
+shader_parameter/outer_roundness = 0.5
+shader_parameter/inner_roundness = 0.0
+shader_parameter/edge_softness = 0.01
+shader_parameter/taper_side = 1
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_slowmo_bar_base"]
+shader = SubResource("Shader_slowmo_bar")
+shader_parameter/taper = 0.35
+shader_parameter/outer_roundness = 0.5
+shader_parameter/inner_roundness = 0.5
+shader_parameter/edge_softness = 0.01
+shader_parameter/taper_side = 2
+
+[sub_resource type="Gradient" id="Gradient_slowmo_sparks"]
+offsets = PackedFloat32Array(0, 0.7, 1)
+colors = PackedColorArray(1, 0.972549, 0.8, 1, 1, 0.764706, 0.2, 0.8, 1, 0.27451, 0, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_slowmo_sparks"]
+gradient = SubResource("Gradient_slowmo_sparks")
+width = 8
+height = 8
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_slowmo_sparks_left"]
+direction = Vector3(-1, 0, 0)
+spread = 35.0
+initial_velocity_min = 50.0
+initial_velocity_max = 100.0
+gravity = Vector3(0, 80, 0)
+scale_min = 0.4
+scale_max = 1.0
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_slowmo_sparks_right"]
+direction = Vector3(1, 0, 0)
+spread = 35.0
+initial_velocity_min = 50.0
+initial_velocity_max = 100.0
+gravity = Vector3(0, 80, 0)
+scale_min = 0.4
+scale_max = 1.0
+
 [sub_resource type="Curve" id="Curve_f4bln"]
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
 point_count = 2
@@ -118,41 +265,67 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
+[node name="SlowMoWaves" type="ColorRect" parent="."]
+visible = false
+material = SubResource("ShaderMaterial_slowmo_waves")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
 [node name="HUD" type="CanvasLayer" parent="."]
 
 [node name="SlowMoContainer" type="Control" parent="HUD"]
 layout_mode = 3
-anchors_preset = 7
-anchor_left = 0.5
+anchor_left = 0.0
 anchor_top = 1.0
-anchor_right = 0.5
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -160.0
-offset_top = -40.0
-offset_right = 160.0
-offset_bottom = -32.0
+offset_left = 0.0
+offset_top = -24.0
+offset_right = 0.0
+offset_bottom = -12.0
 mouse_filter = 2
 
 [node name="SlowMoBase" type="ColorRect" parent="HUD/SlowMoContainer"]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
+material = SubResource("ShaderMaterial_slowmo_bar_base")
 mouse_filter = 2
 color = Color(0.2, 0.2, 0.2, 0.4)
 
 [node name="SlowMoLeft" type="ColorRect" parent="HUD/SlowMoContainer"]
 layout_mode = 0
 anchor_bottom = 1.0
+material = SubResource("ShaderMaterial_slowmo_bar_left")
 mouse_filter = 2
 color = Color(0.9, 0.95, 1, 0.85)
 
 [node name="SlowMoRight" type="ColorRect" parent="HUD/SlowMoContainer"]
 layout_mode = 0
-anchor_left = 1.0
-anchor_right = 1.0
 anchor_bottom = 1.0
+material = SubResource("ShaderMaterial_slowmo_bar_right")
 mouse_filter = 2
 color = Color(0.9, 0.95, 1, 0.85)
+
+[node name="SlowMoLeftSparks" type="GPUParticles2D" parent="HUD/SlowMoContainer"]
+emitting = false
+amount = 24
+lifetime = 0.35
+process_material = SubResource("ParticleProcessMaterial_slowmo_sparks_left")
+texture = SubResource("GradientTexture2D_slowmo_sparks")
+z_index = 2
+
+[node name="SlowMoRightSparks" type="GPUParticles2D" parent="HUD/SlowMoContainer"]
+emitting = false
+amount = 24
+lifetime = 0.35
+process_material = SubResource("ParticleProcessMaterial_slowmo_sparks_right")
+texture = SubResource("GradientTexture2D_slowmo_sparks")
+z_index = 2
 
 [node name="GrindSparks" type="GPUParticles3D" parent="."]
 emitting = false
