@@ -2,20 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b5d6v6cmmmutm"
-path.s3tc="res://.godot/imported/Pug_Player_Hoodie.png-0a5f35b768789b24327bc1764844a33d.s3tc.ctex"
+uid="uid://tey6bodarqsr"
+path.s3tc="res://.godot/imported/window_wall_BrickWindowWall_Baked.png-4df61e7fea2099975112e9d45d99f15e.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "279635eee4a0d343d2e827678126adad"
+"md5": "c33da26cc63e7c370700ef78d2cf7905"
 }
 
 [deps]
 
-source_file="res://assets/Pug_Player_Hoodie.png"
-dest_files=["res://.godot/imported/Pug_Player_Hoodie.png-0a5f35b768789b24327bc1764844a33d.s3tc.ctex"]
+source_file="res://Assets/materials/window_wall_BrickWindowWall_Baked.png"
+dest_files=["res://.godot/imported/window_wall_BrickWindowWall_Baked.png-4df61e7fea2099975112e9d45d99f15e.s3tc.ctex"]
 
 [params]
 

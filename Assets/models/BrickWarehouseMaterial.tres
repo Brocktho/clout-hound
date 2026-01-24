@@ -1,9 +1,9 @@
-[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://c7nsq4wc02y2w"]
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://c3otfx5aotnf1"]
 
-[ext_resource type="Texture2D" uid="uid://xxt64jfh5k0j" path="res://assets/models/windowless_wall_BrickTexture_Baked.png" id="1_wsroy"]
+[ext_resource type="Texture2D" uid="uid://bq1dakdqh3n4d" path="res://Assets/models/windowless_wall_BrickTexture_Baked.png" id="1_fjd8i"]
 
 [resource]
 resource_name = "BrickWarehouseMaterial"
 cull_mode = 2
-albedo_texture = ExtResource("1_wsroy")
+albedo_texture = ExtResource("1_fjd8i")
 roughness = 0.9

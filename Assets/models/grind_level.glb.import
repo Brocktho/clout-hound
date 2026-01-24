@@ -4,16 +4,16 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cchtm2fdlu5f1"
-path="res://.godot/imported/grind_level.glb-0b875bbb380f494b9bdb72bc5e0fa256.scn"
+path="res://.godot/imported/grind_level.glb-9a9dc28d79531b26a4485cea9ededfc7.scn"
 
 [deps]
 
-source_file="res://assets/models/grind_level.glb"
-dest_files=["res://.godot/imported/grind_level.glb-0b875bbb380f494b9bdb72bc5e0fa256.scn"]
+source_file="res://Assets/models/grind_level.glb"
+dest_files=["res://.godot/imported/grind_level.glb-9a9dc28d79531b26a4485cea9ededfc7.scn"]
 
 [params]
 
-nodes/root_type=""
+nodes/root_type="Node3D"
 nodes/root_name=""
 nodes/root_script=null
 nodes/apply_root_scale=true

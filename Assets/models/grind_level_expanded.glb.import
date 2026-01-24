@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://caysowy0c2h07"
-path="res://.godot/imported/grind_level_expanded.glb-a7da2bf580965822396ed712663e28b4.scn"
+path="res://.godot/imported/grind_level_expanded.glb-82850ea0c6110e4a5eb279d694da7e39.scn"
 
 [deps]
 
-source_file="res://assets/models/grind_level_expanded.glb"
-dest_files=["res://.godot/imported/grind_level_expanded.glb-a7da2bf580965822396ed712663e28b4.scn"]
+source_file="res://Assets/models/grind_level_expanded.glb"
+dest_files=["res://.godot/imported/grind_level_expanded.glb-82850ea0c6110e4a5eb279d694da7e39.scn"]
 
 [params]
 

@@ -2,20 +2,17 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://tey6bodarqsr"
-path.s3tc="res://.godot/imported/window_wall_BrickWindowWall_Baked.png-acf9cca6f6eb33fd7ab21402aea346c5.s3tc.ctex"
+uid="uid://uvpqsqrjcxfb"
+path.s3tc="res://.godot/imported/UnderBoardBake.png-084dcb6d8241f9c9d179305d868cace7.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
-generator_parameters={
-"md5": "c33da26cc63e7c370700ef78d2cf7905"
-}
 
 [deps]
 
-source_file="res://assets/models/window_wall_BrickWindowWall_Baked.png"
-dest_files=["res://.godot/imported/window_wall_BrickWindowWall_Baked.png-acf9cca6f6eb33fd7ab21402aea346c5.s3tc.ctex"]
+source_file="res://Assets/materials/UnderBoardBake.png"
+dest_files=["res://.godot/imported/UnderBoardBake.png-084dcb6d8241f9c9d179305d868cace7.s3tc.ctex"]
 
 [params]
 

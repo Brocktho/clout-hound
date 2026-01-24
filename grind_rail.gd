@@ -150,4 +150,7 @@ func get_direction_at_offset(offset: float) -> Vector3:
 	var p1 = curve.sample_baked(offset)
 	var p2 = curve.sample_baked(offset + 0.1)
 	return to_global(p2) - to_global(p1)
+
+func get_rail_radius() -> float:
+	return rail_radius
 	

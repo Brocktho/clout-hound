@@ -1,7 +1,7 @@
-[gd_scene load_steps=207 format=3 uid="uid://qn4iep4fqp4p"]
+[gd_scene load_steps=207 format=3 uid="uid://rqleqrt6jpjb"]
 
-[ext_resource type="PackedScene" uid="uid://caysowy0c2h07" path="res://assets/models/grind_level_expanded.glb" id="1_njp4v"]
-[ext_resource type="PackedScene" path="res://player.tscn" id="2_8fo3n"]
+[ext_resource type="PackedScene" uid="uid://caysowy0c2h07" path="res://Assets/models/grind_level_expanded.glb" id="1_njp4v"]
+[ext_resource type="PackedScene" uid="uid://dtlxuyo830w2f" path="res://player.tscn" id="2_8fo3n"]
 
 [sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_njp4v"]
 data = PackedVector3Array(-0.077, -2.7415, 0.077, -0.077, 2.7415, -0.077, -0.077, 2.7415, 0.077, -0.077, -2.7415, 0.077, -0.077, -2.7415, -0.077, -0.077, 2.7415, -0.077, -0.077, -2.7415, -0.077, 0.077, 2.7415, -0.077, -0.077, 2.7415, -0.077, -0.077, -2.7415, -0.077, 0.077, -2.7415, -0.077, 0.077, 2.7415, -0.077, 0.077, -2.7415, -0.077, 0.077, 2.7415, 0.077, 0.077, 2.7415, -0.077, 0.077, -2.7415, -0.077, 0.077, -2.7415, 0.077, 0.077, 2.7415, 0.077, 0.077, -2.7415, 0.077, -0.077, 2.7415, 0.077, 0.077, 2.7415, 0.077, 0.077, -2.7415, 0.077, -0.077, -2.7415, 0.077, -0.077, 2.7415, 0.077, -0.077, -2.7415, -0.077, 0.077, -2.7415, 0.077, 0.077, -2.7415, -0.077, -0.077, -2.7415, -0.077, -0.077, -2.7415, 0.077, 0.077, -2.7415, 0.077, 0.077, 2.7415, -0.077, -0.077, 2.7415, 0.077, -0.077, 2.7415, -0.077, 0.077, 2.7415, -0.077, 0.077, 2.7415, 0.077, -0.077, 2.7415, 0.077)

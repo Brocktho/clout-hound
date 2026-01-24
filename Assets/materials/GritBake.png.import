@@ -2,20 +2,17 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://jwvq4enql43s"
-path.s3tc="res://.godot/imported/window_wall_BrickTexture_Baked_Window.png-7ab33502321f7106af387e3aa3ca6985.s3tc.ctex"
+uid="uid://b3ags2gq8y0fk"
+path.s3tc="res://.godot/imported/GritBake.png-c9291bfa1629c6df747c4dd567bb1ff7.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
-generator_parameters={
-"md5": "c5c15ca5446b669b9555dca1572ffab7"
-}
 
 [deps]
 
-source_file="res://Assets/models/window_wall_BrickTexture_Baked_Window.png"
-dest_files=["res://.godot/imported/window_wall_BrickTexture_Baked_Window.png-7ab33502321f7106af387e3aa3ca6985.s3tc.ctex"]
+source_file="res://Assets/materials/GritBake.png"
+dest_files=["res://.godot/imported/GritBake.png-c9291bfa1629c6df747c4dd567bb1ff7.s3tc.ctex"]
 
 [params]
 

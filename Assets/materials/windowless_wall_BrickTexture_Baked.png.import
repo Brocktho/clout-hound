@@ -2,20 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c81arrhgbbyra"
-path.s3tc="res://.godot/imported/Pug_Player_Shorts.png-8add0323795a44f9923559f01718d49e.s3tc.ctex"
+uid="uid://xxt64jfh5k0j"
+path.s3tc="res://.godot/imported/windowless_wall_BrickTexture_Baked.png-c52fddb17bddbf79911196bfb49fd931.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "f5d6c0a378b47990a6f5bf1296f0c39b"
+"md5": "7faac354fb844176563cdc9ce8488a1a"
 }
 
 [deps]
 
-source_file="res://assets/Pug_Player_Shorts.png"
-dest_files=["res://.godot/imported/Pug_Player_Shorts.png-8add0323795a44f9923559f01718d49e.s3tc.ctex"]
+source_file="res://Assets/materials/windowless_wall_BrickTexture_Baked.png"
+dest_files=["res://.godot/imported/windowless_wall_BrickTexture_Baked.png-c52fddb17bddbf79911196bfb49fd931.s3tc.ctex"]
 
 [params]
 

@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b1k02wsdib2ej"
-path.s3tc="res://.godot/imported/PugFace.png-fd3272d84c75aa0579693bb37efa9e61.s3tc.ctex"
+uid="uid://bdi4cjdwdgtrs"
+path.s3tc="res://.godot/imported/MetalBake.png-f3d9072cf38cfe1de0a4e000fec130f7.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://assets/PugFace.png"
-dest_files=["res://.godot/imported/PugFace.png-fd3272d84c75aa0579693bb37efa9e61.s3tc.ctex"]
+source_file="res://Assets/materials/MetalBake.png"
+dest_files=["res://.godot/imported/MetalBake.png-f3d9072cf38cfe1de0a4e000fec130f7.s3tc.ctex"]
 
 [params]
 

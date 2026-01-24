@@ -1,0 +1,145 @@
+[gd_scene load_steps=15 format=3 uid="uid://l82dcowaeh2w"]
+
+[ext_resource type="PackedScene" uid="uid://dtlxuyo830w2f" path="res://player.tscn" id="1_yo0q5"]
+[ext_resource type="PackedScene" uid="uid://k7fal1cibb71" path="res://Assets/models/Grinding2.blend" id="2_4kfjl"]
+[ext_resource type="Script" uid="uid://cp2n6abd8usul" path="res://grind_rail_batch.gd" id="3_4frl8"]
+[ext_resource type="Script" uid="uid://d08f4jslh7o2c" path="res://grind_rail_from_mesh.gd" id="4_a4do0"]
+[ext_resource type="Script" uid="uid://mb435j3rb08x" path="res://grind_rail.gd" id="5_a4do0"]
+[ext_resource type="Curve3D" uid="uid://cjgkgeckjmehg" path="res://Assets/models/corkscrew_path.tres" id="6_oto1h"]
+
+[sub_resource type="Curve3D" id="Curve3D_tahvt"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -2.1703641, 2.596062, 0.0037820563, 0, 0, 0, 0, 0, 0, -1.4914774, 2.596063, 0.003779713, 0, 0, 0, 0, 0, 0, -0.6392046, 2.5960617, 0.003784936, 0, 0, 0, 0, 0, 0, 0.2130723, 2.5960689, 0.0037912875, 0, 0, 0, 0, 0, 0, 1.0653446, 2.5960617, 0.0037821084, 0, 0, 0, 0, 0, 0, 1.9176178, 2.5960622, 0.0037818402),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0)
+}
+point_count = 6
+
+[sub_resource type="Curve3D" id="Curve3D_7ejmv"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -2.2569895, 1.9976293, 0.072577745, 0, 0, 0, 0, 0, 0, -1.5781056, 1.9976574, 0.072564915, 0, 0, 0, 0, 0, 0, -0.72586596, 1.9976603, 0.07255487, 0, 0, 0, 0, 0, 0, 0.12644601, 1.9976603, 0.07255487, 0, 0, 0, 0, 0, 0, 0.9786861, 1.9976603, 0.07255487, 0, 0, 0, 0, 0, 0, 1.830991, 1.9976723, 0.07258305),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0)
+}
+point_count = 6
+
+[sub_resource type="Curve3D" id="Curve3D_oto1h"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 3.3303727e-06, 27.716867, -8.121133e-07, 0, 0, 0, 0, 0, 0, 2.7231872e-06, 26.79688, -5.170703e-06, 0, 0, 0, 0, 0, 0, 5.800277e-06, 25.70313, -9.49204e-06, 0, 0, 0, 0, 0, 0, -1.4603138e-06, 24.609379, -4.6268106e-06, 0, 0, 0, 0, 0, 0, 1.6540289e-06, 23.515629, -1.3727695e-05, 0, 0, 0, 0, 0, 0, 1.6540289e-06, 22.421879, -1.3727695e-05, 0, 0, 0, 0, 0, 0, 1.6540289e-06, 21.328129, -1.3727695e-05, 0, 0, 0, 0, 0, 0, -6.854534e-07, 20.234379, -1.9352883e-05, 0, 0, 0, 0, 0, 0, -5.736947e-07, 19.140629, -7.345557e-06, 0, 0, 0, 0, 0, 0, -5.736947e-07, 18.046879, -7.345557e-06, 0, 0, 0, 0, 0, 0, -5.736947e-07, 16.953129, -7.345557e-06, 0, 0, 0, 0, 0, 0, -5.736947e-07, 15.859378, -7.345557e-06, 0, 0, 0, 0, 0, 0, -5.736947e-07, 14.765628, -7.345557e-06, 0, 0, 0, 0, 0, 0, -5.736947e-07, 13.671878, -7.345557e-06, 0, 0, 0, 0, 0, 0, -5.736947e-07, 12.578128, -7.345557e-06, 0, 0, 0, 0, 0, 0, -6.891787e-06, 11.484377, -1.263991e-05, 0, 0, 0, 0, 0, 0, -6.891787e-06, 10.390627, -1.263991e-05, 0, 0, 0, 0, 0, 0, -6.891787e-06, 9.296877, -1.263991e-05, 0, 0, 0, 0, 0, 0, -6.891787e-06, 8.203127, -1.263991e-05, 0, 0, 0, 0, 0, 0, -6.891787e-06, 7.109377, -1.263991e-05, 0, 0, 0, 0, 0, 0, -6.891787e-06, 6.015627, -1.263991e-05, 0, 0, 0, 0, 0, 0, -6.891787e-06, 4.921877, -1.263991e-05, 0, 0, 0, 0, 0, 0, -6.906688e-06, 3.828129, -1.2636185e-05, 0, 0, 0, 0, 0, 0, -6.891787e-06, 2.734379, -1.263991e-05, 0, 0, 0, 0, 0, 0, -6.891787e-06, 1.640629, -1.263991e-05, 0, 0, 0, 0, 0, 0, -6.891787e-06, 0.54687905, -1.263991e-05, 0, 0, 0, 0, 0, 0, -6.9215894e-06, -0.54687285, -1.2632459e-05, 0, 0, 0, 0, 0, 0, -6.891787e-06, -1.6406229, -1.263991e-05, 0, 0, 0, 0, 0, 0, -6.891787e-06, -2.7343729, -1.263991e-05, 0, 0, 0, 0, 0, 0, -6.891787e-06, -3.8281229, -1.263991e-05, 0, 0, 0, 0, 0, 0, -6.891787e-06, -4.921873, -1.263991e-05, 0, 0, 0, 0, 0, 0, -6.891787e-06, -6.015623, -1.263991e-05, 0, 0, 0, 0, 0, 0, -6.891787e-06, -7.109373, -1.263991e-05, 0, 0, 0, 0, 0, 0, -6.891787e-06, -8.203123, -1.263991e-05, 0, 0, 0, 0, 0, 0, -1.2241304e-05, -9.296873, -1.5124679e-05, 0, 0, 0, 0, 0, 0, -8.262694e-06, -10.390624, -6.996095e-06, 0, 0, 0, 0, 0, 0, -1.7888844e-05, -11.484375, -9.119511e-06, 0, 0, 0, 0, 0, 0, -1.7903745e-05, -12.578123, -9.1046095e-06, 0, 0, 0, 0, 0, 0, -0.048532277, -13.671874, 0.18110839, 0, 0, 0, 0, 0, 0, 6.127087e-06, -14.765625, 1.2144446e-06, 0, 0, 0, 0, 0, 0, 1.4714897e-07, -15.859375, -3.2186508e-06, 0, 0, 0, 0, 0, 0, 1.2166798e-05, -16.953125, -9.119511e-06, 0, 0, 0, 0, 0, 0, 2.5257468e-06, -18.046875, -7.0109963e-06, 0, 0, 0, 0, 0, 0, 6.519258e-06, -19.140625, -1.5132129e-05, 0, 0, 0, 0, 0, 0, 1.1846423e-06, -20.234377, -1.2636185e-05, 0, 0, 0, 0, 0, 0, 5.736947e-07, -21.328129, -7.345557e-06, 0, 0, 0, 0, 0, 0, -5.0365925e-06, -22.421879, -1.9352883e-05, 0, 0, 0, 0, 0, 0, -7.390976e-06, -23.515629, -1.3705343e-05, 0, 0, 0, 0, 0, 0, -4.23193e-06, -24.609379, -4.6417117e-06, 0, 0, 0, 0, 0, 0, -1.1537224e-05, -25.70313, -9.4771385e-06, 0, 0, 0, 0, 0, 0, -8.445233e-06, -26.79688, -5.170703e-06, 0, 0, 0, 0, 0, 0, -3.5922706e-06, -27.71693, -6.7055225e-08),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 52
+
+[sub_resource type="Curve3D" id="Curve3D_pl4po"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -1.1981418e-05, 4.5143423, -1.2293458e-06, 0, 0, 0, 0, 0, 0, -4.246831e-06, 3.7945566, -4.6417117e-06, 0, 0, 0, 0, 0, 0, -5.0365925e-06, 2.9017618, -1.9352883e-05, 0, 0, 0, 0, 0, 0, -5.0216913e-06, 2.0088227, -1.9356608e-05, 0, 0, 0, 0, 0, 0, -5.0365925e-06, 1.1160266, -1.9352883e-05, 0, 0, 0, 0, 0, 0, -6.891787e-06, 0.22309372, -1.263991e-05, 0, 0, 0, 0, 0, 0, -6.906688e-06, -0.6697023, -1.2636185e-05, 0, 0, 0, 0, 0, 0, -6.906688e-06, -1.5624979, -1.2636185e-05, 0, 0, 0, 0, 0, 0, -6.891787e-06, -2.4554367, -1.263991e-05, 0, 0, 0, 0, 0, 0, -2.8774148e-06, -3.348229, -2.2351742e-08, 0, 0, 0, 0, 0, 0, -2.8774148e-06, -4.241168, -2.2351742e-08),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 11
+
+[sub_resource type="Curve3D" id="Curve3D_bx768"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -2.110447, 3.0060155, -0.03586091, 0, 0, 0, 0, 0, 0, -1.4316072, 3.00603, -0.035858326, 0, 0, 0, 0, 0, 0, -0.5793574, 3.006041, -0.03585024, 0, 0, 0, 0, 0, 0, 0.27296448, 3.0060422, -0.0358574, 0, 0, 0, 0, 0, 0, 1.1252068, 3.006042, -0.035863288, 0, 0, 0, 0, 0, 0, 1.9775218, 3.0060306, -0.035875507),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0)
+}
+point_count = 6
+
+[sub_resource type="Curve3D" id="Curve3D_yuwe1"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -1.1981418e-05, 2.1705923, -1.2144446e-06, 0, 0, 0, 0, 0, 0, -4.23193e-06, 1.4914333, -4.6417117e-06, 0, 0, 0, 0, 0, 0, -7.3611736e-06, 0.6391938, -1.3727695e-05, 0, 0, 0, 0, 0, 0, -5.0365925e-06, -0.21311715, -1.9349158e-05, 0, 0, 0, 0, 0, 0, -5.0365925e-06, -1.0653574, -1.9345433e-05, 0, 0, 0, 0, 0, 0, 1.6391277e-06, -1.9176614, -1.3727695e-05),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0)
+}
+point_count = 6
+
+[sub_resource type="Curve3D" id="Curve3D_u34vq"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 2.170364, -2.2351742e-08, 0, 0, 0, 0, 0, 0, 0, 1.4904726, 7.450581e-09, 0, 0, 0, 0, 0, 0, 0, 0.63819975, 7.450581e-09, 0, 0, 0, 0, 0, 0, 0, -0.21407293, 7.450581e-09, 0, 0, 0, 0, 0, 0, 0, -1.0663457, 7.450581e-09, 0, 0, 0, 0, 0, 0, 0, -1.9186184, 7.450581e-09),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0)
+}
+point_count = 6
+
+[sub_resource type="Curve3D" id="Curve3D_5fyg0"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 2.170364, -2.2351742e-08, 0, 0, 0, 0, 0, 0, 0, 1.4904726, 7.450581e-09, 0, 0, 0, 0, 0, 0, 0, 0.63819975, 7.450581e-09, 0, 0, 0, 0, 0, 0, 0, -0.21407293, 7.450581e-09, 0, 0, 0, 0, 0, 0, 0, -1.0663457, 7.450581e-09, 0, 0, 0, 0, 0, 0, 0, -1.9186184, 7.450581e-09),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0)
+}
+point_count = 6
+
+[node name="Grinding1" type="Node3D"]
+
+[node name="CharacterBody3D" parent="." instance=ExtResource("1_yo0q5")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -45.921047, 0, 19.338833)
+floor_max_angle = 1.553343
+
+[node name="Grinding2" parent="." instance=ExtResource("2_4kfjl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.878413, 0, 0)
+script = ExtResource("3_4frl8")
+
+[node name="GR-Staircase-Rail_002" parent="Grinding2/SM_Staircase_Support_04_Post_004" index="0"]
+script = ExtResource("4_a4do0")
+
+[node name="GR-Staircase-Rail_002__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post_004" index="2"]
+curve = SubResource("Curve3D_tahvt")
+script = ExtResource("5_a4do0")
+
+[node name="GR-Staircase-Rail" parent="Grinding2/SM_Staircase_Support_04_Post" index="0"]
+script = ExtResource("4_a4do0")
+
+[node name="GR-Staircase-Rail__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post" index="2"]
+curve = SubResource("Curve3D_7ejmv")
+script = ExtResource("5_a4do0")
+
+[node name="GR_Catwalk_UtilitySecondary" parent="Grinding2/SM_Catwalk_Hanger_01" index="2"]
+script = ExtResource("4_a4do0")
+
+[node name="GR_Catwalk_UtilitySecondary__Path3D" type="Path3D" parent="Grinding2/SM_Catwalk_Hanger_01" index="4"]
+transform = Transform3D(-1.1920929e-07, 0.99999994, 0, -0.99999994, -1.1920929e-07, 0, 0, 0, 1, 14.025, -0.37257767, 3.807002)
+curve = SubResource("Curve3D_oto1h")
+script = ExtResource("5_a4do0")
+
+[node name="GR_Overhead_Landing" parent="Grinding2/SM_Overhead_LandingSupport_Bracket" index="0"]
+script = ExtResource("4_a4do0")
+
+[node name="GR_Overhead_Landing__Path3D" type="Path3D" parent="Grinding2/SM_Overhead_LandingSupport_Bracket" index="2"]
+transform = Transform3D(1, 0, 0, 0, -3.5762787e-07, -0.99999994, 0, 0.99999994, -3.5762787e-07, 0, 0.121815205, -2.4749985)
+curve = SubResource("Curve3D_pl4po")
+script = ExtResource("5_a4do0")
+
+[node name="GR-Corkscrew-Spiral" parent="Grinding2/SM-Corkscrew" index="0"]
+script = ExtResource("4_a4do0")
+
+[node name="GR-Corkscrew-Spiral__Path3D" type="Path3D" parent="Grinding2/SM-Corkscrew" index="2"]
+transform = Transform3D(-2.3841858e-07, -1, -1.19209275e-07, 0.2787673, -2.3841858e-07, 0.96035874, -0.96035874, 1.1920929e-07, 0.27876723, 11.275252, -2.514464, 0.0022888184)
+curve = ExtResource("6_oto1h")
+script = ExtResource("5_a4do0")
+
+[node name="GR-Staircase-Rail_001" parent="Grinding2/SM_Staircase_Support_04_Post_005" index="0"]
+script = ExtResource("4_a4do0")
+
+[node name="GR-Staircase-Rail_001__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post_005" index="2"]
+curve = SubResource("Curve3D_bx768")
+script = ExtResource("5_a4do0")
+
+[node name="GR-Staircase-Rail_003" parent="Grinding2/SM_Staircase_Support_04_Post_002" index="0"]
+script = ExtResource("4_a4do0")
+
+[node name="GR-Staircase-Rail_003__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post_002" index="2"]
+transform = Transform3D(0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0, 1, 0, 0, 0)
+curve = SubResource("Curve3D_yuwe1")
+script = ExtResource("5_a4do0")
+
+[node name="GR_Staircase_Horiz_01" parent="Grinding2/SM_Staircase_Support_04_Post_001" index="0"]
+script = ExtResource("4_a4do0")
+
+[node name="GR_Staircase_Horiz_01__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post_001" index="2"]
+transform = Transform3D(0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0, 1, 0, -3.8146973e-06, 0)
+curve = SubResource("Curve3D_u34vq")
+script = ExtResource("5_a4do0")
+
+[node name="GR_Staircase_Horiz_01_001" parent="Grinding2/SM_Staircase_Support_04_Post_003" index="0"]
+script = ExtResource("4_a4do0")
+
+[node name="GR_Staircase_Horiz_01_001__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post_003" index="2"]
+transform = Transform3D(0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0, 1, -0.04378438, 0.008167267, 0)
+curve = SubResource("Curve3D_5fyg0")
+script = ExtResource("5_a4do0")
+
+[editable path="Grinding2"]

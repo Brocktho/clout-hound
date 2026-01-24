@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://bmwqugsuw6c4u"
-path="res://.godot/imported/Pug.glb-c48787c12a8fc30fc308376f8a359127.scn"
+uid="uid://dx8uu4blrmijo"
+path="res://.godot/imported/DogAndBoard1.glb-5441cdc07a4b4bd9ad60da3dd68e6b19.scn"
 
 [deps]
 
-source_file="res://assets/Pug.glb"
-dest_files=["res://.godot/imported/Pug.glb-c48787c12a8fc30fc308376f8a359127.scn"]
+source_file="res://Assets/DogAndBoard1.glb"
+dest_files=["res://.godot/imported/DogAndBoard1.glb-5441cdc07a4b4bd9ad60da3dd68e6b19.scn"]
 
 [params]
 
@@ -39,14 +39,14 @@ materials/extract_format=0
 materials/extract_path=""
 _subresources={
 "meshes": {
-"Pug_Cube_001": {
+"DogAndBoard1_Cube_003": {
 "generate/lightmap_uv": 0,
 "generate/lods": 0,
 "generate/shadow_meshes": 0,
 "lods/normal_merge_angle": 20.0,
 "save_to_file/enabled": true,
-"save_to_file/fallback_path": "res://Assets/PugModel.res",
-"save_to_file/path": "uid://c2lbdia7ws5ho"
+"save_to_file/fallback_path": "res://Assets/models/Dog_Default.res",
+"save_to_file/path": "uid://bhjvh3vj2grbx"
 }
 }
 }
