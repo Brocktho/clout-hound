@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://dtlxuyo830w2f"]
+[gd_scene load_steps=22 format=3 uid="uid://dtlxuyo830w2f"]
 
 [ext_resource type="Script" uid="uid://b34qrfkbx43q5" path="res://player.gd" id="1_4flbx"]
 [ext_resource type="ArrayMesh" uid="uid://djvoga0acqib2" path="res://Assets/models/Board.res" id="2_i3pqv"]
@@ -162,6 +162,14 @@ void fragment() {
 }
 "
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_slowmo_bar_base"]
+shader = SubResource("Shader_slowmo_bar")
+shader_parameter/taper = 0.35
+shader_parameter/outer_roundness = 0.5
+shader_parameter/inner_roundness = 0.5
+shader_parameter/edge_softness = 0.01
+shader_parameter/taper_side = 2
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_slowmo_bar_left"]
 shader = SubResource("Shader_slowmo_bar")
 shader_parameter/taper = 0.35
@@ -177,14 +185,6 @@ shader_parameter/outer_roundness = 0.5
 shader_parameter/inner_roundness = 0.0
 shader_parameter/edge_softness = 0.01
 shader_parameter/taper_side = 1
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_slowmo_bar_base"]
-shader = SubResource("Shader_slowmo_bar")
-shader_parameter/taper = 0.35
-shader_parameter/outer_roundness = 0.5
-shader_parameter/inner_roundness = 0.5
-shader_parameter/edge_softness = 0.01
-shader_parameter/taper_side = 2
 
 [sub_resource type="Gradient" id="Gradient_slowmo_sparks"]
 offsets = PackedFloat32Array(0, 0.7, 1)
@@ -202,16 +202,13 @@ initial_velocity_min = 50.0
 initial_velocity_max = 100.0
 gravity = Vector3(0, 80, 0)
 scale_min = 0.4
-scale_max = 1.0
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_slowmo_sparks_right"]
-direction = Vector3(1, 0, 0)
 spread = 35.0
 initial_velocity_min = 50.0
 initial_velocity_max = 100.0
 gravity = Vector3(0, 80, 0)
 scale_min = 0.4
-scale_max = 1.0
 
 [sub_resource type="Curve" id="Curve_f4bln"]
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
@@ -279,53 +276,51 @@ mouse_filter = 2
 
 [node name="SlowMoContainer" type="Control" parent="HUD"]
 layout_mode = 3
-anchor_left = 0.0
+anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 0.0
 offset_top = -24.0
-offset_right = 0.0
 offset_bottom = -12.0
 mouse_filter = 2
 
 [node name="SlowMoBase" type="ColorRect" parent="HUD/SlowMoContainer"]
+material = SubResource("ShaderMaterial_slowmo_bar_base")
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
-material = SubResource("ShaderMaterial_slowmo_bar_base")
 mouse_filter = 2
 color = Color(0.2, 0.2, 0.2, 0.4)
 
 [node name="SlowMoLeft" type="ColorRect" parent="HUD/SlowMoContainer"]
+material = SubResource("ShaderMaterial_slowmo_bar_left")
 layout_mode = 0
 anchor_bottom = 1.0
-material = SubResource("ShaderMaterial_slowmo_bar_left")
 mouse_filter = 2
 color = Color(0.9, 0.95, 1, 0.85)
 
 [node name="SlowMoRight" type="ColorRect" parent="HUD/SlowMoContainer"]
+material = SubResource("ShaderMaterial_slowmo_bar_right")
 layout_mode = 0
 anchor_bottom = 1.0
-material = SubResource("ShaderMaterial_slowmo_bar_right")
 mouse_filter = 2
 color = Color(0.9, 0.95, 1, 0.85)
 
 [node name="SlowMoLeftSparks" type="GPUParticles2D" parent="HUD/SlowMoContainer"]
+z_index = 2
 emitting = false
 amount = 24
+texture = SubResource("GradientTexture2D_slowmo_sparks")
 lifetime = 0.35
 process_material = SubResource("ParticleProcessMaterial_slowmo_sparks_left")
-texture = SubResource("GradientTexture2D_slowmo_sparks")
-z_index = 2
 
 [node name="SlowMoRightSparks" type="GPUParticles2D" parent="HUD/SlowMoContainer"]
+z_index = 2
 emitting = false
 amount = 24
+texture = SubResource("GradientTexture2D_slowmo_sparks")
 lifetime = 0.35
 process_material = SubResource("ParticleProcessMaterial_slowmo_sparks_right")
-texture = SubResource("GradientTexture2D_slowmo_sparks")
-z_index = 2
 
 [node name="GrindSparks" type="GPUParticles3D" parent="."]
 emitting = false

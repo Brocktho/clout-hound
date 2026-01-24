@@ -926,8 +926,12 @@ func check_for_rails() -> void:
 	
 	if result:
 		var collider = result.collider
-		var target = collider.get_parent() if collider.get_parent() is Path3D else collider
-		if target is Path3D and target.has_method("get_closest_offset"):
+		var target: Path3D = null
+		if collider is Path3D:
+			target = collider
+		elif collider.get_parent():
+			target = _find_parent_sibling_path3d(collider.get_parent())
+		if target and target.has_method("get_closest_offset"):
 			enter_rail(target)
 
 func enter_rail(rail: Node) -> void:
@@ -950,6 +954,21 @@ func enter_rail(rail: Node) -> void:
 	
 	# Initial snap
 	global_position = current_rail.get_pos_at_offset(rail_offset)
+
+func _find_parent_sibling_path3d(parent: Node) -> Path3D:
+	if not parent:
+		return null
+	var grandparent = parent.get_parent()
+	if not grandparent:
+		return null
+	var expected_name = parent.name + "_Path3D"
+	for sibling in grandparent.get_children():
+		if sibling is Path3D and sibling.name == expected_name:
+			return sibling
+	for sibling in grandparent.get_children():
+		if sibling is Path3D:
+			return sibling
+	return null
 
 func apply_grind_movement(delta: float) -> void:
 	if not current_rail:

@@ -6,7 +6,7 @@ extends Node3D
 
 func _ready():
 	# Load scenes if not set in editor (though usually set via editor)
-	if not playground_scene: playground_scene = load("res://Playground.tscn")
+	if not playground_scene: playground_scene = load("res://grind_level_expanded.tscn")
 	if not desert_scene: desert_scene = load("res://Desert.tscn")
 	if not controls_scene: controls_scene = load("res://Controls.tscn")
 	# Ensure mouse is visible for the menu
