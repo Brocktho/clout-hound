@@ -1,10 +1,14 @@
-[gd_scene load_steps=2 format=3 uid="uid://dp7n6x23g8dl4"]
+[gd_scene load_steps=3 format=3 uid="uid://dp7n6x23g8dl4"]
 
 [ext_resource type="Script" uid="uid://omrt0qn81s7s" path="res://controls.gd" id="1_controls"]
+[ext_resource type="AudioStream" path="res://Assets/Audio/SFX/UI_Change.wav" id="2_ui_change"]
 
 [node name="Controls" type="CanvasLayer"]
 layer = 100
 script = ExtResource("1_controls")
+
+[node name="UIChangeSfx" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_ui_change")
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3
@@ -13,6 +17,16 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="PointerLockHint" type="Label" parent="Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 24.0
+offset_bottom = 56.0
+text = "Pointer unlocked. Press Esc to resume."
+horizontal_alignment = 1
 
 [node name="ColorRect" type="ColorRect" parent="Control"]
 layout_mode = 1
@@ -45,19 +59,18 @@ horizontal_alignment = 1
 layout_mode = 2
 text = "WASD - Move
 Space - Jump
-Left Shift/C/F - Slide 
+Left Click (Hold) - Slide
+Right Click - Slow Motion
+R - Kickflip
+Slide to Start Grinding on Rails
 Q/E - Spin
+Spin + Kickflip - Speed Boosts
 Tab - Toggle Camera
 Escape - Toggle Menu / Show Cursor"
 horizontal_alignment = 1
-
-[node name="MainMenuButton" type="Button" parent="Control/CenterContainer/VBoxContainer"]
-layout_mode = 2
-text = "Main Menu"
 
 [node name="CloseButton" type="Button" parent="Control/CenterContainer/VBoxContainer"]
 layout_mode = 2
 text = "Close"
 
-[connection signal="pressed" from="Control/CenterContainer/VBoxContainer/MainMenuButton" to="." method="_on_main_menu_button_pressed"]
 [connection signal="pressed" from="Control/CenterContainer/VBoxContainer/CloseButton" to="." method="_on_close_button_pressed"]

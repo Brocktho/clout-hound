@@ -145,7 +145,7 @@ shape = SubResource("BoxShape3D_xl0jw")
 debug_color = Color(0.9314706, 0.18701509, 0.47006536, 1)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.645, -0.05, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.64780766, -0.03927951, -0.005139351)
 material_override = SubResource("StandardMaterial3D_3b8a5")
 mesh = SubResource("PlaneMesh_f4bln")
 

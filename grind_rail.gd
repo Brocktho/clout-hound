@@ -24,8 +24,6 @@ class_name GrindRail
 			# Reset the button so it can be pressed again
 			generate_rail_button = false
 
-func _ready() -> void:
-	print_rich("[color=yellow]GrindRail: _ready called, Engine.is_editor_hint(): ", Engine.is_editor_hint(), "[/color]")
 
 func generate_rail() -> void:
 	print_rich("[color=cyan]GrindRail: generate_rail() started[/color]")

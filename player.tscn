@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://dtlxuyo830w2f"]
+[gd_scene load_steps=23 format=3 uid="uid://dtlxuyo830w2f"]
 
 [ext_resource type="Script" uid="uid://b34qrfkbx43q5" path="res://player.gd" id="1_4flbx"]
 [ext_resource type="ArrayMesh" uid="uid://djvoga0acqib2" path="res://Assets/models/Board.res" id="2_i3pqv"]
@@ -218,18 +218,38 @@ point_count = 2
 curve = SubResource("Curve_f4bln")
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_f4bln"]
-spread = 20.0
-initial_velocity_min = 2.0
-initial_velocity_max = 5.0
+particle_flag_align_y = true
+emission_shape_offset = Vector3(0, -0.32, -0.03)
+emission_shape = 1
+emission_sphere_radius = 1.0
+direction = Vector3(0, -0.4, -1)
+initial_velocity_min = 9.0
+initial_velocity_max = 20.0
+gravity = Vector3(0, -65, 0)
+linear_accel_min = -3.0
+linear_accel_max = 6.0
+radial_accel_min = -8.0
+radial_accel_max = 12.0
+tangential_accel_min = -4.0
+tangential_accel_max = 4.0
+scale_min = 0.45
+scale_max = 1.5
 scale_curve = SubResource("CurveTexture_xl0jw")
-color = Color(1, 0.75686276, 0, 1)
+color = Color(1, 0.9019608, 0.2, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0p32d"]
 shading_mode = 0
+albedo_color = Color(1, 0.9019608, 0.2, 1)
 
-[sub_resource type="BoxMesh" id="BoxMesh_3b8a5"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_3b8a5"]
 material = SubResource("StandardMaterial3D_0p32d")
-size = Vector3(0.05, 0.05, 0.05)
+top_radius = 0.003
+bottom_radius = 0.012
+height = 0.2
+radial_segments = 6
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_board"]
+size = Vector3(1.5, 0.3, 0.5)
 
 [node name="CharacterBody3D" type="CharacterBody3D"]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
@@ -282,6 +302,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 offset_top = -24.0
 offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 0
 mouse_filter = 2
 
 [node name="SlowMoBase" type="ColorRect" parent="HUD/SlowMoContainer"]
@@ -324,8 +346,32 @@ process_material = SubResource("ParticleProcessMaterial_slowmo_sparks_right")
 
 [node name="GrindSparks" type="GPUParticles3D" parent="."]
 emitting = false
+amount = 240
+lifetime = 0.4
 process_material = SubResource("ParticleProcessMaterial_f4bln")
-draw_pass_1 = SubResource("BoxMesh_3b8a5")
+draw_pass_1 = SubResource("CylinderMesh_3b8a5")
+
+[node name="RagdollSfx" type="AudioStreamPlayer3D" parent="."]
+
+[node name="JumpSfx" type="AudioStreamPlayer3D" parent="."]
+
+[node name="LandingSfx" type="AudioStreamPlayer3D" parent="."]
+
+[node name="AirborneSfx" type="AudioStreamPlayer3D" parent="."]
+
+[node name="MovingSfx" type="AudioStreamPlayer3D" parent="."]
+
+[node name="GrindSfx" type="AudioStreamPlayer3D" parent="."]
+
+[node name="BoardPhysics" type="RigidBody3D" parent="."]
+sleeping = true
+freeze = true
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BoardPhysics"]
+transform = Transform3D(-4.371138e-08, 0, 1, 0, 1, 0, -1, 0, -4.371138e-08, 2.6502043e-09, -0.07127532, -0.030314803)
+shape = SubResource("BoxShape3D_board")
+disabled = true
+debug_color = Color(0.97395235, 0, 0.4337076, 0.41960785)
 
 [node name="Visual" type="Node3D" parent="."]
 
@@ -337,5 +383,5 @@ mesh = ExtResource("2_i3pqv")
 skeleton = NodePath("../../..")
 
 [node name="Body" type="MeshInstance3D" parent="Visual"]
-transform = Transform3D(-2.185569e-08, 0.5, -2.1855694e-08, 0, -2.1855694e-08, -0.5, -0.5, -2.185569e-08, 9.553428e-16, -0.0070000524, 0.6473949, 0.26882905)
+transform = Transform3D(-2.185569e-08, 0.5, -2.1855694e-08, 0, -2.1855694e-08, -0.5, -0.5, -2.185569e-08, 9.553428e-16, -0.0070000594, 0.6473949, 0.34734946)
 mesh = ExtResource("3_hqtel")

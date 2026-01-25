@@ -1,22 +1,54 @@
-[gd_scene load_steps=4 format=3 uid="uid://o8r5uvc2o6hy"]
+[gd_scene load_steps=8 format=3 uid="uid://o8r5uvc2o6hy"]
 
 [ext_resource type="Script" uid="uid://dnas1bh428a6j" path="res://main.gd" id="1_main"]
-[ext_resource type="PackedScene" uid="uid://3tgagwdvw5qv" path="res://Playground.tscn" id="2_r0du0"]
-[ext_resource type="PackedScene" uid="uid://bsmmtqqe1kdn6" path="res://Desert.tscn" id="3_cm0pq"]
+[ext_resource type="PackedScene" uid="uid://l82dcowaeh2w" path="res://grinding1.tscn" id="2_gq5w1"]
+[ext_resource type="AudioStream" uid="uid://em6vk6wpdssa" path="res://Assets/Audio/SFX/UI_Change.wav" id="3_ui_change"]
+[ext_resource type="Shader" uid="uid://bsrludiireds1" path="res://Assets/Shaders/starfield_spatial.gdshader" id="4_starfield_spatial"]
+
+[sub_resource type="Environment" id="Environment_main_menu"]
+background_mode = 1
+background_color = Color(0.02, 0.02, 0.03, 1)
+ambient_light_color = Color(1, 1, 1, 1)
+ambient_light_energy = 2.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_starfield_spatial"]
+render_priority = 0
+shader = ExtResource("4_starfield_spatial")
+shader_parameter/star_density = 0.035
+shader_parameter/star_scale = 140.0
+shader_parameter/drift_speed = 0.01
+shader_parameter/base_color = Vector3(0.02, 0.03, 0.05)
+shader_parameter/star_color = Vector3(0.9, 0.95, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_starfield"]
+radius = 50.0
+height = 100.0
+radial_segments = 32
+rings = 16
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_main")
-playground_scene = ExtResource("2_r0du0")
-desert_scene = ExtResource("3_cm0pq")
+play_scene = ExtResource("2_gq5w1")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
 shadow_enabled = true
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_main_menu")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 4)
+
+[node name="UIChangeSfx" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_ui_change")
+
+[node name="StarfieldSphere" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.058423996, -4.7683716e-07, -0.0019359589)
+material_override = SubResource("ShaderMaterial_starfield_spatial")
+cast_shadow = 0
+mesh = SubResource("SphereMesh_starfield")
+
+[node name="BackgroundFloaters" type="Node3D" parent="."]
 
 [node name="UI" type="CanvasLayer" parent="."]
 
@@ -36,25 +68,26 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -100.0
-offset_top = -50.0
+offset_top = -90.0
 offset_right = 100.0
-offset_bottom = 50.0
+offset_bottom = 90.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 20
 
-[node name="PlaygroundButton" type="Button" parent="UI/MainMenu/VBoxContainer"]
+[node name="TitleLabel" type="Label" parent="UI/MainMenu/VBoxContainer"]
 layout_mode = 2
-text = "Playground"
+theme_override_font_sizes/font_size = 48
+text = "CloutHound"
+horizontal_alignment = 1
 
-[node name="DesertButton" type="Button" parent="UI/MainMenu/VBoxContainer"]
+[node name="PlayButton" type="Button" parent="UI/MainMenu/VBoxContainer"]
 layout_mode = 2
-text = "Desert"
+text = "Play"
 
 [node name="ControlsButton" type="Button" parent="UI/MainMenu/VBoxContainer"]
 layout_mode = 2
-text = "Controls"
+text = "Settings"
 
-[connection signal="pressed" from="UI/MainMenu/VBoxContainer/PlaygroundButton" to="." method="_on_playground_button_pressed"]
-[connection signal="pressed" from="UI/MainMenu/VBoxContainer/DesertButton" to="." method="_on_desert_button_pressed"]
+[connection signal="pressed" from="UI/MainMenu/VBoxContainer/PlayButton" to="." method="_on_play_button_pressed"]
 [connection signal="pressed" from="UI/MainMenu/VBoxContainer/ControlsButton" to="." method="_on_controls_button_pressed"]

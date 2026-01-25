@@ -1,0 +1,137 @@
+[gd_scene load_steps=3 format=3 uid="uid://be50rwf3yw6y"]
+
+[ext_resource type="Script" uid="uid://byc3y4u86o8mg" path="res://settings.gd" id="1_settings"]
+[ext_resource type="AudioStream" path="res://Assets/Audio/SFX/UI_Change.wav" id="2_ui_change"]
+
+[node name="Settings" type="CanvasLayer"]
+layer = 150
+script = ExtResource("1_settings")
+
+[node name="UIChangeSfx" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_ui_change")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 60.0
+offset_top = 40.0
+offset_right = -60.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TabsRow" type="HBoxContainer" parent="Control/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="QHintLabel" type="Label" parent="Control/Panel/VBoxContainer/TabsRow"]
+layout_mode = 2
+text = "Q"
+
+[node name="GeneralTabLabel" type="Label" parent="Control/Panel/VBoxContainer/TabsRow"]
+layout_mode = 2
+text = "General"
+
+[node name="ControlsTabLabel" type="Label" parent="Control/Panel/VBoxContainer/TabsRow"]
+layout_mode = 2
+text = "Controls"
+
+[node name="EHintLabel" type="Label" parent="Control/Panel/VBoxContainer/TabsRow"]
+layout_mode = 2
+text = "E"
+
+[node name="ContentArea" type="Control" parent="Control/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="GeneralPanel" type="Control" parent="Control/Panel/VBoxContainer/ContentArea"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GeneralContent" type="VBoxContainer" parent="Control/Panel/VBoxContainer/ContentArea/GeneralPanel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -180.0
+offset_top = -70.0
+offset_right = 180.0
+offset_bottom = 110.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 14
+
+[node name="SfxLabel" type="Label" parent="Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent"]
+layout_mode = 2
+text = "SFX"
+horizontal_alignment = 1
+
+[node name="SfxSlider" type="HSlider" parent="Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent"]
+layout_mode = 2
+max_value = 2.0
+step = 0.01
+value = 1.0
+
+[node name="MusicLabel" type="Label" parent="Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent"]
+layout_mode = 2
+text = "Music"
+horizontal_alignment = 1
+
+[node name="MusicSlider" type="HSlider" parent="Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent"]
+layout_mode = 2
+max_value = 2.0
+step = 0.01
+value = 1.0
+
+[node name="DisableGrindSfxCheck" type="CheckBox" parent="Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent"]
+layout_mode = 2
+text = "Disable Grind Rail SFX"
+
+[node name="MainMenuButton" type="Button" parent="Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent"]
+layout_mode = 2
+text = "Main Menu"
+
+[node name="ControlsPanel" type="Control" parent="Control/Panel/VBoxContainer/ContentArea"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BottomHint" type="Label" parent="Control"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -220.0
+offset_top = -40.0
+offset_right = 220.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Spacebar to select | ESC to go back"
+horizontal_alignment = 1
