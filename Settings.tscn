@@ -1,7 +1,29 @@
-[gd_scene load_steps=3 format=3 uid="uid://be50rwf3yw6y"]
+[gd_scene load_steps=6 format=3 uid="uid://be50rwf3yw6y"]
 
 [ext_resource type="Script" uid="uid://byc3y4u86o8mg" path="res://settings.gd" id="1_settings"]
-[ext_resource type="AudioStream" path="res://Assets/Audio/SFX/UI_Change.wav" id="2_ui_change"]
+[ext_resource type="AudioStream" uid="uid://em6vk6wpdssa" path="res://Assets/Audio/SFX/UI_Change.wav" id="2_ui_change"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2fv1l"]
+bg_color = Color(0.07, 0.07, 0.07, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1"]
+content_margin_left = 14.0
+content_margin_top = 6.0
+content_margin_right = 14.0
+content_margin_bottom = 6.0
+bg_color = Color(0.9, 0.9, 0.9, 0.12)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.2)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2"]
+bg_color = Color(1, 1, 1, 0.15)
 
 [node name="Settings" type="CanvasLayer"]
 layer = 150
@@ -29,6 +51,7 @@ offset_right = -60.0
 offset_bottom = -40.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_2fv1l")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Control/Panel"]
 layout_mode = 2
@@ -39,20 +62,47 @@ layout_mode = 2
 theme_override_constants/separation = 12
 
 [node name="QHintLabel" type="Label" parent="Control/Panel/VBoxContainer/TabsRow"]
+custom_minimum_size = Vector2(36, 0)
 layout_mode = 2
+theme_override_font_sizes/font_size = 20
 text = "Q"
+horizontal_alignment = 1
 
-[node name="GeneralTabLabel" type="Label" parent="Control/Panel/VBoxContainer/TabsRow"]
+[node name="GeneralTab" type="PanelContainer" parent="Control/Panel/VBoxContainer/TabsRow"]
 layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_1")
+
+[node name="GeneralTabLabel" type="Label" parent="Control/Panel/VBoxContainer/TabsRow/GeneralTab"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
 text = "General"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="ControlsTabLabel" type="Label" parent="Control/Panel/VBoxContainer/TabsRow"]
+[node name="ControlsTab" type="PanelContainer" parent="Control/Panel/VBoxContainer/TabsRow"]
 layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_1")
+
+[node name="ControlsTabLabel" type="Label" parent="Control/Panel/VBoxContainer/TabsRow/ControlsTab"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
 text = "Controls"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="EHintLabel" type="Label" parent="Control/Panel/VBoxContainer/TabsRow"]
+custom_minimum_size = Vector2(36, 0)
 layout_mode = 2
+theme_override_font_sizes/font_size = 20
 text = "E"
+horizontal_alignment = 1
+
+[node name="TabDivider" type="Panel" parent="Control/Panel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_2")
 
 [node name="ContentArea" type="Control" parent="Control/Panel/VBoxContainer"]
 layout_mode = 2

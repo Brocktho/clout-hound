@@ -16,11 +16,11 @@ class_name Player
 
 @export_group("Slide")
 @export var slide_friction: float = 0.5 # Very low friction
-@export var slide_control: float = 0.02 # Heavily restricted movement input
+@export var slide_control: float = 0.05 # Heavily restricted movement input
 @export var steering_weight: float = 4.0 # How quickly the board carves in standard movement
 @export var slope_slide_gravity_modifier: float = 10.0
 @export var slope_regular_gravity_modifier: float = 2.0
-@export var slide_visual_z_scale: float = 0.9
+@export var slide_visual_z_scale: float = 0.5
 @export var slide_collider_height_ratio: float = 0.5
 
 @export_group("Grind")
@@ -30,11 +30,13 @@ class_name Player
 
 @export_group("Camera Settings")
 @export var mouse_sensitivity: float = 0.0005
-@export var camera_height: float = 1.5 # Offset from the player's center
+@export var camera_height: float = 0.5 # Offset from the player's center
 @export var camera_distance: float = 0.1 # Very slight backward offset to avoid clipping inside the head
 @export var base_fov: float = 75.0
 @export var max_fov_boost: float = 50.0
 @export var speed_for_max_fov: float = 50.0
+@export var camera_follow_speed: float = 12.0
+@export var camera_vertical_speed: float = 6.0
 
 @export_group("Third Person Settings")
 @export var third_person_distance: float = 4.0
@@ -114,7 +116,7 @@ class_name Player
 @export_group("Slow Mo")
 @export var slowmo_time_scale: float = 0.1
 @export var slowmo_max_time: float = 1.5
-@export var slowmo_recharge_rate: float = 0.75
+@export var slowmo_recharge_rate: float = 0.25
 @export var slowmo_ui_fade_speed: float = 6.0
 @export var slowmo_ui_inset_ratio: float = 0.03
 @export var slowmo_fov_zoom: float = 10.0
@@ -157,9 +159,10 @@ var slowmo_last_ratio: float = 1.0
 var slowmo_wave_alpha: float = 0.0
 
 var _was_mouse_captured: bool = true
+var _camera_pivot_pos: Vector3 = Vector3.ZERO
 
-@onready var camera: Camera3D = $SpringArm3D/Camera3D
-@onready var spring_arm: SpringArm3D = $SpringArm3D
+@onready var camera: Camera3D = get_parent().get_node("SpringArm3D/Camera3D")
+@onready var spring_arm: SpringArm3D = get_parent().get_node("SpringArm3D")
 @onready var board_node: Node3D = $Visual/BoardVisual
 @onready var board_mesh: MeshInstance3D = $Visual/BoardVisual/Board
 @onready var board_physics: RigidBody3D = $BoardPhysics
@@ -194,7 +197,7 @@ const MOVING_SFX_SLIDE_PITCH_MAX: float = 0.9
 
 @export_group("Rail Settings")
 @export var rail_jump_force: float = 10.0
-@export var rail_reacquisition_time: float = 0.1
+@export var rail_reacquisition_time: float = 0.25
 
 var rail_cooldown_timer: float = 0.0
 var last_rail_direction: Vector3 = Vector3.FORWARD
@@ -304,7 +307,25 @@ func _ready() -> void:
 		
 	# Initialize camera position relative to player
 	update_camera_position()
+	_init_camera_pivot()
 	setup_outline()
+
+func _init_camera_pivot() -> void:
+	# Decouple camera pivot from player to avoid one-frame snaps on landing.
+	spring_arm.top_level = true
+	_camera_pivot_pos = spring_arm.global_position
+
+func _get_movement_basis() -> Basis:
+	if spring_arm:
+		return Basis(Vector3.UP, spring_arm.global_rotation.y)
+	return global_basis
+
+func get_horizontal_boost_dir() -> Vector3:
+	var flat := Vector3(velocity.x, 0.0, velocity.z)
+	if flat.length() < 0.001:
+		var basis := _get_movement_basis()
+		flat = Vector3(-basis.z.x, 0.0, -basis.z.z)
+	return flat.normalized()
 
 func _exit_tree() -> void:
 	if Engine.time_scale != 1.0:
@@ -450,11 +471,9 @@ func toggle_camera_mode() -> void:
 func update_camera_position() -> void:
 		if is_third_person:
 			# Move camera back for 3rd person
-			spring_arm.position.y += 2.0
 			spring_arm.spring_length = third_person_distance
 			camera.position = third_person_offset
 		else:
-			spring_arm.position.y = camera_height
 			spring_arm.spring_length = 0.0
 			# Reset to 1st person
 			camera.position = Vector3(0, 0, -camera_distance)	
@@ -502,6 +521,7 @@ func _physics_process(delta: float) -> void:
 		apply_ragdoll_physics(delta)
 		return	
 		
+	_update_camera_pivot(delta)
 	update_visual_alignment(delta)	
 
 	if rail_cooldown_timer > 0:
@@ -532,7 +552,7 @@ func _physics_process(delta: float) -> void:
 				# Diagonal Momentum Exploit
 				var input_dir_exploit: Vector2 = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
 				if abs(input_dir_exploit.x) > 0.5 and abs(input_dir_exploit.y) > 0.5:
-					var boost_vec: Vector3 = (transform.basis * Vector3(input_dir_exploit.x, 0, input_dir_exploit.y)).normalized()
+					var boost_vec: Vector3 = (_get_movement_basis() * Vector3(input_dir_exploit.x, 0, input_dir_exploit.y)).normalized()
 					velocity += boost_vec * diagonal_boost	
 
 	# Landing detection for grace period
@@ -557,11 +577,11 @@ func _physics_process(delta: float) -> void:
 		
 		# Landing check
 		if is_on_floor() and not is_grinding:
-			# Only look for rails if not on cooldown
+			# During rail cooldown, skip alignment checks entirely.
 			if rail_cooldown_timer <= 0 and is_falling_on_rail():
-				check_for_rails()	
-			else:
-				var success: bool = check_landing_alignment()	
+				check_for_rails()
+			elif rail_cooldown_timer <= 0:
+				var success: bool = check_landing_alignment()
 				if !success: return
 	
 	if pending_landing_sfx and not is_ragdolling:
@@ -584,13 +604,13 @@ func _physics_process(delta: float) -> void:
 
 	var input_dir: Vector3 = Vector3.ZERO
 	if Input.is_action_pressed("move_forward"):
-		input_dir -= transform.basis.z
+		input_dir -= _get_movement_basis().z
 	if Input.is_action_pressed("move_backward"):
-		input_dir += transform.basis.z
+		input_dir += _get_movement_basis().z
 	if Input.is_action_pressed("move_left"):
-		input_dir -= transform.basis.x
+		input_dir -= _get_movement_basis().x
 	if Input.is_action_pressed("move_right"):
-		input_dir += transform.basis.x
+		input_dir += _get_movement_basis().x
 	
 	var direction: Vector3 = input_dir
 
@@ -605,6 +625,21 @@ func _physics_process(delta: float) -> void:
 	_update_movement_sfx()
 	update_speed_effects(delta)
 	update_outline_color()
+
+func _update_camera_pivot(delta: float) -> void:
+	if not spring_arm:
+		return
+	var target := global_position + Vector3(0.0, camera_height, 0.0)
+	if is_third_person:
+		target.y += 2.0
+	# Keep camera yaw aligned with player while pivot position is smoothed.
+	spring_arm.global_rotation = Vector3(0.0, global_rotation.y + PI, 0.0)
+	var alpha_h := 1.0 - exp(-camera_follow_speed * delta)
+	var alpha_v := 1.0 - exp(-camera_vertical_speed * delta)
+	_camera_pivot_pos.x = lerp(_camera_pivot_pos.x, target.x, alpha_h)
+	_camera_pivot_pos.z = lerp(_camera_pivot_pos.z, target.z, alpha_h)
+	_camera_pivot_pos.y = lerp(_camera_pivot_pos.y, target.y, alpha_v)
+	spring_arm.global_position = _camera_pivot_pos
 
 func update_outline_color() -> void:
 	if not outline_material:
@@ -683,7 +718,7 @@ func update_visual_alignment(delta: float) -> void:
 	var target_basis: Basis = Basis()
 	
 	# Determine the "Forward" direction based on input
-	var target_fwd: Vector3 = -transform.basis.z # Default to forward	
+	var target_fwd: Vector3 = -_get_movement_basis().z # Default to forward	
 	
 	if is_grinding and current_rail:
 		target_fwd = rail_fwd_dir
@@ -691,14 +726,14 @@ func update_visual_alignment(delta: float) -> void:
 		var input_dir: Vector2 = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
 		if input_dir.length() > 0.1:
 			# Map the 2D input to the player's 3D orientation
-			var world_input := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+			var world_input := (_get_movement_basis() * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 			target_fwd = world_input
 	
 	# Calculate the new right and forward vectors based on the new Up
 	if target_up.length() < 0.001:
 		target_up = Vector3.UP
 	if target_fwd.length() < 0.001:
-		target_fwd = -transform.basis.z
+		target_fwd = -_get_movement_basis().z
 	target_basis.y = target_up
 	var right := target_basis.y.cross(target_fwd)
 	if right.length() < 0.001:
@@ -750,7 +785,7 @@ func update_visual_alignment(delta: float) -> void:
 
 	var target_visual_scale := default_visual_scale
 	if is_sliding:
-		target_visual_scale.z *= slide_visual_z_scale
+		target_visual_scale.y *= slide_visual_z_scale
 	visual.scale = visual.scale.lerp(target_visual_scale, 10.0 * delta)
 
 	var capsule := body_collision.shape as CapsuleShape3D
@@ -771,6 +806,9 @@ func update_visual_alignment(delta: float) -> void:
 	#body_mesh.position.y = lerp(body_mesh.position.y, target_y_pos, 10.0 * delta)	
 	
 func handle_dynamic_snapping() -> void:
+	if not is_on_floor():
+		floor_snap_length = 0.0
+		return
 	var current_speed: float = velocity.length()
 	
 	# Default snapping to keep us grounded
@@ -863,7 +901,7 @@ func clear_visual_override() -> void:
 	visual_override_basis = Basis.IDENTITY
 
 func consume_trick_stale(trick: TrickResource) -> float:
-	var trick_id := trick.get_class()
+	var trick_id := trick.display_name
 	if trick_id == last_trick_id:
 		trick_stale_count += 1
 	else:
@@ -885,9 +923,7 @@ func apply_spin_boost(multiplier: float = 1.0) -> void:
 		velocity = velocity.normalized() * rail_speed
 	else:
 		# Apply standard air boost
-		var boost_dir = velocity.normalized()
-		if boost_dir == Vector3.ZERO:
-			boost_dir = -transform.basis.z
+		var boost_dir := get_horizontal_boost_dir()
 		velocity += boost_dir * spin_boost_amount * multiplier
 	start_trick_pose()
 
@@ -981,7 +1017,7 @@ func start_ragdoll(bail_severity: float = 1.0) -> void:
 	# Detach the board
 	var kick_dir := -velocity.normalized()
 	if kick_dir == Vector3.ZERO:
-		kick_dir = transform.basis.z
+		kick_dir = global_basis.z
 	board_velocity = kick_dir * maxf(velocity.length(), 1.0) * 2.0 + Vector3.UP * 2.5
 
 	# Reparent to physics body so it can collide while detached.
@@ -1434,7 +1470,7 @@ func enter_rail(rail: Node) -> void:
 	var has_input: bool = input_dir.length() > 0.1
 	var input_world_dir: Vector3 = Vector3.ZERO
 	if has_input:
-		input_world_dir = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+		input_world_dir = (_get_movement_basis() * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	var current_velocity_dir: Vector3 = velocity.normalized()
 	
 	rail_speed = velocity.length()
@@ -1538,7 +1574,7 @@ func exit_rail() -> void:
 		_stop_grind_sfx()
 		velocity = last_rail_direction
 		# Prevent clipping: Lift player slightly off the rail
-		global_position += Vector3.UP * 2.5
+		global_position += Vector3.UP * 1.5
 		is_grinding = false
 		current_rail = null
 		rail_cooldown_timer = rail_reacquisition_time
@@ -1556,7 +1592,7 @@ func jump_exit_rail() -> void:
 		
 		# 3. Add Directional Control (Left/Right)
 		var input_dir: Vector2 = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
-		var lateral_dir: Vector3 = (transform.basis * Vector3(input_dir.x, 0, 0)).normalized()
+		var lateral_dir: Vector3 = (_get_movement_basis() * Vector3(input_dir.x, 0, 0)).normalized()
 		exit_velocity += lateral_dir * rail_jump_force * 0.5
 		
 		velocity = exit_velocity
@@ -1565,7 +1601,7 @@ func jump_exit_rail() -> void:
 		rail_cooldown_timer = rail_reacquisition_time
 		
 		# Nudge player to ensure they clear the collision shape
-		global_position += Vector3.UP * 0.2
+		global_position += Vector3.UP * 0.5
 		
 		is_grinding = false
 		current_rail = null

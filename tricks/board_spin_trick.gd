@@ -45,9 +45,7 @@ func _apply_spin_boost(player: Player, multiplier: float = 1.0) -> void:
 		player.rail_speed += player.spin_boost_amount * multiplier
 		player.velocity = player.velocity.normalized() * player.rail_speed
 	else:
-		var boost_dir := player.velocity.normalized()
-		if boost_dir == Vector3.ZERO:
-			boost_dir = -player.transform.basis.z
+		var boost_dir := player.get_horizontal_boost_dir()
 		player.velocity += boost_dir * player.spin_boost_amount * multiplier
 	player.start_trick_pose()
 

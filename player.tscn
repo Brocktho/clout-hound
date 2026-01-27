@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://dtlxuyo830w2f"]
+[gd_scene load_steps=24 format=3 uid="uid://dtlxuyo830w2f"]
 
 [ext_resource type="Script" uid="uid://b34qrfkbx43q5" path="res://player.gd" id="1_4flbx"]
 [ext_resource type="ArrayMesh" uid="uid://djvoga0acqib2" path="res://Assets/models/Board.res" id="2_i3pqv"]
@@ -251,10 +251,15 @@ radial_segments = 6
 [sub_resource type="BoxShape3D" id="BoxShape3D_board"]
 size = Vector3(1.5, 0.3, 0.5)
 
-[node name="CharacterBody3D" type="CharacterBody3D"]
+[sub_resource type="SphereShape3D" id="SphereShape3D_i3pqv"]
+radius = 0.2
+
+[node name="Node3D" type="Node3D"]
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="."]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
 floor_stop_on_slope = false
-floor_max_angle = 1.5882496
+floor_max_angle = 1.553343
 floor_snap_length = 0.5
 script = ExtResource("1_4flbx")
 max_speed = 5.0
@@ -262,18 +267,12 @@ acceleration = 10.0
 friction = 60.0
 stand_offset = 0.6
 
-[node name="BodyCollision" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.404948e-08, 0.75587094, -0.7326406)
+[node name="BodyCollision" type="CollisionShape3D" parent="CharacterBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.475132e-08, 0.75587094, -0.7406688)
 shape = SubResource("CapsuleShape3D_i3pqv")
 debug_fill = false
 
-[node name="SpringArm3D" type="SpringArm3D" parent="."]
-
-[node name="Camera3D" type="Camera3D" parent="SpringArm3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.66992, 2.464325)
-current = true
-
-[node name="SpeedLines" type="ColorRect" parent="."]
+[node name="SpeedLines" type="ColorRect" parent="CharacterBody3D"]
 material = SubResource("ShaderMaterial_speed_lines")
 anchors_preset = 15
 anchor_right = 1.0
@@ -282,7 +281,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="SlowMoWaves" type="ColorRect" parent="."]
+[node name="SlowMoWaves" type="ColorRect" parent="CharacterBody3D"]
 visible = false
 material = SubResource("ShaderMaterial_slowmo_waves")
 anchors_preset = 15
@@ -292,9 +291,9 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="HUD" type="CanvasLayer" parent="."]
+[node name="HUD" type="CanvasLayer" parent="CharacterBody3D"]
 
-[node name="SlowMoContainer" type="Control" parent="HUD"]
+[node name="SlowMoContainer" type="Control" parent="CharacterBody3D/HUD"]
 layout_mode = 3
 anchors_preset = 12
 anchor_top = 1.0
@@ -306,7 +305,7 @@ grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2
 
-[node name="SlowMoBase" type="ColorRect" parent="HUD/SlowMoContainer"]
+[node name="SlowMoBase" type="ColorRect" parent="CharacterBody3D/HUD/SlowMoContainer"]
 material = SubResource("ShaderMaterial_slowmo_bar_base")
 layout_mode = 0
 anchor_right = 1.0
@@ -314,21 +313,21 @@ anchor_bottom = 1.0
 mouse_filter = 2
 color = Color(0.2, 0.2, 0.2, 0.4)
 
-[node name="SlowMoLeft" type="ColorRect" parent="HUD/SlowMoContainer"]
+[node name="SlowMoLeft" type="ColorRect" parent="CharacterBody3D/HUD/SlowMoContainer"]
 material = SubResource("ShaderMaterial_slowmo_bar_left")
 layout_mode = 0
 anchor_bottom = 1.0
 mouse_filter = 2
 color = Color(0.9, 0.95, 1, 0.85)
 
-[node name="SlowMoRight" type="ColorRect" parent="HUD/SlowMoContainer"]
+[node name="SlowMoRight" type="ColorRect" parent="CharacterBody3D/HUD/SlowMoContainer"]
 material = SubResource("ShaderMaterial_slowmo_bar_right")
 layout_mode = 0
 anchor_bottom = 1.0
 mouse_filter = 2
 color = Color(0.9, 0.95, 1, 0.85)
 
-[node name="SlowMoLeftSparks" type="GPUParticles2D" parent="HUD/SlowMoContainer"]
+[node name="SlowMoLeftSparks" type="GPUParticles2D" parent="CharacterBody3D/HUD/SlowMoContainer"]
 z_index = 2
 emitting = false
 amount = 24
@@ -336,7 +335,7 @@ texture = SubResource("GradientTexture2D_slowmo_sparks")
 lifetime = 0.35
 process_material = SubResource("ParticleProcessMaterial_slowmo_sparks_left")
 
-[node name="SlowMoRightSparks" type="GPUParticles2D" parent="HUD/SlowMoContainer"]
+[node name="SlowMoRightSparks" type="GPUParticles2D" parent="CharacterBody3D/HUD/SlowMoContainer"]
 z_index = 2
 emitting = false
 amount = 24
@@ -344,44 +343,52 @@ texture = SubResource("GradientTexture2D_slowmo_sparks")
 lifetime = 0.35
 process_material = SubResource("ParticleProcessMaterial_slowmo_sparks_right")
 
-[node name="GrindSparks" type="GPUParticles3D" parent="."]
+[node name="GrindSparks" type="GPUParticles3D" parent="CharacterBody3D"]
 emitting = false
 amount = 240
 lifetime = 0.4
 process_material = SubResource("ParticleProcessMaterial_f4bln")
 draw_pass_1 = SubResource("CylinderMesh_3b8a5")
 
-[node name="RagdollSfx" type="AudioStreamPlayer3D" parent="."]
+[node name="RagdollSfx" type="AudioStreamPlayer3D" parent="CharacterBody3D"]
 
-[node name="JumpSfx" type="AudioStreamPlayer3D" parent="."]
+[node name="JumpSfx" type="AudioStreamPlayer3D" parent="CharacterBody3D"]
 
-[node name="LandingSfx" type="AudioStreamPlayer3D" parent="."]
+[node name="LandingSfx" type="AudioStreamPlayer3D" parent="CharacterBody3D"]
 
-[node name="AirborneSfx" type="AudioStreamPlayer3D" parent="."]
+[node name="AirborneSfx" type="AudioStreamPlayer3D" parent="CharacterBody3D"]
 
-[node name="MovingSfx" type="AudioStreamPlayer3D" parent="."]
+[node name="MovingSfx" type="AudioStreamPlayer3D" parent="CharacterBody3D"]
 
-[node name="GrindSfx" type="AudioStreamPlayer3D" parent="."]
+[node name="GrindSfx" type="AudioStreamPlayer3D" parent="CharacterBody3D"]
 
-[node name="BoardPhysics" type="RigidBody3D" parent="."]
+[node name="BoardPhysics" type="RigidBody3D" parent="CharacterBody3D"]
 sleeping = true
 freeze = true
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="BoardPhysics"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D/BoardPhysics"]
 transform = Transform3D(-4.371138e-08, 0, 1, 0, 1, 0, -1, 0, -4.371138e-08, 2.6502043e-09, -0.07127532, -0.030314803)
 shape = SubResource("BoxShape3D_board")
 disabled = true
 debug_color = Color(0.97395235, 0, 0.4337076, 0.41960785)
 
-[node name="Visual" type="Node3D" parent="."]
+[node name="Visual" type="Node3D" parent="CharacterBody3D"]
 
-[node name="BoardVisual" type="Node3D" parent="Visual"]
+[node name="BoardVisual" type="Node3D" parent="CharacterBody3D/Visual"]
 
-[node name="Board" type="MeshInstance3D" parent="Visual/BoardVisual"]
+[node name="Board" type="MeshInstance3D" parent="CharacterBody3D/Visual/BoardVisual"]
 transform = Transform3D(-4.371139e-08, 2.1855698e-08, -0.5, -0.5, 2.1855694e-08, 4.371139e-08, 2.1855696e-08, 0.5, 2.185569e-08, 0, 0, 0)
 mesh = ExtResource("2_i3pqv")
 skeleton = NodePath("../../..")
 
-[node name="Body" type="MeshInstance3D" parent="Visual"]
+[node name="Body" type="MeshInstance3D" parent="CharacterBody3D/Visual"]
 transform = Transform3D(-2.185569e-08, 0.5, -2.1855694e-08, 0, -2.1855694e-08, -0.5, -0.5, -2.185569e-08, 9.553428e-16, -0.0070000594, 0.6473949, 0.34734946)
 mesh = ExtResource("3_hqtel")
+
+[node name="SpringArm3D" type="SpringArm3D" parent="."]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0.2117852, 0.72224844)
+shape = SubResource("SphereShape3D_i3pqv")
+
+[node name="Camera3D" type="Camera3D" parent="SpringArm3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.66992, 2.464325)
+current = true

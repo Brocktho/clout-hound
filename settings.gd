@@ -4,8 +4,8 @@ extends CanvasLayer
 @export var show_pointer_lock_hint: bool = false
 
 @onready var ui_change_sfx: AudioStreamPlayer = $UIChangeSfx
-@onready var general_tab_label: Label = $Control/Panel/VBoxContainer/TabsRow/GeneralTabLabel
-@onready var controls_tab_label: Label = $Control/Panel/VBoxContainer/TabsRow/ControlsTabLabel
+@onready var general_tab_label: Label = $Control/Panel/VBoxContainer/TabsRow/GeneralTab/GeneralTabLabel
+@onready var controls_tab_label: Label = $Control/Panel/VBoxContainer/TabsRow/ControlsTab/ControlsTabLabel
 @onready var q_hint_label: Label = $Control/Panel/VBoxContainer/TabsRow/QHintLabel
 @onready var e_hint_label: Label = $Control/Panel/VBoxContainer/TabsRow/EHintLabel
 @onready var general_panel: Control = $Control/Panel/VBoxContainer/ContentArea/GeneralPanel
