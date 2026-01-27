@@ -129,6 +129,9 @@ class_name Player
 @export var slide_offset: float = 0.5;
 @export var grind_visual_offset: float = 0.0
 
+# Add the overlay variable
+var live_overlay: LiveOverlay
+
 var is_third_person: bool = true
 var is_sliding: bool = false
 var camera_look_input: Vector2 = Vector2.ZERO
@@ -240,6 +243,11 @@ var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 func _ready() -> void:
 	add_to_group("player")
+	
+	# Instantiate our new Overlay
+	live_overlay = load("live_overlay.gd").new()
+	add_child(live_overlay)
+	
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	_was_mouse_captured = Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
 	mouse_sensitivity = Global.mouse_sensitivity
@@ -442,6 +450,10 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	if event.is_action_pressed("toggle_camera"):
 		toggle_camera_mode()
+
+	if event.is_action_pressed("toggle_overlay"):
+		if live_overlay:
+			live_overlay.visible = !live_overlay.visible
 
 	if event.is_action_pressed("ui_cancel"):
 		show_settings(false)
@@ -933,6 +945,11 @@ func apply_spin_boost(multiplier: float = 1.0) -> void:
 func start_trick_pose() -> void:
 	if is_ragdolling or trick_frames.is_empty():
 		return
+	
+	# TRIGGER OVERLAY for generic tricks
+	if live_overlay:
+		live_overlay.trigger_trick_reaction()
+		
 	trick_pose_active = true
 	trick_pose_end_us = Time.get_ticks_usec() + 500_000
 	var frame_index := trick_rng.randi_range(0, trick_frames.size() - 1)
@@ -996,6 +1013,10 @@ func is_falling_on_rail() -> bool:
 func start_ragdoll(bail_severity: float = 1.0) -> void:
 	if is_ragdolling:
 		return
+	# TRIGGER OVERLAY for bails
+	if live_overlay:
+		live_overlay.trigger_bail_reaction()
+		
 	is_ragdolling = true
 	_prepare_ragdoll_pose()
 	pending_landing_sfx = false
@@ -1464,6 +1485,12 @@ func enter_rail(rail: Node) -> void:
 	_stop_airborne_sfx()
 	_stop_moving_sfx()
 	_start_grind_sfx()
+	# TRIGGER OVERLAY for grind start
+	if live_overlay:
+		live_overlay.trigger_grind_reaction()
+		# Don't collide with the rail we are riding
+	rail.add_collision_exception_with(self) 
+
 	current_rail = rail
 	rail_offset = current_rail.get_closest_offset(global_position)
 	
@@ -1529,9 +1556,13 @@ func _find_rail_from_sphere_cast(origin: Vector3) -> Path3D:
 	return null
 
 func apply_grind_movement(delta: float) -> void:
-	if not current_rail:
-		exit_rail()
-		return
+    if live_overlay:
+        live_overlay.process_grind_tick(delta)
+
+    # Safety check
+    if not current_rail or not (current_rail is Path3D):
+        exit_rail()
+        return
 		
 	rail_offset += rail_speed * rail_direction * delta
 	
