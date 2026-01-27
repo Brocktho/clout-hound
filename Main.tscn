@@ -41,6 +41,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 4)
 
 [node name="UIChangeSfx" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("3_ui_change")
+bus = "SFX"
 
 [node name="StarfieldSphere" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.058423996, -4.7683716e-07, -0.0019359589)

@@ -47,6 +47,7 @@ func _ready() -> void:
 		_register_ui_change(sfx_slider)
 	if music_slider:
 		music_slider.focus_mode = Control.FOCUS_ALL
+		music_slider.value = Global.music_level
 		music_slider.value_changed.connect(_on_music_value_changed)
 		_register_ui_change(music_slider)
 	if disable_grind_sfx_check:
@@ -182,7 +183,7 @@ func _on_sfx_value_changed(value: float) -> void:
 	_apply_sfx_volume(Global.sfx_level)
 
 func _on_music_value_changed(_value: float) -> void:
-	pass
+	Global.set_music_level(_value)
 
 func _on_disable_grind_sfx_toggled(pressed: bool) -> void:
 	Global.disable_grind_sfx = pressed
@@ -190,13 +191,8 @@ func _on_disable_grind_sfx_toggled(pressed: bool) -> void:
 
 func _apply_sfx_volume(value: float) -> void:
 	var db := -80.0 if value <= 0.001 else linear_to_db(value)
-	var bus_name := "SFX"
-	var bus_index := AudioServer.get_bus_index(bus_name)
-	if bus_index == -1:
-		bus_name = "Master"
-		bus_index = AudioServer.get_bus_index(bus_name)
-	if bus_index >= 0:
-		AudioServer.set_bus_volume_db(bus_index, db)
+	var bus_index := Global.ensure_bus(&"SFX")
+	AudioServer.set_bus_volume_db(bus_index, db)
 
 func _apply_disable_grind_sfx(disabled: bool) -> void:
 	var scene := get_tree().current_scene

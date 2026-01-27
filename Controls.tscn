@@ -9,6 +9,7 @@ script = ExtResource("1_controls")
 
 [node name="UIChangeSfx" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("2_ui_change")
+bus = "SFX"
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3

@@ -1092,9 +1092,9 @@ func _get_board_drop_transform(original: Transform3D) -> Transform3D:
 	var forward := original.basis.z.slide(hit_normal).normalized()
 	if forward.length() < 0.01:
 		forward = Vector3.FORWARD
-	var basis := Basis().looking_at(forward, hit_normal)
+	var new_basis: Basis = Basis.looking_at(forward, hit_normal)
 	var offset := hit_normal * 0.4
-	return Transform3D(basis, hit_pos + offset)
+	return Transform3D(new_basis, hit_pos + offset)
 
 func _play_ragdoll_bail_sfx() -> void:
 	if ragdoll_bail_sfx.is_empty():

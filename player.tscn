@@ -351,16 +351,22 @@ process_material = SubResource("ParticleProcessMaterial_f4bln")
 draw_pass_1 = SubResource("CylinderMesh_3b8a5")
 
 [node name="RagdollSfx" type="AudioStreamPlayer3D" parent="CharacterBody3D"]
+bus = "SFX"
 
 [node name="JumpSfx" type="AudioStreamPlayer3D" parent="CharacterBody3D"]
+bus = "SFX"
 
 [node name="LandingSfx" type="AudioStreamPlayer3D" parent="CharacterBody3D"]
+bus = "SFX"
 
 [node name="AirborneSfx" type="AudioStreamPlayer3D" parent="CharacterBody3D"]
+bus = "SFX"
 
 [node name="MovingSfx" type="AudioStreamPlayer3D" parent="CharacterBody3D"]
+bus = "SFX"
 
 [node name="GrindSfx" type="AudioStreamPlayer3D" parent="CharacterBody3D"]
+bus = "SFX"
 
 [node name="BoardPhysics" type="RigidBody3D" parent="CharacterBody3D"]
 sleeping = true
