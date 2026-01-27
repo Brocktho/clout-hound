@@ -239,8 +239,10 @@ var trick_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 func _ready() -> void:
+	add_to_group("player")
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	_was_mouse_captured = Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
+	mouse_sensitivity = Global.mouse_sensitivity
 	initial_spawn_pos = global_position
 	default_body_rotation = body_mesh.rotation
 	default_board_rotation = board_node.rotation
@@ -462,9 +464,10 @@ func show_settings(show_pointer_lock_hint: bool) -> void:
 					settings_instance.set("show_pointer_lock_hint", show_pointer_lock_hint)
 					break
 		add_sibling(settings_instance) # Add to parent so it's not affected by player's transform
-		
+	
+# First person camera is no longer a valid option :)		
 func toggle_camera_mode() -> void:
-		is_third_person = !is_third_person
+		#is_third_person = !is_third_person
 		update_camera_position()	
 		
 		

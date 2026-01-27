@@ -1,51 +1,49 @@
 extends Node
 
-@export var music_stream: AudioStream = preload("res://Assets/Audio/Music/ElectronicLoop.wav")
-@export var music_autoplay: bool = true
-
 var sfx_level: float = 1.0
 var music_level: float = 1.0
+var mouse_sensitivity: float = 0.0005
+var mouse_sensitivity_slider: float = 0.0
 var disable_grind_sfx: bool = false
-var _music_player: AudioStreamPlayer
-var _needs_user_gesture: bool = true
+var _music_players: Array[AudioStreamPlayer] = []
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	print("Global ready, autoload ok")
 	ensure_bus(&"SFX")
-	ensure_bus(&"Music")
-	_setup_music_player()
+	if get_tree():
+		get_tree().node_added.connect(_on_node_added)
 	_apply_music_volume(music_level)
-	_try_start_music()
 
 func set_music_level(value: float) -> void:
 	music_level = clamp(value, 0.0, 2.0)
 	_apply_music_volume(music_level)
 
-func _input(event: InputEvent) -> void:
-	if not _needs_user_gesture:
-		return
-	if event is InputEventKey and event.pressed:
-		_try_start_music()
-	elif event is InputEventMouseButton and event.pressed:
-		_try_start_music()
-	elif event is InputEventJoypadButton and event.pressed:
-		_try_start_music()
+func set_mouse_sensitivity_slider(value: float) -> void:
+	mouse_sensitivity_slider = clamp(value, 0.0, 0.5)
+	mouse_sensitivity = _map_sensitivity(mouse_sensitivity_slider)
+	_apply_mouse_sensitivity()
 
-func _setup_music_player() -> void:
-	if not _music_player:
-		_music_player = AudioStreamPlayer.new()
-		_music_player.name = "GlobalMusicPlayer"
-		_music_player.process_mode = Node.PROCESS_MODE_ALWAYS
-		add_child(_music_player)
-		print("GlobalMusicPlayer created")
-	if not music_stream:
-		music_stream = load("res://Assets/Audio/Music/ElectronicLoop.wav")
-	if music_stream:
-		_music_player.stream = _prepare_music_stream(music_stream)
-		print("Music stream set, length=", _music_player.stream.get_length())
-	_music_player.bus = &"Music"
-	_music_player.stream_paused = false
+func _map_sensitivity(value: float) -> float:
+	var base := 0.0005
+	var max_value := 0.5
+	var slider_max := 0.5
+	if value <= 0.0:
+		return base
+	var t : float = clamp(value / slider_max, 0.0, 1.0)
+	return base * pow(max_value / base, t)
+
+func _apply_mouse_sensitivity() -> void:
+	if not get_tree():
+		return
+	for node in get_tree().get_nodes_in_group("player"):
+		if node and _has_property(node, "mouse_sensitivity"):
+			node.set("mouse_sensitivity", mouse_sensitivity)
+
+func _has_property(obj: Object, property_name: String) -> bool:
+	for item in obj.get_property_list():
+		if item.name == property_name:
+			return true
+	return false
 
 func ensure_bus(bus_name: StringName) -> int:
 	var bus_index := AudioServer.get_bus_index(bus_name)
@@ -58,62 +56,29 @@ func ensure_bus(bus_name: StringName) -> int:
 		bus_index = insert_index
 	return bus_index
 
-func _prepare_music_stream(stream: AudioStream) -> AudioStream:
-	if stream is AudioStreamWAV:
-		var wav := stream as AudioStreamWAV
-		wav.loop_mode = AudioStreamWAV.LOOP_FORWARD
-		return wav
-	if stream is AudioStreamOggVorbis or stream is AudioStreamMP3:
-		stream.loop = true
-	return stream
-
 func _apply_music_volume(value: float) -> void:
 	var db := -80.0 if value <= 0.001 else linear_to_db(value)
-	if _music_player:
-		_music_player.volume_db = db
-
-func _try_start_music() -> void:
-	_setup_music_player()
-	if not _music_player:
+	for player in _music_players:
+		if is_instance_valid(player):
+			player.volume_db = db
+		else:
+			_music_players.erase(player)
+	if not get_tree():
 		return
-	if music_stream:
-		_print_bus_state(&"Master")
-		_print_bus_state(&"Music")
-		print("GlobalMusicPlayer attempting play, autoplay=", music_autoplay, " playing(before)=", _music_player.playing)
-		AudioServer.set_bus_mute(AudioServer.get_bus_index(&"Master"), false)
-		AudioServer.set_bus_mute(AudioServer.get_bus_index(&"Music"), false)
-		_music_player.play()
-		print("GlobalMusicPlayer play() called, playing(after)=", _music_player.playing, " stream=", _music_player.stream, " bus=", _music_player.bus, " vol_db=", _music_player.volume_db)
-		call_deferred("_report_music_signal")
-	if _music_player.playing:
-		_needs_user_gesture = false
+	for node in get_tree().get_nodes_in_group("music"):
+		var player := node as AudioStreamPlayer
+		if player:
+			player.volume_db = db
 
-func _print_bus_state(bus_name: StringName) -> void:
-	var bus_index := AudioServer.get_bus_index(bus_name)
-	if bus_index == -1:
-		print("Bus missing:", bus_name)
+func _on_node_added(node: Node) -> void:
+	if node and node.is_in_group("music") and node is AudioStreamPlayer:
+		var player := node as AudioStreamPlayer
+		player.volume_db = -80.0 if music_level <= 0.001 else linear_to_db(music_level)
+
+func register_music_player(player: AudioStreamPlayer) -> void:
+	if not player:
 		return
-	var db := AudioServer.get_bus_volume_db(bus_index)
-	var mute := AudioServer.is_bus_mute(bus_index)
-	var send := AudioServer.get_bus_send(bus_index)
-	print("Bus state:", bus_name, " index=", bus_index, " db=", db, " mute=", mute, " send=", send)
-
-func _report_music_signal() -> void:
-	await get_tree().create_timer(0.3).timeout
-	_print_bus_peaks(&"Music")
-	_print_bus_peaks(&"Master")
-	if _music_player:
-		print("Music playback position=", _music_player.get_playback_position(), " playing=", _music_player.playing)
-	await get_tree().create_timer(0.7).timeout
-	_print_bus_peaks(&"Music")
-	_print_bus_peaks(&"Master")
-	if _music_player:
-		print("Music playback position(after)=", _music_player.get_playback_position(), " playing=", _music_player.playing)
-
-func _print_bus_peaks(bus_name: StringName) -> void:
-	var bus_index := AudioServer.get_bus_index(bus_name)
-	if bus_index == -1:
+	if _music_players.has(player):
 		return
-	var peak_l := AudioServer.get_bus_peak_volume_left_db(bus_index, 0)
-	var peak_r := AudioServer.get_bus_peak_volume_right_db(bus_index, 0)
-	print("Bus peaks:", bus_name, " L=", peak_l, " R=", peak_r)
+	_music_players.append(player)
+	player.volume_db = -80.0 if music_level <= 0.001 else linear_to_db(music_level)

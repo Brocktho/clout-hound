@@ -4,10 +4,18 @@ extends Node3D
 @export var settings_scene: PackedScene
 
 @onready var play_button: Button = $UI/MainMenu/VBoxContainer/PlayButton
+@onready var settings_button: Button = $UI/MainMenu/VBoxContainer/SettingsButton
 @onready var controls_button: Button = $UI/MainMenu/VBoxContainer/ControlsButton
 @onready var ui_change_sfx: AudioStreamPlayer = $UIChangeSfx
+@onready var music_player: AudioStreamPlayer = $MusicPlayer
+@onready var scene_host: Node3D = $SceneHost
+@onready var menu_root: Control = $UI/MainMenu
 @onready var background_floaters: Node3D = $BackgroundFloaters
 @onready var main_camera: Camera3D = $Camera3D
+@onready var starfield_sphere: MeshInstance3D = $StarfieldSphere
+@onready var world_environment: WorldEnvironment = $WorldEnvironment
+@onready var menu_environment: Environment = world_environment.environment if world_environment else null
+@onready var directional_light: DirectionalLight3D = $DirectionalLight3D
 
 @export var floater_min_interval: float = 6.0
 @export var floater_max_interval: float = 12.0
@@ -27,6 +35,8 @@ var _dog_mesh: Mesh = preload("res://Assets/models/Dog_Default.res")
 var _board_mesh: Mesh = preload("res://Assets/models/Board.res")
 var _floaters: Array[MeshInstance3D] = []
 var _return_focus_path: NodePath = NodePath("")
+var _active_scene: Node
+var _floaters_enabled: bool = true
 
 func _ready():
 	# Load scenes if not set in editor (though usually set via editor)
@@ -35,32 +45,81 @@ func _ready():
 	# Ensure mouse is visible for the menu
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	play_button.focus_mode = Control.FOCUS_ALL
+	settings_button.focus_mode = Control.FOCUS_ALL
 	controls_button.focus_mode = Control.FOCUS_ALL
 	play_button.grab_focus()
 	_register_ui_change(play_button)
+	_register_ui_change(settings_button)
 	_register_ui_change(controls_button)
 	_rng.randomize()
 	_start_floater_loop()
+	_set_menu_visible(true)
+	_prepare_music()
+	if music_player:
+		Global.register_music_player(music_player)
+		music_player.process_mode = Node.PROCESS_MODE_ALWAYS
+		music_player.stream_paused = false
+		if not music_player.playing:
+			music_player.play()
 
 func _process(_delta: float) -> void:
-	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+	if menu_root and menu_root.visible and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_update_floaters()
 
 func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel"):
+	if menu_root and menu_root.visible and event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()
 
 func _on_play_button_pressed():
-	get_tree().change_scene_to_packed(play_scene)
+	if not play_scene or not scene_host:
+		return
+	if _active_scene and is_instance_valid(_active_scene):
+		return
+	var instance := play_scene.instantiate()
+	scene_host.add_child(instance)
+	_active_scene = instance
+	_set_menu_visible(false)
+	if not _active_scene.tree_exited.is_connected(_on_active_scene_exited):
+		_active_scene.tree_exited.connect(_on_active_scene_exited)
 
-func _on_controls_button_pressed():
+func _on_settings_button_pressed():
 	var focused := get_viewport().gui_get_focus_owner()
 	if focused:
 		_return_focus_path = focused.get_path()
 	var settings_instance = settings_scene.instantiate()
 	add_child(settings_instance)
 	settings_instance.tree_exited.connect(_on_settings_closed)
+
+func _on_controls_button_pressed() -> void:
+	if not settings_scene:
+		return
+	var focused := get_viewport().gui_get_focus_owner()
+	if focused:
+		_return_focus_path = focused.get_path()
+	var settings_instance = settings_scene.instantiate()
+	settings_instance.show_pointer_lock_hint = true
+	if settings_instance.has_method("set_initial_tab"):
+		settings_instance.set_initial_tab(&"Controls")
+	add_child(settings_instance)
+	settings_instance.tree_exited.connect(_on_settings_closed)
+
+func return_to_menu() -> void:
+	if _active_scene and is_instance_valid(_active_scene):
+		_active_scene.queue_free()
+		_active_scene = null
+	_set_menu_visible(true)
+	get_tree().paused = false
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+func is_game_active() -> bool:
+	return _active_scene != null and is_instance_valid(_active_scene)
+
+func _on_active_scene_exited() -> void:
+	_active_scene = null
+	_set_menu_visible(true)
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	get_tree().paused = false
 
 func _on_settings_closed() -> void:
 	if not is_inside_tree():
@@ -78,7 +137,7 @@ func _register_ui_change(control: Control) -> void:
 	if not control:
 		return
 	control.focus_entered.connect(_on_ui_change)
-	control.mouse_entered.connect(_on_ui_change)
+	control.mouse_entered.connect(_on_hover_focus.bind(control))
 	if control is BaseButton:
 		control.pressed.connect(_on_ui_change)
 
@@ -89,11 +148,52 @@ func _on_ui_change() -> void:
 		ui_change_sfx.pitch_scale = _rng.randf_range(0.94, 1.06)
 		ui_change_sfx.play()
 
+func _on_hover_focus(control: Control) -> void:
+	if not control or not control.visible:
+		return
+	if control.focus_mode == Control.FOCUS_NONE:
+		return
+	control.grab_focus()
+	_on_ui_change()
+
+func _set_menu_visible(visible: bool) -> void:
+	if menu_root:
+		menu_root.visible = visible
+	if visible:
+		play_button.grab_focus()
+	_floaters_enabled = visible
+	if background_floaters:
+		background_floaters.visible = visible
+	if starfield_sphere:
+		starfield_sphere.visible = visible
+	if world_environment:
+		world_environment.environment = menu_environment if visible else null
+	if directional_light:
+		directional_light.visible = visible
+	if not visible:
+		for floater in _floaters:
+			if is_instance_valid(floater):
+				floater.queue_free()
+		_floaters.clear()
+
+func _prepare_music() -> void:
+	if not music_player:
+		return
+	if not music_player.finished.is_connected(_on_music_finished):
+		music_player.finished.connect(_on_music_finished)
+
+func _on_music_finished() -> void:
+	if music_player and music_player.is_inside_tree():
+		music_player.play()
+
 func _start_floater_loop() -> void:
 	call_deferred("_spawn_floater_loop")
 
 func _spawn_floater_loop() -> void:
 	await get_tree().create_timer(_rng.randf_range(floater_min_interval, floater_max_interval)).timeout
+	if not _floaters_enabled:
+		_spawn_floater_loop()
+		return
 	if _floaters.size() < 2:
 		_spawn_floater()
 	_spawn_floater_loop()
@@ -176,6 +276,8 @@ func _random_offscreen_screen_point(viewport_size: Vector2, margin: float) -> Ve
 	return Vector2(viewport_size.x + margin, _rng.randf_range(-margin, viewport_size.y + margin))
 
 func _update_floaters() -> void:
+	if not _floaters_enabled:
+		return
 	if not main_camera:
 		return
 	var viewport_size := get_viewport().get_visible_rect().size

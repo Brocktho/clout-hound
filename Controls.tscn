@@ -1,7 +1,20 @@
 [gd_scene load_steps=3 format=3 uid="uid://dp7n6x23g8dl4"]
 
 [ext_resource type="Script" uid="uid://omrt0qn81s7s" path="res://controls.gd" id="1_controls"]
-[ext_resource type="AudioStream" path="res://Assets/Audio/SFX/UI_Change.wav" id="2_ui_change"]
+[ext_resource type="AudioStream" uid="uid://em6vk6wpdssa" path="res://Assets/Audio/SFX/UI_Change.wav" id="2_ui_change"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_row"]
+bg_color = Color(1, 1, 1, 0.08)
+content_margin_left = 6.0
+content_margin_right = 6.0
+content_margin_top = 4.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_row"]
+content_margin_left = 6.0
+content_margin_right = 6.0
+content_margin_top = 4.0
+content_margin_bottom = 4.0
 
 [node name="Controls" type="CanvasLayer"]
 layer = 100
@@ -9,7 +22,6 @@ script = ExtResource("1_controls")
 
 [node name="UIChangeSfx" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("2_ui_change")
-bus = "SFX"
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3
@@ -18,6 +30,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 
 [node name="PointerLockHint" type="Label" parent="Control"]
 visible = false
@@ -26,6 +39,7 @@ anchors_preset = 10
 anchor_right = 1.0
 offset_top = 24.0
 offset_bottom = 56.0
+grow_horizontal = 2
 text = "Pointer unlocked. Press Esc to resume."
 horizontal_alignment = 1
 
@@ -36,6 +50,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 color = Color(0, 0, 0, 1)
 
 [node name="CenterContainer" type="CenterContainer" parent="Control"]
@@ -45,9 +60,11 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Control/CenterContainer"]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 20
 
 [node name="Label" type="Label" parent="Control/CenterContainer/VBoxContainer"]
@@ -56,19 +73,214 @@ theme_override_font_sizes/font_size = 32
 text = "Controls"
 horizontal_alignment = 1
 
-[node name="ControlList" type="Label" parent="Control/CenterContainer/VBoxContainer"]
+[node name="ControlsScroll" type="ScrollContainer" parent="Control/CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(520, 280)
 layout_mode = 2
-text = "WASD - Move
-Space - Jump
-Left Click (Hold) - Slide
-Right Click - Slow Motion
-R - Kickflip
-Slide to Start Grinding on Rails
-Q/E - Spin
-Spin + Kickflip - Speed Boosts
-Tab - Toggle Camera
-Escape - Toggle Menu / Show Cursor"
+size_flags_vertical = 3
+
+[node name="ControlsContent" type="VBoxContainer" parent="Control/CenterContainer/VBoxContainer/ControlsScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="CoreMovementLabel" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Core Movement"
 horizontal_alignment = 1
+
+[node name="CoreMovementTable" type="GridContainer" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent"]
+layout_mode = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/v_separation = 6
+columns = 2
+
+[node name="CoreMovementHeaderCommand" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/CoreMovementTable"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Command Name"
+horizontal_alignment = 0
+
+[node name="CoreMovementHeaderButton" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/CoreMovementTable"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Button to Press"
+horizontal_alignment = 2
+
+[node name="CoreMovementRowMove" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/CoreMovementTable"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_row")
+text = "Move"
+horizontal_alignment = 0
+
+[node name="CoreMovementRowMoveKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/CoreMovementTable"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_row")
+text = "WASD"
+horizontal_alignment = 2
+
+[node name="CoreMovementRowJump" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/CoreMovementTable"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxEmpty_row")
+text = "Jump"
+horizontal_alignment = 0
+
+[node name="CoreMovementRowJumpKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/CoreMovementTable"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxEmpty_row")
+text = "Space"
+horizontal_alignment = 2
+
+[node name="CoreMovementRowSlide" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/CoreMovementTable"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_row")
+text = "Slide"
+horizontal_alignment = 0
+
+[node name="CoreMovementRowSlideKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/CoreMovementTable"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_row")
+text = "Left Click (Hold)"
+horizontal_alignment = 2
+
+[node name="CoreMovementRowSlowMo" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/CoreMovementTable"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxEmpty_row")
+text = "Slow Motion"
+horizontal_alignment = 0
+
+[node name="CoreMovementRowSlowMoKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/CoreMovementTable"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxEmpty_row")
+text = "Right Click"
+horizontal_alignment = 2
+
+[node name="TrickControlsLabel" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Trick Controls"
+horizontal_alignment = 1
+
+[node name="TrickControlsTable" type="GridContainer" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent"]
+layout_mode = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/v_separation = 6
+columns = 2
+
+[node name="TrickControlsHeaderCommand" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/TrickControlsTable"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Command Name"
+horizontal_alignment = 0
+
+[node name="TrickControlsHeaderButton" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/TrickControlsTable"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Button to Press"
+horizontal_alignment = 2
+
+[node name="TrickControlsRowKickflip" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/TrickControlsTable"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_row")
+text = "Kickflip"
+horizontal_alignment = 0
+
+[node name="TrickControlsRowKickflipKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/TrickControlsTable"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_row")
+text = "R"
+horizontal_alignment = 2
+
+[node name="TrickControlsRowSpinRight" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/TrickControlsTable"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxEmpty_row")
+text = "Spin"
+horizontal_alignment = 0
+
+[node name="TrickControlsRowSpinRightKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/TrickControlsTable"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxEmpty_row")
+text = "E"
+horizontal_alignment = 2
+
+[node name="TrickControlsRowBoost" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/TrickControlsTable"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_row")
+text = "Spin + Kickflip"
+horizontal_alignment = 0
+
+[node name="TrickControlsRowBoostKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/TrickControlsTable"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_row")
+text = "Speed Boost"
+horizontal_alignment = 2
+
+[node name="TrickControlsRowGrind" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/TrickControlsTable"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxEmpty_row")
+text = "Grind Rails"
+horizontal_alignment = 0
+
+[node name="TrickControlsRowGrindKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/TrickControlsTable"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxEmpty_row")
+text = "Slide to Start Grinding"
+horizontal_alignment = 2
+
+[node name="UiControlsLabel" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "UI Controls"
+horizontal_alignment = 1
+
+[node name="UiControlsTable" type="GridContainer" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent"]
+layout_mode = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/v_separation = 6
+columns = 2
+
+[node name="UiControlsHeaderCommand" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/UiControlsTable"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Command Name"
+horizontal_alignment = 0
+
+[node name="UiControlsHeaderButton" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/UiControlsTable"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Button to Press"
+horizontal_alignment = 2
+
+[node name="UiControlsRowMenu" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/UiControlsTable"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_row")
+text = "Toggle Menu / Show Cursor"
+horizontal_alignment = 0
+
+[node name="UiControlsRowMenuKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/UiControlsTable"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_row")
+text = "Escape/Tab"
+horizontal_alignment = 2
 
 [node name="CloseButton" type="Button" parent="Control/CenterContainer/VBoxContainer"]
 layout_mode = 2

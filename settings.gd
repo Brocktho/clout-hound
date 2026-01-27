@@ -6,22 +6,29 @@ extends CanvasLayer
 @onready var ui_change_sfx: AudioStreamPlayer = $UIChangeSfx
 @onready var general_tab_label: Label = $Control/Panel/VBoxContainer/TabsRow/GeneralTab/GeneralTabLabel
 @onready var controls_tab_label: Label = $Control/Panel/VBoxContainer/TabsRow/ControlsTab/ControlsTabLabel
+@onready var general_tab_panel: Control = $Control/Panel/VBoxContainer/TabsRow/GeneralTab
+@onready var controls_tab_panel: Control = $Control/Panel/VBoxContainer/TabsRow/ControlsTab
 @onready var q_hint_label: Label = $Control/Panel/VBoxContainer/TabsRow/QHintLabel
 @onready var e_hint_label: Label = $Control/Panel/VBoxContainer/TabsRow/EHintLabel
 @onready var general_panel: Control = $Control/Panel/VBoxContainer/ContentArea/GeneralPanel
 @onready var controls_panel: Control = $Control/Panel/VBoxContainer/ContentArea/ControlsPanel
-@onready var main_menu_button: Button = $Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent/MainMenuButton
+@onready var main_menu_button: Button = $Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent/BottomButtons/MainMenuButton
+@onready var close_button: Button = $Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent/BottomButtons/CloseButton
+@onready var close_button_top: Button = $Control/Panel/VBoxContainer/TabsRow/CloseButtonTop
 @onready var sfx_slider: HSlider = $Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent/SfxSlider
 @onready var music_slider: HSlider = $Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent/MusicSlider
+@onready var sensitivity_slider: HSlider = $Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent/SensitivitySlider
 @onready var disable_grind_sfx_check: CheckBox = $Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent/DisableGrindSfxCheck
 
 var _tabs: Array[StringName] = [&"General", &"Controls"]
 var _current_tab_index: int = 0
+var _forced_initial_tab: int = -1
 var _controls_instance: CanvasLayer
 var _previous_mouse_mode: Input.MouseMode = Input.MOUSE_MODE_VISIBLE
 var _previous_focus_path: NodePath = NodePath("")
 var _ui_rng := RandomNumberGenerator.new()
 var _suppress_ui_change: bool = true
+var _last_sfx_preview_ms: int = 0
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -29,7 +36,12 @@ func _ready() -> void:
 	if not controls_scene:
 		controls_scene = load("res://Controls.tscn")
 	var current_scene := get_tree().current_scene
-	var in_game := current_scene and current_scene.name != "Main"
+	var in_game := false
+	if current_scene:
+		if current_scene.has_method("is_game_active"):
+			in_game = bool(current_scene.call("is_game_active"))
+		else:
+			in_game = current_scene.name != "Main"
 	if in_game:
 		_previous_mouse_mode = Input.mouse_mode
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -40,6 +52,14 @@ func _ready() -> void:
 
 	main_menu_button.focus_mode = Control.FOCUS_ALL
 	main_menu_button.pressed.connect(_on_main_menu_pressed)
+	if close_button:
+		close_button.focus_mode = Control.FOCUS_ALL
+		close_button.pressed.connect(_on_close_pressed)
+		_register_ui_change(close_button)
+	if close_button_top:
+		close_button_top.focus_mode = Control.FOCUS_ALL
+		close_button_top.pressed.connect(_on_close_pressed)
+		_register_ui_change(close_button_top)
 	if sfx_slider:
 		sfx_slider.focus_mode = Control.FOCUS_ALL
 		sfx_slider.value = Global.sfx_level
@@ -50,15 +70,30 @@ func _ready() -> void:
 		music_slider.value = Global.music_level
 		music_slider.value_changed.connect(_on_music_value_changed)
 		_register_ui_change(music_slider)
+	if sensitivity_slider:
+		sensitivity_slider.focus_mode = Control.FOCUS_ALL
+		sensitivity_slider.value = Global.mouse_sensitivity_slider
+		sensitivity_slider.value_changed.connect(_on_sensitivity_value_changed)
+		_register_ui_change(sensitivity_slider)
 	if disable_grind_sfx_check:
 		disable_grind_sfx_check.focus_mode = Control.FOCUS_ALL
 		disable_grind_sfx_check.button_pressed = Global.disable_grind_sfx
 		disable_grind_sfx_check.toggled.connect(_on_disable_grind_sfx_toggled)
 		_register_ui_change(disable_grind_sfx_check)
 	_register_ui_change(main_menu_button)
+	_register_ui_change(general_tab_panel)
+	_register_ui_change(controls_tab_panel)
+	if general_tab_panel and not general_tab_panel.gui_input.is_connected(_on_tab_gui_input):
+		general_tab_panel.gui_input.connect(_on_tab_gui_input.bind(0))
+	if controls_tab_panel and not controls_tab_panel.gui_input.is_connected(_on_tab_gui_input):
+		controls_tab_panel.gui_input.connect(_on_tab_gui_input.bind(1))
 
+	if _forced_initial_tab >= 0:
+		_current_tab_index = _forced_initial_tab
+		_forced_initial_tab = -1
 	_show_tab(_tabs[_current_tab_index])
 	_apply_sfx_volume(Global.sfx_level)
+	Global.set_mouse_sensitivity_slider(Global.mouse_sensitivity_slider)
 	call_deferred("_enable_ui_change_sfx")
 	_apply_disable_grind_sfx(Global.disable_grind_sfx)
 
@@ -145,13 +180,27 @@ func _update_tab_labels() -> void:
 	q_hint_label.text = "[Q]" if controls_active else "Q"
 	e_hint_label.text = "[E]" if general_active else "E"
 
+func _on_tab_gui_input(event: InputEvent, tab_index: int) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		_current_tab_index = tab_index
+		_show_tab(_tabs[_current_tab_index])
+		_play_ui_change()
+
 func _register_ui_change(control: Control) -> void:
 	if not control:
 		return
 	control.focus_entered.connect(_play_ui_change)
-	control.mouse_entered.connect(_play_ui_change)
+	control.mouse_entered.connect(_on_hover_focus.bind(control))
 	if control is BaseButton:
 		control.pressed.connect(_play_ui_change)
+
+func _on_hover_focus(control: Control) -> void:
+	if not control or not control.visible:
+		return
+	if control.focus_mode == Control.FOCUS_NONE:
+		return
+	control.grab_focus()
+	_play_ui_change()
 
 func _play_ui_change() -> void:
 	if _suppress_ui_change:
@@ -166,11 +215,25 @@ func _enable_ui_change_sfx() -> void:
 	_suppress_ui_change = false
 
 func _on_main_menu_pressed() -> void:
+	var current_scene := get_tree().current_scene
+	if current_scene and current_scene.has_method("return_to_menu"):
+		current_scene.call_deferred("return_to_menu")
+		queue_free()
+		return
 	get_tree().change_scene_to_file("res://Main.tscn")
+
+func _on_close_pressed() -> void:
+	queue_free()
 
 func _exit_tree() -> void:
 	var current_scene := get_tree().current_scene
-	if current_scene and current_scene.name != "Main":
+	var in_game := false
+	if current_scene:
+		if current_scene.has_method("is_game_active"):
+			in_game = bool(current_scene.call("is_game_active"))
+		else:
+			in_game = current_scene.name != "Main"
+	if in_game:
 		get_tree().paused = false
 		Input.mouse_mode = _previous_mouse_mode
 		if _previous_focus_path != NodePath(""):
@@ -181,9 +244,18 @@ func _exit_tree() -> void:
 func _on_sfx_value_changed(value: float) -> void:
 	Global.sfx_level = clamp(value, 0.0, 2.0)
 	_apply_sfx_volume(Global.sfx_level)
+	_play_sfx_preview()
 
 func _on_music_value_changed(_value: float) -> void:
 	Global.set_music_level(_value)
+
+func _on_sensitivity_value_changed(value: float) -> void:
+	Global.set_mouse_sensitivity_slider(value)
+
+func set_initial_tab(tab_name: StringName) -> void:
+	var idx := _tabs.find(tab_name)
+	if idx >= 0:
+		_forced_initial_tab = idx
 
 func _on_disable_grind_sfx_toggled(pressed: bool) -> void:
 	Global.disable_grind_sfx = pressed
@@ -191,8 +263,9 @@ func _on_disable_grind_sfx_toggled(pressed: bool) -> void:
 
 func _apply_sfx_volume(value: float) -> void:
 	var db := -80.0 if value <= 0.001 else linear_to_db(value)
-	var bus_index := Global.ensure_bus(&"SFX")
+	var bus_index : int = Global.ensure_bus(&"SFX")
 	AudioServer.set_bus_volume_db(bus_index, db)
+
 
 func _apply_disable_grind_sfx(disabled: bool) -> void:
 	var scene := get_tree().current_scene
@@ -206,3 +279,13 @@ func _apply_disable_grind_sfx(disabled: bool) -> void:
 		grind_player.volume_db = -80.0
 	else:
 		grind_player.volume_db = 0.0
+
+func _play_sfx_preview() -> void:
+	if not ui_change_sfx or not ui_change_sfx.is_inside_tree():
+		return
+	var now_ms := Time.get_ticks_msec()
+	if now_ms - _last_sfx_preview_ms < 120:
+		return
+	_last_sfx_preview_ms = now_ms
+	ui_change_sfx.pitch_scale = _ui_rng.randf_range(0.96, 1.04)
+	ui_change_sfx.play()

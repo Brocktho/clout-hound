@@ -31,7 +31,6 @@ script = ExtResource("1_settings")
 
 [node name="UIChangeSfx" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("2_ui_change")
-bus = "SFX"
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3
@@ -100,6 +99,14 @@ theme_override_font_sizes/font_size = 20
 text = "E"
 horizontal_alignment = 1
 
+[node name="CloseButtonTop" type="Button" parent="Control/Panel/VBoxContainer/TabsRow"]
+z_index = 10
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+text = "X"
+
 [node name="TabDivider" type="Panel" parent="Control/Panel/VBoxContainer"]
 custom_minimum_size = Vector2(0, 2)
 layout_mode = 2
@@ -154,13 +161,33 @@ max_value = 2.0
 step = 0.01
 value = 1.0
 
+[node name="SensitivityLabel" type="Label" parent="Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent"]
+layout_mode = 2
+text = "Mouse Sensitivity"
+horizontal_alignment = 1
+
+[node name="SensitivitySlider" type="HSlider" parent="Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent"]
+layout_mode = 2
+max_value = 0.5
+step = 0.005
+
 [node name="DisableGrindSfxCheck" type="CheckBox" parent="Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent"]
 layout_mode = 2
 text = "Disable Grind Rail SFX"
 
-[node name="MainMenuButton" type="Button" parent="Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent"]
+[node name="BottomButtons" type="HBoxContainer" parent="Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent"]
 layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="MainMenuButton" type="Button" parent="Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent/BottomButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
 text = "Main Menu"
+
+[node name="CloseButton" type="Button" parent="Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent/BottomButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Close"
 
 [node name="ControlsPanel" type="Control" parent="Control/Panel/VBoxContainer/ContentArea"]
 visible = false
