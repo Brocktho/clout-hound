@@ -80,8 +80,11 @@ func _try_start_music() -> void:
 		_print_bus_state(&"Master")
 		_print_bus_state(&"Music")
 		print("GlobalMusicPlayer attempting play, autoplay=", music_autoplay, " playing(before)=", _music_player.playing)
+		AudioServer.set_bus_mute(AudioServer.get_bus_index(&"Master"), false)
+		AudioServer.set_bus_mute(AudioServer.get_bus_index(&"Music"), false)
 		_music_player.play()
 		print("GlobalMusicPlayer play() called, playing(after)=", _music_player.playing, " stream=", _music_player.stream, " bus=", _music_player.bus, " vol_db=", _music_player.volume_db)
+		call_deferred("_report_music_signal")
 	if _music_player.playing:
 		_needs_user_gesture = false
 
@@ -94,3 +97,23 @@ func _print_bus_state(bus_name: StringName) -> void:
 	var mute := AudioServer.is_bus_mute(bus_index)
 	var send := AudioServer.get_bus_send(bus_index)
 	print("Bus state:", bus_name, " index=", bus_index, " db=", db, " mute=", mute, " send=", send)
+
+func _report_music_signal() -> void:
+	await get_tree().create_timer(0.3).timeout
+	_print_bus_peaks(&"Music")
+	_print_bus_peaks(&"Master")
+	if _music_player:
+		print("Music playback position=", _music_player.get_playback_position(), " playing=", _music_player.playing)
+	await get_tree().create_timer(0.7).timeout
+	_print_bus_peaks(&"Music")
+	_print_bus_peaks(&"Master")
+	if _music_player:
+		print("Music playback position(after)=", _music_player.get_playback_position(), " playing=", _music_player.playing)
+
+func _print_bus_peaks(bus_name: StringName) -> void:
+	var bus_index := AudioServer.get_bus_index(bus_name)
+	if bus_index == -1:
+		return
+	var peak_l := AudioServer.get_bus_peak_volume_left_db(bus_index, 0)
+	var peak_r := AudioServer.get_bus_peak_volume_right_db(bus_index, 0)
+	print("Bus peaks:", bus_name, " L=", peak_l, " R=", peak_r)
