@@ -1,19 +1,19 @@
-[gd_scene load_steps=3 format=3 uid="uid://dp7n6x23g8dl4"]
+[gd_scene load_steps=5 format=3 uid="uid://dp7n6x23g8dl4"]
 
 [ext_resource type="Script" uid="uid://omrt0qn81s7s" path="res://controls.gd" id="1_controls"]
 [ext_resource type="AudioStream" uid="uid://em6vk6wpdssa" path="res://Assets/Audio/SFX/UI_Change.wav" id="2_ui_change"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_row"]
-bg_color = Color(1, 1, 1, 0.08)
 content_margin_left = 6.0
-content_margin_right = 6.0
 content_margin_top = 4.0
+content_margin_right = 6.0
 content_margin_bottom = 4.0
+bg_color = Color(1, 1, 1, 0.08)
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_row"]
 content_margin_left = 6.0
-content_margin_right = 6.0
 content_margin_top = 4.0
+content_margin_right = 6.0
 content_margin_bottom = 4.0
 
 [node name="Controls" type="CanvasLayer"]
@@ -77,6 +77,7 @@ horizontal_alignment = 1
 custom_minimum_size = Vector2(520, 280)
 layout_mode = 2
 size_flags_vertical = 3
+scroll_vertical = 332
 
 [node name="ControlsContent" type="VBoxContainer" parent="Control/CenterContainer/VBoxContainer/ControlsScroll"]
 layout_mode = 2
@@ -100,7 +101,6 @@ columns = 2
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Command Name"
-horizontal_alignment = 0
 
 [node name="CoreMovementHeaderButton" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/CoreMovementTable"]
 layout_mode = 2
@@ -113,7 +113,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("StyleBoxFlat_row")
 text = "Move"
-horizontal_alignment = 0
 
 [node name="CoreMovementRowMoveKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/CoreMovementTable"]
 layout_mode = 2
@@ -127,7 +126,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("StyleBoxEmpty_row")
 text = "Jump"
-horizontal_alignment = 0
 
 [node name="CoreMovementRowJumpKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/CoreMovementTable"]
 layout_mode = 2
@@ -141,7 +139,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("StyleBoxFlat_row")
 text = "Slide"
-horizontal_alignment = 0
 
 [node name="CoreMovementRowSlideKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/CoreMovementTable"]
 layout_mode = 2
@@ -155,7 +152,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("StyleBoxEmpty_row")
 text = "Slow Motion"
-horizontal_alignment = 0
 
 [node name="CoreMovementRowSlowMoKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/CoreMovementTable"]
 layout_mode = 2
@@ -180,7 +176,6 @@ columns = 2
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Command Name"
-horizontal_alignment = 0
 
 [node name="TrickControlsHeaderButton" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/TrickControlsTable"]
 layout_mode = 2
@@ -193,7 +188,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("StyleBoxFlat_row")
 text = "Kickflip"
-horizontal_alignment = 0
 
 [node name="TrickControlsRowKickflipKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/TrickControlsTable"]
 layout_mode = 2
@@ -207,7 +201,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("StyleBoxEmpty_row")
 text = "Spin"
-horizontal_alignment = 0
 
 [node name="TrickControlsRowSpinRightKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/TrickControlsTable"]
 layout_mode = 2
@@ -221,7 +214,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("StyleBoxFlat_row")
 text = "Spin + Kickflip"
-horizontal_alignment = 0
 
 [node name="TrickControlsRowBoostKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/TrickControlsTable"]
 layout_mode = 2
@@ -235,7 +227,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("StyleBoxEmpty_row")
 text = "Grind Rails"
-horizontal_alignment = 0
 
 [node name="TrickControlsRowGrindKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/TrickControlsTable"]
 layout_mode = 2
@@ -260,7 +251,6 @@ columns = 2
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Command Name"
-horizontal_alignment = 0
 
 [node name="UiControlsHeaderButton" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/UiControlsTable"]
 layout_mode = 2
@@ -273,13 +263,25 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("StyleBoxFlat_row")
 text = "Toggle Menu / Show Cursor"
-horizontal_alignment = 0
 
 [node name="UiControlsRowMenuKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/UiControlsTable"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("StyleBoxFlat_row")
-text = "Escape/Tab"
+text = "Escape"
+horizontal_alignment = 2
+
+[node name="UiControlsRowHideChat" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/UiControlsTable"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxEmpty_row")
+text = "Hide Stream Chat"
+
+[node name="UiControlsRowHideChatKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/UiControlsTable"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxEmpty_row")
+text = "Tab"
 horizontal_alignment = 2
 
 [node name="CloseButton" type="Button" parent="Control/CenterContainer/VBoxContainer"]

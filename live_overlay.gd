@@ -48,7 +48,7 @@ const COMMENTS_BAIL = [
 const COMMENTS_IDLE = [
 	"are we lagging?", "go fast again", "hello?", "more tricks pls",
 	"boring...", "waiting for content", "💤", "do something cool",
-    "IS that a DOG on a skateboard? wtaf !?" 
+	"IS that a DOG on a skateboard? wtaf !?" 
 ]
 
 const DONATION_MSGS = [
@@ -346,7 +346,7 @@ func _cleanup_chat() -> void:
 
 
 func trigger_trick_reaction() -> void:
-	var previous_multiplier = tracker.get_multiplier()
+	var _previous_multiplier = tracker.get_multiplier()
 	tracker.add_trick_score(150.0)
 	var current_multiplier = tracker.get_multiplier()
 	
@@ -370,32 +370,32 @@ func trigger_trick_reaction() -> void:
 		add_chat_message(user, msg, Color.GOLD)
 
 func trigger_grind_start() -> void:
-    # Initial burst for locking onto the rail
-    tracker.add_trick_score(50.0) 
-    _target_watcher_count += _rng.randf_range(5, 10)
-    
-    # High chance of initial "Locked in" message
-    if _rng.randf() > 0.4:
-        var user = _get_unique_item(USERNAMES, _recent_users)
-        var msg = "Locked in 🔒"
-        add_chat_message(user, msg, Color.ORANGE)
+	# Initial burst for locking onto the rail
+	tracker.add_trick_score(50.0) 
+	_target_watcher_count += _rng.randf_range(5, 10)
+
+	# High chance of initial "Locked in" message
+	if _rng.randf() > 0.4:
+		var user = _get_unique_item(USERNAMES, _recent_users)
+		var msg = "Locked in 🔒"
+		add_chat_message(user, msg, Color.ORANGE)
 
 func process_grind_tick(delta: float) -> void:
-    # Continuous score per second (e.g. 500 base points per sec)
-    tracker.add_grind_score(500.0 * delta)
-    
-    # Continuous viewer gain
-    _target_watcher_count += 5.0 * delta
-    
-    # Occasional chat message (approx every 1.5 seconds)
-    if _rng.randf() < (0.6 * delta):
-        var user = _get_unique_item(USERNAMES, _recent_users)
-        var msg = _get_unique_item(COMMENTS_GRIND, _recent_msgs)
-        add_chat_message(user, msg, Color.ORANGE)
+	# Continuous score per second (e.g. 500 base points per sec)
+	tracker.add_grind_score(500.0 * delta)
 
-# Kept for backward compatibility if needed, but redirects to start
+	# Continuous viewer gain
+	_target_watcher_count += 5.0 * delta
+
+	# Occasional chat message (approx every 1.5 seconds)
+	if _rng.randf() < (0.6 * delta):
+		var user = _get_unique_item(USERNAMES, _recent_users)
+		var msg = _get_unique_item(COMMENTS_GRIND, _recent_msgs)
+		add_chat_message(user, msg, Color.ORANGE)
+
+	# Kept for backward compatibility if needed, but redirects to start
 func trigger_grind_reaction() -> void:
-    trigger_grind_start()
+	trigger_grind_start()
 
 func trigger_bail_reaction() -> void:
 	tracker.fail_combo()
@@ -426,7 +426,7 @@ func trigger_sub() -> void:
 	add_special_message(user, "just subscribed! 🎉", Color(0.6, 0.2, 0.6, 0.6))
 	_spawn_center_notification("NEW SUBSCRIBER!", user, Color(0.5, 0.2, 0.8, 0.9))
 
-func _on_score_changed(current_score: float, display_score: float) -> void:
+func _on_score_changed(_current_score: float, display_score: float) -> void:
 	score_label.text = "HYPE: %d (x%d)" % [int(display_score), tracker.get_multiplier()]
 	# Pulse effect on high multiplier
 	if tracker.get_multiplier() >= 4:

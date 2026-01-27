@@ -156,21 +156,21 @@ func _on_hover_focus(control: Control) -> void:
 	control.grab_focus()
 	_on_ui_change()
 
-func _set_menu_visible(visible: bool) -> void:
+func _set_menu_visible(new_visible: bool) -> void:
 	if menu_root:
-		menu_root.visible = visible
-	if visible:
+		menu_root.visible = new_visible
+	if new_visible:
 		play_button.grab_focus()
-	_floaters_enabled = visible
+	_floaters_enabled = new_visible
 	if background_floaters:
-		background_floaters.visible = visible
+		background_floaters.visible = new_visible
 	if starfield_sphere:
-		starfield_sphere.visible = visible
+		starfield_sphere.visible = new_visible
 	if world_environment:
-		world_environment.environment = menu_environment if visible else null
+		world_environment.environment = menu_environment if new_visible else null
 	if directional_light:
-		directional_light.visible = visible
-	if not visible:
+		directional_light.visible = new_visible
+	if not new_visible:
 		for floater in _floaters:
 			if is_instance_valid(floater):
 				floater.queue_free()

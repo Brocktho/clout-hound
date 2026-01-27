@@ -138,6 +138,7 @@ var camera_look_input: Vector2 = Vector2.ZERO
 
 var is_grinding: bool = false
 var current_rail: Node = null # Using Node to avoid class_name issues in some environments
+var current_rail_body: PhysicsBody3D = null
 var rail_offset: float = 0.0
 var rail_speed: float = 0.0
 var rail_direction: int = 1 # 1 or -1
@@ -333,8 +334,8 @@ func _get_movement_basis() -> Basis:
 func get_horizontal_boost_dir() -> Vector3:
 	var flat := Vector3(velocity.x, 0.0, velocity.z)
 	if flat.length() < 0.001:
-		var basis := _get_movement_basis()
-		flat = Vector3(-basis.z.x, 0.0, -basis.z.z)
+		var new_basis := _get_movement_basis()
+		flat = Vector3(-new_basis.z.x, 0.0, -new_basis.z.z)
 	return flat.normalized()
 
 func _exit_tree() -> void:
@@ -907,9 +908,9 @@ func _has_started_spin() -> bool:
 			return true
 	return false
 
-func set_visual_override_basis(basis: Basis) -> void:
+func set_visual_override_basis(new_basis: Basis) -> void:
 	visual_override_active = true
-	visual_override_basis = basis
+	visual_override_basis = new_basis
 
 func clear_visual_override() -> void:
 	visual_override_active = false
@@ -1488,8 +1489,11 @@ func enter_rail(rail: Node) -> void:
 	# TRIGGER OVERLAY for grind start
 	if live_overlay:
 		live_overlay.trigger_grind_reaction()
-		# Don't collide with the rail we are riding
-	rail.add_collision_exception_with(self) 
+	# Don't collide with the rail we are riding
+	current_rail_body = _find_rail_body(rail)
+	if current_rail_body:
+		add_collision_exception_with(current_rail_body)
+		current_rail_body.add_collision_exception_with(self)
 
 	current_rail = rail
 	rail_offset = current_rail.get_closest_offset(global_position)
@@ -1532,6 +1536,19 @@ func _find_parent_sibling_path3d(parent: Node) -> Path3D:
 			return sibling
 	return null
 
+func _find_rail_body(rail: Node) -> PhysicsBody3D:
+	if not rail:
+		return null
+	if rail is PhysicsBody3D:
+		return rail
+	var parent = rail.get_parent()
+	if not parent:
+		return null
+	for sibling in parent.get_children():
+		if sibling is PhysicsBody3D:
+			return sibling
+	return null
+
 func _find_rail_from_sphere_cast(origin: Vector3) -> Path3D:
 	var space_state: PhysicsDirectSpaceState3D = get_world_3d().direct_space_state
 	var shape := SphereShape3D.new()
@@ -1556,13 +1573,13 @@ func _find_rail_from_sphere_cast(origin: Vector3) -> Path3D:
 	return null
 
 func apply_grind_movement(delta: float) -> void:
-    if live_overlay:
-        live_overlay.process_grind_tick(delta)
+	if live_overlay:
+		live_overlay.process_grind_tick(delta)
 
-    # Safety check
-    if not current_rail or not (current_rail is Path3D):
-        exit_rail()
-        return
+	# Safety check
+	if not current_rail or not (current_rail is Path3D):
+		exit_rail()
+		return
 		
 	rail_offset += rail_speed * rail_direction * delta
 	
@@ -1609,6 +1626,10 @@ func exit_rail() -> void:
 		velocity = last_rail_direction
 		# Prevent clipping: Lift player slightly off the rail
 		global_position += Vector3.UP * 1.5
+		if current_rail_body:
+			remove_collision_exception_with(current_rail_body)
+			current_rail_body.remove_collision_exception_with(self)
+			current_rail_body = null
 		is_grinding = false
 		current_rail = null
 		rail_cooldown_timer = rail_reacquisition_time
@@ -1636,6 +1657,11 @@ func jump_exit_rail() -> void:
 		
 		# Nudge player to ensure they clear the collision shape
 		global_position += Vector3.UP * 0.5
+
+		if current_rail_body:
+			remove_collision_exception_with(current_rail_body)
+			current_rail_body.remove_collision_exception_with(self)
+			current_rail_body = null
 		
 		is_grinding = false
 		current_rail = null

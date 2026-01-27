@@ -134,8 +134,7 @@ func _cycle_tab(direction: int) -> void:
 	_current_tab_index = posmod(_current_tab_index + direction, count)
 	_show_tab(_tabs[_current_tab_index])
 
-func _connect_controls_close(instance: CanvasLayer) -> void:
-	var close_button := instance.get_node_or_null("Control/CenterContainer/VBoxContainer/CloseButton") as Button
+func _connect_controls_close(_instance: CanvasLayer) -> void:
 	if close_button and not close_button.pressed.is_connected(_on_controls_close_pressed):
 		close_button.pressed.connect(_on_controls_close_pressed)
 

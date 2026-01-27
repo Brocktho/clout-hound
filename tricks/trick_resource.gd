@@ -6,11 +6,11 @@ class_name TrickResource
 func process_input(_player: Player, _delta: float) -> void:
 	pass
 
-func check_completion(player: Player, _delta: float) -> bool:
+func check_completion(_player: Player, _delta: float) -> bool:
 	push_error("TrickResource.check_completion must be overridden")
 	return false
 
-func grant_reward(player: Player) -> void:
+func grant_reward(_player: Player) -> void:
 	push_error("TrickResource.grant_reward must be overridden")
 
 func check_validity(_player: Player, _delta: float) -> float:
