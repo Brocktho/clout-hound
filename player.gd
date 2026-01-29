@@ -1556,13 +1556,13 @@ func _find_rail_from_sphere_cast(origin: Vector3) -> Path3D:
 	return null
 
 func apply_grind_movement(delta: float) -> void:
-    if live_overlay:
-        live_overlay.process_grind_tick(delta)
+	if live_overlay:
+		live_overlay.process_grind_tick(delta)
 
-    # Safety check
-    if not current_rail or not (current_rail is Path3D):
-        exit_rail()
-        return
+	# Safety check
+	if not current_rail or not (current_rail is Path3D):
+		exit_rail()
+		return
 		
 	rail_offset += rail_speed * rail_direction * delta
 	
