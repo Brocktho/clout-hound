@@ -138,6 +138,7 @@ var camera_look_input: Vector2 = Vector2.ZERO
 
 var is_grinding: bool = false
 var current_rail: Node = null # Using Node to avoid class_name issues in some environments
+var current_rail_body: PhysicsBody3D = null
 var rail_offset: float = 0.0
 var rail_speed: float = 0.0
 var rail_direction: int = 1 # 1 or -1
@@ -145,6 +146,8 @@ var rail_direction: int = 1 # 1 or -1
 var current_board_lean: float = 0.0 # Tilt of board during turning or rotating
 var is_ragdolling: bool = false
 var ragdoll_rot_vel: Vector3 = Vector3.ZERO
+@export var ragdoll_reset_seconds: float = 1.5
+var ragdoll_reset_timer: Timer
 var board_velocity: Vector3 = Vector3.ZERO
 var initial_spawn_pos: Vector3
 
@@ -161,7 +164,10 @@ var slowmo_last_ticks: int = 0
 var slowmo_last_ratio: float = 1.0
 var slowmo_wave_alpha: float = 0.0
 
-var _was_mouse_captured: bool = true
+var _was_mouse_captured: bool = false
+var _allow_settings_on_mouse_release: bool = false
+var _has_captured_once: bool = false
+var _settings_opening: bool = false
 var _camera_pivot_pos: Vector3 = Vector3.ZERO
 
 @onready var camera: Camera3D = get_parent().get_node("SpringArm3D/Camera3D")
@@ -243,6 +249,13 @@ var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 func _ready() -> void:
 	add_to_group("player")
+	if not Global.kill_zone_triggered.is_connected(_on_kill_zone_triggered):
+		Global.kill_zone_triggered.connect(_on_kill_zone_triggered)
+	ragdoll_reset_timer = Timer.new()
+	ragdoll_reset_timer.one_shot = true
+	ragdoll_reset_timer.wait_time = ragdoll_reset_seconds
+	ragdoll_reset_timer.timeout.connect(_on_ragdoll_reset_timeout)
+	add_child(ragdoll_reset_timer)
 	
 	# Instantiate our new Overlay
 	live_overlay = load("live_overlay.gd").new()
@@ -250,6 +263,8 @@ func _ready() -> void:
 	
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	_was_mouse_captured = Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
+	_has_captured_once = _was_mouse_captured
+	call_deferred("_enable_settings_on_mouse_release")
 	mouse_sensitivity = Global.mouse_sensitivity
 	initial_spawn_pos = global_position
 	default_body_rotation = body_mesh.rotation
@@ -333,8 +348,8 @@ func _get_movement_basis() -> Basis:
 func get_horizontal_boost_dir() -> Vector3:
 	var flat := Vector3(velocity.x, 0.0, velocity.z)
 	if flat.length() < 0.001:
-		var basis := _get_movement_basis()
-		flat = Vector3(-basis.z.x, 0.0, -basis.z.z)
+		var new_basis := _get_movement_basis()
+		flat = Vector3(-new_basis.z.x, 0.0, -new_basis.z.z)
 	return flat.normalized()
 
 func _exit_tree() -> void:
@@ -456,6 +471,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			live_overlay.visible = !live_overlay.visible
 
 	if event.is_action_pressed("ui_cancel"):
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		show_settings(false)
 
 func _is_settings_open() -> bool:
@@ -464,9 +480,26 @@ func _is_settings_open() -> bool:
 		return false
 	return scene.has_node("Settings")
 
+func _is_completion_popup_open() -> bool:
+	if Global.completion_popup_active:
+		return true
+	if not get_tree():
+		return false
+	for node in get_tree().get_nodes_in_group("completion_popup"):
+		if node is CanvasItem and node.visible:
+			return true
+	return false
+
+func _enable_settings_on_mouse_release() -> void:
+	await get_tree().create_timer(0.35).timeout
+	_allow_settings_on_mouse_release = true
+	_was_mouse_captured = Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
+	_has_captured_once = _has_captured_once or _was_mouse_captured
+
 func show_settings(show_pointer_lock_hint: bool) -> void:
-	if _is_settings_open():
+	if _settings_opening or _is_settings_open():
 		return
+	_settings_opening = true
 	var settings_scene = load("res://Settings.tscn")
 	if settings_scene:
 		var settings_instance = settings_scene.instantiate()
@@ -475,7 +508,14 @@ func show_settings(show_pointer_lock_hint: bool) -> void:
 				if item.name == "show_pointer_lock_hint":
 					settings_instance.set("show_pointer_lock_hint", show_pointer_lock_hint)
 					break
+		if settings_instance:
+			settings_instance.tree_exited.connect(_on_settings_instance_exited)
 		add_sibling(settings_instance) # Add to parent so it's not affected by player's transform
+	else:
+		_settings_opening = false
+
+func _on_settings_instance_exited() -> void:
+	_settings_opening = false
 	
 # First person camera is no longer a valid option :)		
 func toggle_camera_mode() -> void:
@@ -495,7 +535,9 @@ func update_camera_position() -> void:
 			
 func _process(delta: float) -> void:
 	var is_captured := Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
-	if _was_mouse_captured and not is_captured and not _is_settings_open():
+	if is_captured:
+		_has_captured_once = true
+	if _allow_settings_on_mouse_release and _has_captured_once and _was_mouse_captured and not is_captured and not _is_settings_open() and not _is_completion_popup_open():
 		show_settings(true)
 	_was_mouse_captured = is_captured
 
@@ -907,9 +949,9 @@ func _has_started_spin() -> bool:
 			return true
 	return false
 
-func set_visual_override_basis(basis: Basis) -> void:
+func set_visual_override_basis(new_basis: Basis) -> void:
 	visual_override_active = true
-	visual_override_basis = basis
+	visual_override_basis = new_basis
 
 func clear_visual_override() -> void:
 	visual_override_active = false
@@ -1018,6 +1060,7 @@ func start_ragdoll(bail_severity: float = 1.0) -> void:
 		live_overlay.trigger_bail_reaction()
 		
 	is_ragdolling = true
+	_start_ragdoll_reset_timer()
 	_prepare_ragdoll_pose()
 	pending_landing_sfx = false
 	pending_rail_landing = false
@@ -1337,6 +1380,8 @@ func _is_board_physics_active() -> bool:
 
 func reset_player() -> void:
 	is_ragdolling = false
+	if ragdoll_reset_timer:
+		ragdoll_reset_timer.stop()
 	pending_landing_sfx = false
 	pending_rail_landing = false
 	_stop_grind_sfx()
@@ -1357,6 +1402,24 @@ func reset_player() -> void:
 	body_collision.rotation = Vector3.ZERO
 	velocity = Vector3.ZERO
 	global_position = initial_spawn_pos # Or nearest checkpoint
+
+func _on_kill_zone_triggered(player: Node) -> void:
+	if player == self:
+		if is_ragdolling:
+			_start_ragdoll_reset_timer()
+		else:
+			start_ragdoll(1.0)
+
+func _start_ragdoll_reset_timer() -> void:
+	if not ragdoll_reset_timer:
+		return
+	ragdoll_reset_timer.stop()
+	ragdoll_reset_timer.wait_time = ragdoll_reset_seconds
+	ragdoll_reset_timer.start()
+
+func _on_ragdoll_reset_timeout() -> void:
+	if is_ragdolling:
+		reset_player()
 
 
 func apply_standard_movement(direction: Vector3, delta: float) -> void:
@@ -1488,8 +1551,11 @@ func enter_rail(rail: Node) -> void:
 	# TRIGGER OVERLAY for grind start
 	if live_overlay:
 		live_overlay.trigger_grind_reaction()
-		# Don't collide with the rail we are riding
-	rail.add_collision_exception_with(self) 
+	# Don't collide with the rail we are riding
+	current_rail_body = _find_rail_body(rail)
+	if current_rail_body:
+		add_collision_exception_with(current_rail_body)
+		current_rail_body.add_collision_exception_with(self)
 
 	current_rail = rail
 	rail_offset = current_rail.get_closest_offset(global_position)
@@ -1529,6 +1595,19 @@ func _find_parent_sibling_path3d(parent: Node) -> Path3D:
 			return sibling
 	for sibling in grandparent.get_children():
 		if sibling is Path3D:
+			return sibling
+	return null
+
+func _find_rail_body(rail: Node) -> PhysicsBody3D:
+	if not rail:
+		return null
+	if rail is PhysicsBody3D:
+		return rail
+	var parent = rail.get_parent()
+	if not parent:
+		return null
+	for sibling in parent.get_children():
+		if sibling is PhysicsBody3D:
 			return sibling
 	return null
 
@@ -1579,7 +1658,11 @@ func apply_grind_movement(delta: float) -> void:
 		grind_sparks.amount_ratio = speed_factor	
 	
 	# Check if we've reached the end of the rail
-	var rail_length = current_rail.curve.get_baked_length()
+	var rail_length = 0.0
+	if current_rail.has_method("get_rail_length"):
+		rail_length = current_rail.get_rail_length()
+	else:
+		rail_length = current_rail.curve.get_baked_length()
 	
 	if rail_offset < 0 or rail_offset > rail_length:
 		# If the path is closed (looped), wrap the offset instead of exiting
@@ -1609,6 +1692,10 @@ func exit_rail() -> void:
 		velocity = last_rail_direction
 		# Prevent clipping: Lift player slightly off the rail
 		global_position += Vector3.UP * 1.5
+		if current_rail_body:
+			remove_collision_exception_with(current_rail_body)
+			current_rail_body.remove_collision_exception_with(self)
+			current_rail_body = null
 		is_grinding = false
 		current_rail = null
 		rail_cooldown_timer = rail_reacquisition_time
@@ -1636,6 +1723,11 @@ func jump_exit_rail() -> void:
 		
 		# Nudge player to ensure they clear the collision shape
 		global_position += Vector3.UP * 0.5
+
+		if current_rail_body:
+			remove_collision_exception_with(current_rail_body)
+			current_rail_body.remove_collision_exception_with(self)
+			current_rail_body = null
 		
 		is_grinding = false
 		current_rail = null

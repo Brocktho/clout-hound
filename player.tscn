@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://b34qrfkbx43q5" path="res://player.gd" id="1_4flbx"]
 [ext_resource type="ArrayMesh" uid="uid://djvoga0acqib2" path="res://Assets/models/Board.res" id="2_i3pqv"]
 [ext_resource type="ArrayMesh" uid="uid://bhjvh3vj2grbx" path="res://Assets/models/Dog_Default.res" id="3_hqtel"]
+[ext_resource type="Script" uid="uid://db7g2h7xv0eui" path="res://capture_cursor_button.gd" id="4_capture_cursor"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_i3pqv"]
 radius = 0.3
@@ -390,6 +391,32 @@ skeleton = NodePath("../../..")
 [node name="Body" type="MeshInstance3D" parent="CharacterBody3D/Visual"]
 transform = Transform3D(-2.185569e-08, 0.5, -2.1855694e-08, 0, -2.1855694e-08, -0.5, -0.5, -2.185569e-08, 9.553428e-16, -0.0070000594, 0.6473949, 0.34734946)
 mesh = ExtResource("3_hqtel")
+
+[node name="CursorCaptureUI" type="CanvasLayer" parent="."]
+layer = 50
+script = ExtResource("4_capture_cursor")
+
+[node name="Control" type="Control" parent="CursorCaptureUI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="CaptureCursorButton" type="Button" parent="CursorCaptureUI/Control"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -788.0
+offset_top = 247.0
+offset_right = -315.0
+offset_bottom = 366.0
+grow_horizontal = 0
+tooltip_text = "Capture Cursor"
+text = "Capture Cursor"
 
 [node name="SpringArm3D" type="SpringArm3D" parent="."]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0.2117852, 0.72224844)

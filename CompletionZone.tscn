@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://completion_zone.gd" id="1_8csxx"]
+[ext_resource type="PackedScene" path="res://CompletionPopup.tscn" id="2_2n1vg"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_qlg5i"]
+size = Vector3(6, 3, 6)
+
+[node name="CompletionZone" type="Area3D"]
+script = ExtResource("1_8csxx")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_qlg5i")
+
+[node name="CompletionPopup" parent="." instance=ExtResource("2_2n1vg")]

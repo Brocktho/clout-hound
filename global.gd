@@ -1,10 +1,13 @@
 extends Node
 
+signal kill_zone_triggered(player: Node)
+
 var sfx_level: float = 1.0
 var music_level: float = 1.0
 var mouse_sensitivity: float = 0.0005
 var mouse_sensitivity_slider: float = 0.0
 var disable_grind_sfx: bool = false
+var completion_popup_active: bool = false
 var _music_players: Array[AudioStreamPlayer] = []
 
 func _ready() -> void:
