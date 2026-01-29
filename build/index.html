@@ -92,7 +92,6 @@ body {
 		</style>
 		<link id="-gd-engine-icon" rel="icon" type="image/png" href="index.icon.png" />
 <link rel="apple-touch-icon" href="index.apple-touch-icon.png"/>
-<link rel="manifest" href="index.manifest.json">
 
 	</head>
 	<body>
@@ -112,8 +111,8 @@ body {
 
 		<script src="index.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":79933520,"index.wasm":36445641},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4,"serviceWorker":"index.service.worker.js"};
-const GODOT_THREADS_ENABLED = true;
+const GODOT_CONFIG = {{{ GODOT_CONFIG }}};
+const GODOT_THREADS_ENABLED = {{{ GODOT_THREADS_ENABLED }}};
 const engine = new Engine(GODOT_CONFIG);
 
 (function () {
@@ -163,6 +162,17 @@ const engine = new Engine(GODOT_CONFIG);
 		initializing = false;
 	}
 
+	let audioResumeRequested = false;
+	const requestAudioResume = () => {
+		audioResumeRequested = true;
+		if (window.godotResumeAudio) {
+			window.godotResumeAudio();
+		}
+	};
+	const resumeOnce = () => requestAudioResume();
+	document.addEventListener('pointerdown', resumeOnce, { once: true });
+	document.addEventListener('keydown', resumeOnce, { once: true });
+
 	const missing = Engine.getMissingFeatures({
 		threads: GODOT_THREADS_ENABLED,
 	});
@@ -211,6 +221,15 @@ const engine = new Engine(GODOT_CONFIG);
 				}
 			},
 		}).then(() => {
+			window.godotModule = engine.rtenv || null;
+			window.godotResumeAudio = () => {
+				if (window.godotModule && window.godotModule._godot_audio_resume) {
+					window.godotModule._godot_audio_resume();
+				}
+			};
+			if (audioResumeRequested) {
+				window.godotResumeAudio();
+			}
 			setStatusMode('hidden');
 		}, displayFailureNotice);
 	}

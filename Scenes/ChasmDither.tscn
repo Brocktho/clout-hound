@@ -1,0 +1,32 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://chasm_dither.gd" id="1_chasm_script"]
+[ext_resource type="Shader" path="res://Assets/Shaders/chasm_dither.gdshader" id="2_chasm_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_chasm"]
+shader = ExtResource("2_chasm_shader")
+shader_parameter/top_color = Color(0.12, 0.14, 0.16, 1)
+shader_parameter/bottom_color = Color(0.02, 0.02, 0.03, 1)
+shader_parameter/half_size = Vector2(5, 5)
+shader_parameter/bottom_depth = 12.0
+shader_parameter/curve_power = 2.0
+shader_parameter/dither_scale = 1.0
+shader_parameter/dither_strength = 1.0
+shader_parameter/banding_levels = 6.0
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_chasm"]
+size = Vector2(10, 10)
+subdivide_width = 32
+subdivide_depth = 32
+
+[node name="ChasmDither" type="Node3D"]
+script = ExtResource("1_chasm_script")
+
+[node name="CornerA" type="Marker3D" parent="."]
+
+[node name="CornerB" type="Marker3D" parent="."]
+position = Vector3(10, 0, 10)
+
+[node name="Surface" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_chasm")
+material_override = SubResource("ShaderMaterial_chasm")

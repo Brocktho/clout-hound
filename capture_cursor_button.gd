@@ -13,7 +13,8 @@ func _process(_delta: float) -> void:
 func _update_button_state() -> void:
 	var is_captured := Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
 	if capture_button:
-		capture_button.visible = not is_captured
+		var suppress_for_completion := Global.completion_popup_active
+		capture_button.visible = not is_captured and not suppress_for_completion
 
 func _on_capture_button_pressed() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED

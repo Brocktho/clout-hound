@@ -10,6 +10,7 @@ extends Node3D
 @onready var music_player: AudioStreamPlayer = $MusicPlayer
 @onready var scene_host: Node3D = $SceneHost
 @onready var menu_root: Control = $UI/MainMenu
+@onready var audio_unlock_overlay: Control = $UI/AudioUnlock
 @onready var background_floaters: Node3D = $BackgroundFloaters
 @onready var main_camera: Camera3D = $Camera3D
 @onready var starfield_sphere: MeshInstance3D = $StarfieldSphere
@@ -37,10 +38,12 @@ var _floaters: Array[MeshInstance3D] = []
 var _return_focus_path: NodePath = NodePath("")
 var _active_scene: Node
 var _floaters_enabled: bool = true
+var _audio_unlocked: bool = true
+var _suppress_menu_on_scene_exit: bool = false
 
 func _ready():
 	# Load scenes if not set in editor (though usually set via editor)
-	if not play_scene: play_scene = load("res://grinding1.tscn")
+	if not play_scene: play_scene = load("res://LevelSelect.tscn")
 	if not settings_scene: settings_scene = load("res://Settings.tscn")
 	# Ensure mouse is visible for the menu
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -54,13 +57,16 @@ func _ready():
 	_rng.randomize()
 	_start_floater_loop()
 	_set_menu_visible(true)
+	_audio_unlocked = not OS.has_feature("web")
+	if audio_unlock_overlay:
+		audio_unlock_overlay.visible = not _audio_unlocked
 	_prepare_music()
 	if music_player:
 		Global.register_music_player(music_player)
 		music_player.process_mode = Node.PROCESS_MODE_ALWAYS
 		music_player.stream_paused = false
-		if not music_player.playing:
-			music_player.play()
+		if _audio_unlocked:
+			_start_music()
 
 func _process(_delta: float) -> void:
 	if menu_root and menu_root.visible and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
@@ -71,7 +77,14 @@ func _input(event: InputEvent) -> void:
 	if menu_root and menu_root.visible and event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()
 
+func _unhandled_input(event: InputEvent) -> void:
+	if _audio_unlocked:
+		return
+	if event is InputEventMouseButton or event is InputEventKey or event is InputEventScreenTouch:
+		_unlock_audio()
+
 func _on_play_button_pressed():
+	_unlock_audio()
 	if not play_scene or not scene_host:
 		return
 	if _active_scene and is_instance_valid(_active_scene):
@@ -80,6 +93,26 @@ func _on_play_button_pressed():
 	scene_host.add_child(instance)
 	_active_scene = instance
 	_set_menu_visible(false)
+	if not _active_scene.tree_exited.is_connected(_on_active_scene_exited):
+		_active_scene.tree_exited.connect(_on_active_scene_exited)
+
+func start_level(scene_path: String) -> void:
+	if not scene_host or scene_path == "":
+		return
+	if _active_scene and is_instance_valid(_active_scene):
+		_suppress_menu_on_scene_exit = true
+		_active_scene.queue_free()
+		_active_scene = null
+	_clear_scene_host()
+	var packed := load(scene_path) as PackedScene
+	if not packed:
+		push_warning("Unable to load level: %s" % scene_path)
+		return
+	var instance := packed.instantiate()
+	scene_host.add_child(instance)
+	_active_scene = instance
+	_set_menu_visible(false)
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	if not _active_scene.tree_exited.is_connected(_on_active_scene_exited):
 		_active_scene.tree_exited.connect(_on_active_scene_exited)
 
@@ -108,6 +141,7 @@ func return_to_menu() -> void:
 	if _active_scene and is_instance_valid(_active_scene):
 		_active_scene.queue_free()
 		_active_scene = null
+	_clear_scene_host()
 	_set_menu_visible(true)
 	get_tree().paused = false
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -117,9 +151,18 @@ func is_game_active() -> bool:
 
 func _on_active_scene_exited() -> void:
 	_active_scene = null
-	_set_menu_visible(true)
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	get_tree().paused = false
+	if not _suppress_menu_on_scene_exit:
+		_set_menu_visible(true)
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		get_tree().paused = false
+	_suppress_menu_on_scene_exit = false
+
+func _clear_scene_host() -> void:
+	if not scene_host:
+		return
+	for child in scene_host.get_children():
+		if is_instance_valid(child):
+			child.queue_free()
 
 func _on_settings_closed() -> void:
 	if not is_inside_tree():
@@ -155,6 +198,35 @@ func _on_hover_focus(control: Control) -> void:
 		return
 	control.grab_focus()
 	_on_ui_change()
+	
+func _on_audio_unlock_pressed() -> void:
+	_unlock_audio()
+	
+func _resume_web_audio() -> void:
+	if not OS.has_feature("web"):
+		return
+	JavaScriptBridge.eval("""
+		if (window.godotResumeAudio) {
+			window.godotResumeAudio();
+		} else {
+			console.warn("WebAudio not resumed, please check your audio setup.");
+		}
+	""", true)
+
+func _unlock_audio() -> void:
+	if _audio_unlocked:
+		return
+	_audio_unlocked = true
+	if audio_unlock_overlay:
+		audio_unlock_overlay.visible = false
+	_resume_web_audio()
+	_start_music()
+
+func _start_music() -> void:
+	if not music_player or not music_player.is_inside_tree():
+		return
+	if not music_player.playing:
+		music_player.play()
 
 func _set_menu_visible(new_visible: bool) -> void:
 	if menu_root:

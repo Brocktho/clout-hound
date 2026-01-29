@@ -1,0 +1,69 @@
+[gd_scene format=3 uid="uid://b1ew2yfjml5hb"]
+
+[ext_resource type="PackedScene" uid="uid://cn0de11tl22g2" path="res://Assets/models/RailTeaching.blend" id="1_4oe3j"]
+[ext_resource type="Script" uid="uid://d08f4jslh7o2c" path="res://grind_rail_from_mesh.gd" id="2_hfsba"]
+[ext_resource type="Script" uid="uid://mb435j3rb08x" path="res://grind_rail.gd" id="3_do1dg"]
+[ext_resource type="PackedScene" uid="uid://dtlxuyo830w2f" path="res://player.tscn" id="4_1fmyy"]
+[ext_resource type="PackedScene" path="res://KillZone.tscn" id="5_do1dg"]
+[ext_resource type="PackedScene" path="res://Scenes/ChasmDither.tscn" id="6_1fmyy"]
+[ext_resource type="PackedScene" path="res://CompletionZone.tscn" id="7_halpd"]
+
+[sub_resource type="Curve3D" id="Curve3D_halpd"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 2, -0.125, 0, 0, 0, 0, 0, 0, 0, 1.9, -0.125, 0, 0, 0, 0, 0, 0, 0, 1.8, -0.125, 0, 0, 0, 0, 0, 0, 0, 1.7, -0.125, 0, 0, 0, 0, 0, 0, 0, 1.6, -0.125, 0, 0, 0, 0, 0, 0, 0, 1.5, -0.125, 0, 0, 0, 0, 0, 0, 0, 1.4, -0.125, 0, 0, 0, 0, 0, 0, 0, 1.3, -0.125, 0, 0, 0, 0, 0, 0, 0, 1.2, -0.125, 0, 0, 0, 0, 0, 0, 0, 1.1, -0.125, 0, 0, 0, 0, 0, 0, 0, 1, -0.125, 0, 0, 0, 0, 0, -0.125, 0, 0.9, -0.125, 0, 0, 0, 0, 0, -0.125, 0, 0.8, -0.125, 0, 0, 0, 0, 0, -0.125, 0, 0.7, -0.125, 0, 0, 0, 0, 0, -0.125, 0, 0.6, -0.125, 0, 0, 0, 0, 0, -0.125, 0, 0.5, -0.125, 0, 0, 0, 0, 0, 0, 0, 0, -0.125, 0, 0, 0, 0, 0, 0, 0, -0.5, -0.125, 0, 0, 0, 0, 0, 0, 0, -1, -0.125, 0, 0, 0, 0, 0, 0, 0, -1.5, -0.125, 0, 0, 0, 0, 0, 0, 0, -2, -0.125),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 21
+
+[node name="RailTutorial" type="Node3D" unique_id=1703072201]
+
+[node name="RailTeaching" parent="." unique_id=1376573494 instance=ExtResource("1_4oe3j")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+
+[node name="Light" parent="RailTeaching" index="0" unique_id=1968974407]
+transform = Transform3D(-0.14543235, -0.38555047, 0.28319657, -0.02759452, 0.30226234, 0.39733618, -0.47758558, 0.09994173, -0.1091956, 0.50108147, 1.3092175, 0.18916667)
+
+[node name="Light2" type="OmniLight3D" parent="RailTeaching" unique_id=1913204402]
+transform = Transform3D(-0.14543235, -0.38555047, 0.28319657, -0.02759452, 0.30226234, 0.39733618, -0.47758558, 0.09994173, -0.1091956, -32.258514, 1.3092175, 0.18916667)
+light_energy = 79.57747
+omni_range = 4096.0
+omni_attenuation = 2.0
+
+[node name="Boundaries" parent="RailTeaching" index="3" unique_id=1195476336]
+transform = Transform3D(25.184061, 0.0003064964, 0.0119549185, 0.011969907, -0.00048825, -25.184053, -0.015313116, 0.50368106, -0.024419844, 0.0047838474, 6.43204, -6.1730084)
+
+[node name="GR_Rail" parent="RailTeaching/Rail-Post" parent_id_path=PackedInt32Array(1376573494, 1807296462) index="0" unique_id=1427880479]
+script = ExtResource("2_hfsba")
+path_mode = 1
+max_points = 52
+min_hit_distance = 0.1
+debug_logging = true
+
+[node name="GR_Rail_Path3D" type="Path3D" parent="RailTeaching/Rail-Post" parent_id_path=PackedInt32Array(1376573494, 1807296462) index="3" unique_id=1240068127]
+transform = Transform3D(0, 12.5, -5.960464e-08, 2.9802322e-08, -1.490116e-06, -0.5, -0.5, -8.881784e-14, -2.9802322e-08, -24.764385, 0.24012451, 0)
+curve = SubResource("Curve3D_halpd")
+script = ExtResource("3_do1dg")
+
+[node name="Node3D" parent="." unique_id=170758959 instance=ExtResource("4_1fmyy")]
+transform = Transform3D(-0.09780866, 0, 0.9952052, 0, 1, 0, -0.9952052, 0, -0.09780866, 0, 0.35443056, 0)
+
+[node name="KillZone" parent="." unique_id=1195876588 instance=ExtResource("5_do1dg")]
+transform = Transform3D(4838.311, 0, 0, 0, 1, 0, 0, 0, 5706.0024, -31.776888, -10.103203, 0)
+
+[node name="ChasmDither" parent="." unique_id=93618548 instance=ExtResource("6_1fmyy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -39.177544, -4.937605, -4.7440567)
+corner_a_path = NodePath("../ChasmCornerA")
+corner_b_path = NodePath("../ChasmCornerB")
+bottom_depth = 24.0
+
+[node name="ChasmCornerA" type="Node3D" parent="." unique_id=1783321078]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -51.193, -5, -10.762)
+
+[node name="ChasmCornerB" type="Node3D" parent="." unique_id=671991199]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.549, -5, 12.095)
+
+[node name="CompletionZone" parent="." unique_id=1844977314 instance=ExtResource("7_halpd")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, -75.45049, 0, 2.106553)
+
+[editable path="RailTeaching"]
+[editable path="CompletionZone"]

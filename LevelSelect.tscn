@@ -1,9 +1,244 @@
-[gd_scene format=3 uid="uid://gess2apgxsa3"]
+[gd_scene load_steps=15 format=3 uid="uid://gess2apgxsa3"]
 
-[node name="LevelSelect" type="Control"]
+[ext_resource type="Script" path="res://level_select.gd" id="1_level_select"]
+[ext_resource type="PackedScene" path="res://LevelRow.tscn" id="2_level_row"]
+[ext_resource type="AudioStream" path="res://Assets/Audio/SFX/UI_Change.wav" id="3_ui_change"]
+[ext_resource type="Texture2D" path="res://Assets/UI/star_filled.svg" id="4_star_filled"]
+[ext_resource type="Texture2D" path="res://Assets/UI/star_empty.svg" id="5_star_empty"]
+[ext_resource type="Texture2D" path="res://Assets/UI/clock.svg" id="6_clock"]
+[ext_resource type="Texture2D" path="res://Assets/UI/score.svg" id="7_score"]
+[ext_resource type="Texture2D" path="res://Assets/UI/preview_placeholder.svg" id="8_preview_placeholder"]
+[ext_resource type="Resource" path="res://Levels/rail_tutorial.tres" id="9_rail_tutorial"]
+[ext_resource type="Resource" path="res://Levels/grinding_basics.tres" id="10_grinding_basics"]
+[ext_resource type="Resource" path="res://Levels/halfpipe_intro.tres" id="11_halfpipe_intro"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.07, 0.07, 0.07, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab"]
+content_margin_left = 14.0
+content_margin_top = 6.0
+content_margin_right = 14.0
+content_margin_bottom = 6.0
+bg_color = Color(0.9, 0.9, 0.9, 0.12)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.2)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_divider"]
+bg_color = Color(1, 1, 1, 0.15)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_preview"]
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+bg_color = Color(1, 1, 1, 0.04)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.15)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="LevelSelect" type="CanvasLayer"]
+layer = 150
+script = ExtResource("1_level_select")
+level_row_scene = ExtResource("2_level_row")
+tutorial_levels = [ExtResource("9_rail_tutorial"), ExtResource("10_grinding_basics"), ExtResource("11_halfpipe_intro")]
+star_filled = ExtResource("4_star_filled")
+star_empty = ExtResource("5_star_empty")
+clock_icon = ExtResource("6_clock")
+score_icon = ExtResource("7_score")
+preview_placeholder = ExtResource("8_preview_placeholder")
+
+[node name="UIChangeSfx" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_ui_change")
+
+[node name="Control" type="Control" parent="."]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 60.0
+offset_top = 40.0
+offset_right = -60.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TabsRow" type="HBoxContainer" parent="Control/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="QHintLabel" type="Label" parent="Control/Panel/VBoxContainer/TabsRow"]
+custom_minimum_size = Vector2(36, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Q"
+horizontal_alignment = 1
+
+[node name="TutorialsTab" type="PanelContainer" parent="Control/Panel/VBoxContainer/TabsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_tab")
+
+[node name="TutorialsTabLabel" type="Label" parent="Control/Panel/VBoxContainer/TabsRow/TutorialsTab"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Tutorials"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ChallengesTab" type="PanelContainer" parent="Control/Panel/VBoxContainer/TabsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_tab")
+
+[node name="ChallengesTabLabel" type="Label" parent="Control/Panel/VBoxContainer/TabsRow/ChallengesTab"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Challenges"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FreeSkateTab" type="PanelContainer" parent="Control/Panel/VBoxContainer/TabsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_tab")
+
+[node name="FreeSkateTabLabel" type="Label" parent="Control/Panel/VBoxContainer/TabsRow/FreeSkateTab"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Free Skate"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EHintLabel" type="Label" parent="Control/Panel/VBoxContainer/TabsRow"]
+custom_minimum_size = Vector2(36, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "E"
+horizontal_alignment = 1
+
+[node name="CloseButtonTop" type="Button" parent="Control/Panel/VBoxContainer/TabsRow"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+text = "X"
+
+[node name="TabDivider" type="Panel" parent="Control/Panel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_divider")
+
+[node name="ContentArea" type="Control" parent="Control/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TutorialsPanel" type="Control" parent="Control/Panel/VBoxContainer/ContentArea"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ContentRow" type="HBoxContainer" parent="Control/Panel/VBoxContainer/ContentArea/TutorialsPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 18
+
+[node name="LevelsScroll" type="ScrollContainer" parent="Control/Panel/VBoxContainer/ContentArea/TutorialsPanel/ContentRow"]
+custom_minimum_size = Vector2(540, 360)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="LevelsContent" type="VBoxContainer" parent="Control/Panel/VBoxContainer/ContentArea/TutorialsPanel/ContentRow/LevelsScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="PreviewPanel" type="PanelContainer" parent="Control/Panel/VBoxContainer/ContentArea/TutorialsPanel/ContentRow"]
+custom_minimum_size = Vector2(260, 260)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_preview")
+
+[node name="PreviewTexture" type="TextureRect" parent="Control/Panel/VBoxContainer/ContentArea/TutorialsPanel/ContentRow/PreviewPanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+expand_mode = 1
+stretch_mode = 5
+texture = ExtResource("8_preview_placeholder")
+texture_filter = 1
+
+[node name="ChallengesPanel" type="Control" parent="Control/Panel/VBoxContainer/ContentArea"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ChallengesLabel" type="Label" parent="Control/Panel/VBoxContainer/ContentArea/ChallengesPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Challenges coming soon."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FreeSkatePanel" type="Control" parent="Control/Panel/VBoxContainer/ContentArea"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="FreeSkateLabel" type="Label" parent="Control/Panel/VBoxContainer/ContentArea/FreeSkatePanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Free skate coming soon."
+horizontal_alignment = 1
+vertical_alignment = 1

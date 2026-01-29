@@ -1,0 +1,106 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://level_row.gd" id="1_level_row"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_row"]
+content_margin_left = 10.0
+content_margin_top = 8.0
+content_margin_right = 10.0
+content_margin_bottom = 8.0
+bg_color = Color(1, 1, 1, 0.06)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.12)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="LevelRow" type="PanelContainer"]
+custom_minimum_size = Vector2(0, 54)
+script = ExtResource("1_level_row")
+focus_mode = 2
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_row")
+
+[node name="FocusHighlight" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.97, 0.84, 0.35, 0.12)
+
+[node name="Content" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="LeftGroup" type="HBoxContainer" parent="Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme_override_constants/separation = 10
+
+[node name="StarIcon" type="TextureRect" parent="Content/LeftGroup"]
+custom_minimum_size = Vector2(18, 18)
+layout_mode = 2
+stretch_mode = 5
+texture_filter = 1
+
+[node name="LevelLabel" type="Label" parent="Content/LeftGroup"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Level Name"
+vertical_alignment = 1
+
+[node name="RightGroup" type="HBoxContainer" parent="Content"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 1
+theme_override_constants/separation = 16
+alignment = 2
+
+[node name="InfoColumn" type="VBoxContainer" parent="Content/RightGroup"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TimeRow" type="HBoxContainer" parent="Content/RightGroup/InfoColumn"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="TimeIcon" type="TextureRect" parent="Content/RightGroup/InfoColumn/TimeRow"]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+stretch_mode = 5
+texture_filter = 1
+
+[node name="TimeLabel" type="Label" parent="Content/RightGroup/InfoColumn/TimeRow"]
+layout_mode = 2
+text = "--:--"
+vertical_alignment = 1
+
+[node name="ScoreRow" type="HBoxContainer" parent="Content/RightGroup/InfoColumn"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ScoreIcon" type="TextureRect" parent="Content/RightGroup/InfoColumn/ScoreRow"]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+stretch_mode = 5
+texture_filter = 1
+
+[node name="ScoreLabel" type="Label" parent="Content/RightGroup/InfoColumn/ScoreRow"]
+layout_mode = 2
+text = "N/A"
+vertical_alignment = 1
+
+[node name="PlayButton" type="Button" parent="Content/RightGroup"]
+custom_minimum_size = Vector2(90, 0)
+layout_mode = 2
+text = "Play"

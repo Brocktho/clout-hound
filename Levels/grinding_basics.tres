@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="LevelInformation" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://level_information.gd" id="1_level_information"]
+
+[resource]
+script = ExtResource("1_level_information")
+scene_path = "res://grinding1.tscn"
+preview_image_path = "res://Assets/UI/preview_placeholder.svg"
+level_name = "Grinding Basics"
+completed = false
+high_score = -1
+fastest_completion_seconds = -1.0

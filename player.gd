@@ -146,6 +146,8 @@ var rail_direction: int = 1 # 1 or -1
 var current_board_lean: float = 0.0 # Tilt of board during turning or rotating
 var is_ragdolling: bool = false
 var ragdoll_rot_vel: Vector3 = Vector3.ZERO
+@export var ragdoll_reset_seconds: float = 1.5
+var ragdoll_reset_timer: Timer
 var board_velocity: Vector3 = Vector3.ZERO
 var initial_spawn_pos: Vector3
 
@@ -162,7 +164,10 @@ var slowmo_last_ticks: int = 0
 var slowmo_last_ratio: float = 1.0
 var slowmo_wave_alpha: float = 0.0
 
-var _was_mouse_captured: bool = true
+var _was_mouse_captured: bool = false
+var _allow_settings_on_mouse_release: bool = false
+var _has_captured_once: bool = false
+var _settings_opening: bool = false
 var _camera_pivot_pos: Vector3 = Vector3.ZERO
 
 @onready var camera: Camera3D = get_parent().get_node("SpringArm3D/Camera3D")
@@ -244,6 +249,13 @@ var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 func _ready() -> void:
 	add_to_group("player")
+	if not Global.kill_zone_triggered.is_connected(_on_kill_zone_triggered):
+		Global.kill_zone_triggered.connect(_on_kill_zone_triggered)
+	ragdoll_reset_timer = Timer.new()
+	ragdoll_reset_timer.one_shot = true
+	ragdoll_reset_timer.wait_time = ragdoll_reset_seconds
+	ragdoll_reset_timer.timeout.connect(_on_ragdoll_reset_timeout)
+	add_child(ragdoll_reset_timer)
 	
 	# Instantiate our new Overlay
 	live_overlay = load("live_overlay.gd").new()
@@ -251,6 +263,8 @@ func _ready() -> void:
 	
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	_was_mouse_captured = Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
+	_has_captured_once = _was_mouse_captured
+	call_deferred("_enable_settings_on_mouse_release")
 	mouse_sensitivity = Global.mouse_sensitivity
 	initial_spawn_pos = global_position
 	default_body_rotation = body_mesh.rotation
@@ -457,6 +471,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			live_overlay.visible = !live_overlay.visible
 
 	if event.is_action_pressed("ui_cancel"):
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		show_settings(false)
 
 func _is_settings_open() -> bool:
@@ -465,9 +480,26 @@ func _is_settings_open() -> bool:
 		return false
 	return scene.has_node("Settings")
 
+func _is_completion_popup_open() -> bool:
+	if Global.completion_popup_active:
+		return true
+	if not get_tree():
+		return false
+	for node in get_tree().get_nodes_in_group("completion_popup"):
+		if node is CanvasItem and node.visible:
+			return true
+	return false
+
+func _enable_settings_on_mouse_release() -> void:
+	await get_tree().create_timer(0.35).timeout
+	_allow_settings_on_mouse_release = true
+	_was_mouse_captured = Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
+	_has_captured_once = _has_captured_once or _was_mouse_captured
+
 func show_settings(show_pointer_lock_hint: bool) -> void:
-	if _is_settings_open():
+	if _settings_opening or _is_settings_open():
 		return
+	_settings_opening = true
 	var settings_scene = load("res://Settings.tscn")
 	if settings_scene:
 		var settings_instance = settings_scene.instantiate()
@@ -476,7 +508,14 @@ func show_settings(show_pointer_lock_hint: bool) -> void:
 				if item.name == "show_pointer_lock_hint":
 					settings_instance.set("show_pointer_lock_hint", show_pointer_lock_hint)
 					break
+		if settings_instance:
+			settings_instance.tree_exited.connect(_on_settings_instance_exited)
 		add_sibling(settings_instance) # Add to parent so it's not affected by player's transform
+	else:
+		_settings_opening = false
+
+func _on_settings_instance_exited() -> void:
+	_settings_opening = false
 	
 # First person camera is no longer a valid option :)		
 func toggle_camera_mode() -> void:
@@ -496,7 +535,9 @@ func update_camera_position() -> void:
 			
 func _process(delta: float) -> void:
 	var is_captured := Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
-	if _was_mouse_captured and not is_captured and not _is_settings_open():
+	if is_captured:
+		_has_captured_once = true
+	if _allow_settings_on_mouse_release and _has_captured_once and _was_mouse_captured and not is_captured and not _is_settings_open() and not _is_completion_popup_open():
 		show_settings(true)
 	_was_mouse_captured = is_captured
 
@@ -1019,6 +1060,7 @@ func start_ragdoll(bail_severity: float = 1.0) -> void:
 		live_overlay.trigger_bail_reaction()
 		
 	is_ragdolling = true
+	_start_ragdoll_reset_timer()
 	_prepare_ragdoll_pose()
 	pending_landing_sfx = false
 	pending_rail_landing = false
@@ -1338,6 +1380,8 @@ func _is_board_physics_active() -> bool:
 
 func reset_player() -> void:
 	is_ragdolling = false
+	if ragdoll_reset_timer:
+		ragdoll_reset_timer.stop()
 	pending_landing_sfx = false
 	pending_rail_landing = false
 	_stop_grind_sfx()
@@ -1358,6 +1402,24 @@ func reset_player() -> void:
 	body_collision.rotation = Vector3.ZERO
 	velocity = Vector3.ZERO
 	global_position = initial_spawn_pos # Or nearest checkpoint
+
+func _on_kill_zone_triggered(player: Node) -> void:
+	if player == self:
+		if is_ragdolling:
+			_start_ragdoll_reset_timer()
+		else:
+			start_ragdoll(1.0)
+
+func _start_ragdoll_reset_timer() -> void:
+	if not ragdoll_reset_timer:
+		return
+	ragdoll_reset_timer.stop()
+	ragdoll_reset_timer.wait_time = ragdoll_reset_seconds
+	ragdoll_reset_timer.start()
+
+func _on_ragdoll_reset_timeout() -> void:
+	if is_ragdolling:
+		reset_player()
 
 
 func apply_standard_movement(direction: Vector3, delta: float) -> void:
@@ -1596,7 +1658,11 @@ func apply_grind_movement(delta: float) -> void:
 		grind_sparks.amount_ratio = speed_factor	
 	
 	# Check if we've reached the end of the rail
-	var rail_length = current_rail.curve.get_baked_length()
+	var rail_length = 0.0
+	if current_rail.has_method("get_rail_length"):
+		rail_length = current_rail.get_rail_length()
+	else:
+		rail_length = current_rail.curve.get_baked_length()
 	
 	if rail_offset < 0 or rail_offset > rail_length:
 		# If the path is closed (looped), wrap the offset instead of exiting
