@@ -202,6 +202,15 @@ func add_chat_message(username: String, text: String, name_color: Color = Color.
 	
 	var lbl = RichTextLabel.new()
 	lbl.bbcode_enabled = true
+	
+	# Create a FontVariation with emoji as fallback instead of replacing the main font
+	var emoji_font = preload("res://Assets/Fonts/NotoColorEmoji-Regular.ttf")
+	if emoji_font:
+		var font_variation = FontVariation.new()
+		font_variation.base_font = ThemeDB.fallback_font
+		font_variation.fallbacks = [emoji_font]
+		lbl.add_theme_font_override("normal_font", font_variation)
+	
 	# Format: [Avatar] [Name]: Payload
 	lbl.text = "%s [color=#%s][b]%s:[/b][/color] %s" % [avatar, name_html, username, text]
 	lbl.fit_content = true
