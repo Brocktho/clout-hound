@@ -12,7 +12,11 @@ var _music_players: Array[AudioStreamPlayer] = []
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	ensure_bus(&"SFX")
+	# Bus should already exist in default_bus_layout.tres
+	# Just verify it exists, don't create dynamically
+	var sfx_bus = AudioServer.get_bus_index("SFX")
+	if sfx_bus == -1:
+		push_warning("SFX bus not found! Create it in Project Settings → Audio → Buses")
 	if get_tree():
 		get_tree().node_added.connect(_on_node_added)
 	_apply_music_volume(music_level)
@@ -47,17 +51,6 @@ func _has_property(obj: Object, property_name: String) -> bool:
 		if item.name == property_name:
 			return true
 	return false
-
-func ensure_bus(bus_name: StringName) -> int:
-	var bus_index := AudioServer.get_bus_index(bus_name)
-	if bus_index == -1:
-		var insert_index := AudioServer.get_bus_count()
-		AudioServer.add_bus(insert_index)
-		AudioServer.set_bus_name(insert_index, bus_name)
-		AudioServer.set_bus_send(insert_index, "Master")
-		AudioServer.set_bus_mute(insert_index, false)
-		bus_index = insert_index
-	return bus_index
 
 func _apply_music_volume(value: float) -> void:
 	var db := -80.0 if value <= 0.001 else linear_to_db(value)
