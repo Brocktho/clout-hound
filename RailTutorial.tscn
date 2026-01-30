@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://d08f4jslh7o2c" path="res://grind_rail_from_mesh.gd" id="2_hfsba"]
 [ext_resource type="Script" uid="uid://mb435j3rb08x" path="res://grind_rail.gd" id="3_do1dg"]
 [ext_resource type="PackedScene" uid="uid://dtlxuyo830w2f" path="res://player.tscn" id="4_1fmyy"]
-[ext_resource type="PackedScene" path="res://KillZone.tscn" id="5_do1dg"]
+[ext_resource type="PackedScene" uid="uid://bkev234foxvba" path="res://KillZone.tscn" id="5_do1dg"]
 [ext_resource type="PackedScene" path="res://Scenes/ChasmDither.tscn" id="6_1fmyy"]
 [ext_resource type="PackedScene" path="res://CompletionZone.tscn" id="7_halpd"]
 
@@ -20,29 +20,30 @@ point_count = 21
 [node name="RailTeaching" parent="." unique_id=1376573494 instance=ExtResource("1_4oe3j")]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
 
-[node name="Light" parent="RailTeaching" index="0" unique_id=1968974407]
-transform = Transform3D(-0.14543235, -0.38555047, 0.28319657, -0.02759452, 0.30226234, 0.39733618, -0.47758558, 0.09994173, -0.1091956, 0.50108147, 1.3092175, 0.18916667)
+[node name="Light" parent="RailTeaching" index="0" unique_id=1402556078]
+transform = Transform3D(-0.14543235, -0.38555047, 0.28319657, -0.02759452, 0.30226234, 0.39733618, -0.47758558, 0.09994173, -0.1091956, 0.50108147, 2.0416994, 0.18916667)
+omni_attenuation = 3.0
 
-[node name="Light2" type="OmniLight3D" parent="RailTeaching" unique_id=1913204402]
-transform = Transform3D(-0.14543235, -0.38555047, 0.28319657, -0.02759452, 0.30226234, 0.39733618, -0.47758558, 0.09994173, -0.1091956, -32.258514, 1.3092175, 0.18916667)
-light_energy = 79.57747
-omni_range = 4096.0
-omni_attenuation = 2.0
-
-[node name="Boundaries" parent="RailTeaching" index="3" unique_id=1195476336]
+[node name="Boundaries" parent="RailTeaching" index="2" unique_id=2052395724]
 transform = Transform3D(25.184061, 0.0003064964, 0.0119549185, 0.011969907, -0.00048825, -25.184053, -0.015313116, 0.50368106, -0.024419844, 0.0047838474, 6.43204, -6.1730084)
 
-[node name="GR_Rail" parent="RailTeaching/Rail-Post" parent_id_path=PackedInt32Array(1376573494, 1807296462) index="0" unique_id=1427880479]
+[node name="GR_Rail" parent="RailTeaching/Rail-Post" parent_id_path=PackedInt32Array(1376573494, 1197815463) index="0" unique_id=853085872]
 script = ExtResource("2_hfsba")
 path_mode = 1
 max_points = 52
 min_hit_distance = 0.1
 debug_logging = true
 
-[node name="GR_Rail_Path3D" type="Path3D" parent="RailTeaching/Rail-Post" parent_id_path=PackedInt32Array(1376573494, 1807296462) index="3" unique_id=1240068127]
+[node name="GR_Rail_Path3D" type="Path3D" parent="RailTeaching/Rail-Post" parent_id_path=PackedInt32Array(1376573494, 1197815463) index="3" unique_id=1240068127]
 transform = Transform3D(0, 12.5, -5.960464e-08, 2.9802322e-08, -1.490116e-06, -0.5, -0.5, -8.881784e-14, -2.9802322e-08, -24.764385, 0.24012451, 0)
 curve = SubResource("Curve3D_halpd")
 script = ExtResource("3_do1dg")
+
+[node name="Light2" type="OmniLight3D" parent="RailTeaching" unique_id=1913204402]
+transform = Transform3D(-0.14543235, -0.38555047, 0.28319657, -0.02759452, 0.30226234, 0.39733618, -0.47758558, 0.09994173, -0.1091956, -32.258514, 2.143598, 0.18916667)
+light_energy = 79.57747
+omni_range = 4096.0
+omni_attenuation = 3.0
 
 [node name="Node3D" parent="." unique_id=170758959 instance=ExtResource("4_1fmyy")]
 transform = Transform3D(-0.09780866, 0, 0.9952052, 0, 1, 0, -0.9952052, 0, -0.09780866, 0, 0.35443056, 0)

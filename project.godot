@@ -22,6 +22,11 @@ config/icon="res://icon.svg"
 
 Global="*res://global.gd"
 
+[display]
+
+window/size/viewport_width=2400
+window/size/viewport_height=1020
+
 [input]
 
 ui_cancel={
