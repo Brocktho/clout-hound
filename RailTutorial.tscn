@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://b1ew2yfjml5hb"]
+[gd_scene load_steps=0 format=3 uid="uid://b1ew2yfjml5hb"]
 
 [ext_resource type="PackedScene" uid="uid://cn0de11tl22g2" path="res://Assets/models/RailTeaching.blend" id="1_4oe3j"]
 [ext_resource type="Script" uid="uid://d08f4jslh7o2c" path="res://grind_rail_from_mesh.gd" id="2_hfsba"]

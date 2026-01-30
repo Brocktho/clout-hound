@@ -618,6 +618,21 @@ func _physics_process(delta: float) -> void:
 		pending_landing_sfx = true
 		pending_rail_landing = _is_rail_landing_surface()
 		_stop_airborne_sfx()
+
+		 # Check if landing is aligned (successful) before banking score
+		var landing_success := check_landing_alignment()
+		
+		# Reset trick staleness on landing
+		_reset_trick_staleness()
+		
+		# Only bank combo if landing was successful
+		if landing_success and live_overlay:
+			live_overlay.on_player_landed()
+			
+		_play_landing_sfx(false)
+		
+		# Visual Squash
+		visual.scale = Vector3(1.2, 0.6, 1.2) * default_visual_scale
 	
 	was_on_floor = is_on_floor()
 
@@ -987,17 +1002,18 @@ func apply_spin_boost(multiplier: float = 1.0) -> void:
 func start_trick_pose() -> void:
 	if is_ragdolling or trick_frames.is_empty():
 		return
-	
-	# TRIGGER OVERLAY for generic tricks
-	if live_overlay:
-		live_overlay.trigger_trick_reaction()
-		
+
 	trick_pose_active = true
 	trick_pose_end_us = Time.get_ticks_usec() + 500_000
 	var frame_index := trick_rng.randi_range(0, trick_frames.size() - 1)
 	body_mesh.mesh = trick_frames[frame_index]
 	body_mesh.scale = default_body_scale
 	_set_body_outline(true)
+
+# New helper for tricks to call
+func report_trick(trick_name: String, score: float) -> void:
+	if live_overlay:
+		live_overlay.trigger_trick_reaction(trick_name, score)
 
 func _set_body_outline(active: bool) -> void:
 	if not trick_outline_material:

@@ -16,6 +16,7 @@ var _backflip_radians: float = 0.0
 
 func _init() -> void:
 	display_name = "Forward Back Boost"
+	base_score = 200.0
 	watched_actions = ["move_forward", "move_backward"]
 
 func check_completion(_player: Player, _delta: float) -> bool:
@@ -23,6 +24,11 @@ func check_completion(_player: Player, _delta: float) -> bool:
 
 func grant_reward(player: Player) -> void:
 	var stale_multiplier := player.consume_trick_stale(self)
+	
+	# Calculate and Report Score
+	var score = base_score * stale_multiplier
+	player.report_trick(display_name, score)
+	
 	if player.is_grinding:
 		player.jump_exit_rail()
 		player.velocity.y += player.rail_jump_force * stale_multiplier
