@@ -3,21 +3,193 @@
 [ext_resource type="PackedScene" uid="uid://bsk8mbhvd2lp8" path="res://Assets/models/warehouse.glb" id="1_vudxo"]
 [ext_resource type="PackedScene" uid="uid://dtlxuyo830w2f" path="res://player.tscn" id="2_25wl0"]
 [ext_resource type="Script" uid="uid://d08f4jslh7o2c" path="res://grind_rail_from_mesh.gd" id="2_hxk2g"]
+[ext_resource type="Curve3D" uid="uid://c4ib4gjxsou8b" path="res://Levels/FreeSkate/WarehouseData/VolcanoCenterRail.tres" id="3_151gk"]
 [ext_resource type="Script" uid="uid://mb435j3rb08x" path="res://grind_rail.gd" id="3_n2k7l"]
+[ext_resource type="Curve3D" uid="uid://b0b6hxarnb2f8" path="res://Levels/FreeSkate/WarehouseData/CatwalkRail.tres" id="4_n2k7l"]
+[ext_resource type="Curve3D" uid="uid://c3ni0g88brgeg" path="res://Levels/FreeSkate/WarehouseData/HubRail.tres" id="5_dvqtg"]
 
-[sub_resource type="Curve3D" id="Curve3D_hxk2g"]
+[sub_resource type="Curve3D" id="Curve3D_e2r2e"]
 _data = {
-"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 11.5, 0),
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 10.5, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0)
+}
+point_count = 6
+
+[sub_resource type="Curve3D" id="Curve3D_817gw"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 4.4, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0)
+}
+point_count = 6
+
+[sub_resource type="Curve3D" id="Curve3D_obid3"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, -3, 0, 0, 0, 0, 0, 0, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, -5, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0)
+}
+point_count = 6
+
+[sub_resource type="Curve3D" id="Curve3D_11a0k"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0),
 "tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0)
 }
 point_count = 7
 
 [sub_resource type="Curve3D" id="Curve3D_n2k7l"]
 _data = {
-"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -8.239407, 0.0002804026, -1.0005574, 0, 0, 0, 0, 0, 0, -8.299658, 0.0003194362, -0.00013486517, 0, 0, 0, 0, 0, 0, -8.239213, 0.000102467835, 1.0003402, 0, 0, 0, 0, 0, 0, -8.058364, -0.000105157495, 1.9860373, 0, 0, 0, 0, 0, 0, -7.7605104, -0.0001896657, 2.943059, 0, 0, 0, 0, 0, 0, -7.3492565, -0.00019364338, 3.8570814, 0, 0, 0, 0, 0, 0, 7.8201294e-05, -0.00015930412, 0.00015282631, 0, 0, 0, 0, 0, 0, -8.239477, -0.00018271338, -1.0005426),
-"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0)
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, -3, 0, 0, 0, 0, 0, 0, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, -5, 0, 0, 0, 0, 0, 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, -7, 0, 0, 0, 0, 0, 0, 0, 0, -8, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0)
 }
-point_count = 8
+point_count = 9
+
+[sub_resource type="Curve3D" id="Curve3D_glb41"]
+closed = true
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -6.8305993, 0.0002090428, -4.714805, 0, 0, 0, 0, 0, 0, -6.2126436, 0.00017766934, -5.503907, 0, 0, 0, 0, 0, 0, -5.5358677, -4.7683716e-07, -6.207198, 0, 0, 0, 0, 0, 0, -4.7936835, 0, -6.7808285, 0, 0, 0, 0, 0, 0, -3.6054878, 0, -7.4222784, 0, 0, 0, 0, 0, 0, -1.6906958, 0, -8.107721, 0, 0, 0, 0, 0, 0, -0.1267209, 0, -8.284695, 0, 0, 0, 0, 0, 0, 1.6746359, 0, -8.109329, 0, 0, 0, 0, 0, 0, 3.5626907, 0, -7.5063806, 0, 0, 0, 0, 0, 0, 5.5154333, 0, -6.20324, 0, 0, 0, 0, 0, 0, 6.988785, 0, -4.4498096, 0, 0, 0, 0, 0, 0, 7.7146378, 4.7683716e-07, -3.0169873, 0, 0, 0, 0, 0, 0, 8.148241, -4.7683716e-07, -1.4753046, 0, 0, 0, 0, 0, 0, 8.307259, 0, 0.12799215, 0, 0, 0, 0, 0, 0, 8.046237, 0, 1.9445245, 0, 0, 0, 0, 0, 0, 7.4604897, 0, 3.549759, 0, 0, 0, 0, 0, 0, 6.3892097, 0, 5.26583, 0, 0, 0, 0, 0, 0, 4.795844, 0, 6.745501, 0, 0, 0, 0, 0, 0, 2.9573846, 4.7683716e-07, 7.751808, 0, 0, 0, 0, 0, 0, -0.27281952, -4.7683716e-07, 8.292998, 0, 0, 0, 0, 0, 0, -2.9179814, -4.7683716e-07, 7.7655964, 0, 0, 0, 0, 0, 0, -4.869916, 0, 6.712869, 0, 0, 0, 0, 0, 0, -6.664943, 0, 4.9792523, 0, 0, 0, 0, 0, 0, -7.970538, 0, 2.4533634, 0, 0, 0, 0, 0, 0, -8.307671, 0, 0.0109733045, 0, 0, 0, 0, 0, 0, -8.0324135, 0, -1.9746709, 0, 0, 0, 0, 0, 0, -7.532346, 0, -3.4490223),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 27
+
+[sub_resource type="Curve3D" id="Curve3D_i3ypt"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 14.9, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 9
+
+[sub_resource type="Curve3D" id="Curve3D_tliix"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 9
+
+[sub_resource type="Curve3D" id="Curve3D_5d5eo"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 9
+
+[sub_resource type="Curve3D" id="Curve3D_um5fe"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 9
+
+[sub_resource type="Curve3D" id="Curve3D_8b0fx"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 18, 0, 0, 0, 0, 0, 0, 0, 0, 19, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 11
+
+[sub_resource type="Curve3D" id="Curve3D_3fa4t"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 18, 0, 0, 0, 0, 0, 0, 0, 0, 19, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 11
+
+[sub_resource type="Curve3D" id="Curve3D_r8qqj"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0)
+}
+point_count = 5
+
+[sub_resource type="Curve3D" id="Curve3D_i0ojs"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0)
+}
+point_count = 5
+
+[sub_resource type="Curve3D" id="Curve3D_qnnea"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0)
+}
+point_count = 6
+
+[sub_resource type="Curve3D" id="Curve3D_2g60j"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0)
+}
+point_count = 6
+
+[sub_resource type="Curve3D" id="Curve3D_f0koq"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0)
+}
+point_count = 6
+
+[sub_resource type="Curve3D" id="Curve3D_etl70"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0)
+}
+point_count = 6
+
+[sub_resource type="Curve3D" id="Curve3D_58r6f"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 18, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 11
+
+[sub_resource type="Curve3D" id="Curve3D_rptrn"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, -8, 0, 0, 0, 0, 0, 0, 0, 0, -10, 0, 0, 0, 0, 0, 0, 0, 0, -12, 0, 0, 0, 0, 0, 0, 0, 0, -14, 0, 0, 0, 0, 0, 0, 0, 0, -16, 0, 0, 0, 0, 0, 0, 0, 0, -18, 0, 0, 0, 0, 0, 0, 0, 0, -20, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 11
+
+[sub_resource type="Curve3D" id="Curve3D_tlbs1"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 18, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 11
+
+[sub_resource type="Curve3D" id="Curve3D_mnyac"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, -8, 0, 0, 0, 0, 0, 0, 0, 0, -10, 0, 0, 0, 0, 0, 0, 0, 0, -12, 0, 0, 0, 0, 0, 0, 0, 0, -14, 0, 0, 0, 0, 0, 0, 0, 0, -16, 0, 0, 0, 0, 0, 0, 0, 0, -18, 0, 0, 0, 0, 0, 0, 0, 0, -20, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 11
+
+[sub_resource type="Curve3D" id="Curve3D_ef3y3"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0)
+}
+point_count = 6
+
+[sub_resource type="Curve3D" id="Curve3D_ol2fl"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, -8, 0, 0, 0, 0, 0, 0, 0, 0, -10, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0)
+}
+point_count = 6
+
+[sub_resource type="Curve3D" id="Curve3D_1bk3k"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0)
+}
+point_count = 6
+
+[sub_resource type="Curve3D" id="Curve3D_ja86d"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, -8, 0, 0, 0, 0, 0, 0, 0, 0, -10, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0)
+}
+point_count = 6
 
 [sub_resource type="Curve3D" id="Curve3D_dvqtg"]
 _data = {
@@ -47,6 +219,20 @@ _data = {
 }
 point_count = 49
 
+[sub_resource type="Curve3D" id="Curve3D_n75fq"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0)
+}
+point_count = 6
+
+[sub_resource type="Curve3D" id="Curve3D_kj42j"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0)
+}
+point_count = 5
+
 [node name="Warehouse" type="Node3D" unique_id=1754844202]
 
 [node name="warehouse" parent="." unique_id=1014671168 instance=ExtResource("1_vudxo")]
@@ -62,6 +248,9 @@ transform = Transform3D(1.05, 0, 0, 0, 1.05, 0, 0, 0, 1.05, 0, 0, 0)
 
 [node name="GR_Volcano_Coping" parent="warehouse" index="94" unique_id=197007441]
 script = ExtResource("2_hxk2g")
+path_mode = 2
+min_hit_distance = 0.1
+closed_edge_penalty = 15.0
 
 [node name="GR_T1_Plat_NW_Rail" parent="warehouse" index="97" unique_id=21282731]
 script = ExtResource("2_hxk2g")
@@ -203,192 +392,280 @@ script = ExtResource("2_hxk2g")
 
 [node name="GR_T2_Center_Rail_-1_Path3D" type="Path3D" parent="warehouse" unique_id=1644309165]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -5.8, 10.58, -5.661513)
-curve = SubResource("Curve3D_hxk2g")
+visible = false
+curve = ExtResource("3_151gk")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_FunBox_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=1316236660]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 35, 0.98, 0)
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 35, 0.98, -5.167653)
+visible = false
+curve = SubResource("Curve3D_e2r2e")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_FlatRail_C_Path3D" type="Path3D" parent="warehouse" unique_id=1345177745]
-transform = Transform3D(0, 0.9396927, -0.34202015, -1, 0, -1.4901161e-08, -1.4901161e-08, 0.34202015, 0.9396926, 18, 0.45, 12)
+transform = Transform3D(0, 0.9396927, -0.34202015, -1, 0, -1.4901161e-08, -1.4901161e-08, 0.34202015, 0.9396926, 15.952936, 0.45, 11.234187)
+visible = false
+curve = SubResource("Curve3D_817gw")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_FlatRail_B_Path3D" type="Path3D" parent="warehouse" unique_id=2000903149]
-transform = Transform3D(0, 0.9659259, 0.2588191, -1, 0, 1.4901161e-08, -1.4901161e-08, -0.2588191, 0.9659258, -25, 0.45, -8)
+transform = Transform3D(0, 0.9659259, 0.2588191, -1, 0, 1.4901161e-08, -1.4901161e-08, -0.2588191, 0.9659258, -22.622442, 0.45, -8.641679)
+visible = false
+curve = SubResource("Curve3D_obid3")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_FlatRail_A_Path3D" type="Path3D" parent="warehouse" unique_id=919855721]
-transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 25, 0.45, -10)
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 22.004795, 0.45, -10)
+visible = false
+curve = SubResource("Curve3D_11a0k")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_QP_SE_Coping_Path3D" type="Path3D" parent="warehouse" unique_id=1342850828]
-transform = Transform3D(5.9604645e-08, 0.7071067, -0.7071068, -1, 0, -2.9802322e-08, -2.9802322e-08, 0.7071068, 0.70710677, 44.333454, 2.86, 15.666548)
+transform = Transform3D(5.9604645e-08, 0.7071067, -0.7071068, -1, 0, -2.9802322e-08, -2.9802322e-08, 0.7071068, 0.70710677, 47.152687, 2.86, 18.490051)
+visible = false
+curve = SubResource("Curve3D_n2k7l")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_Volcano_Coping_Path3D" type="Path3D" parent="warehouse" unique_id=69413433]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.57, 0)
-curve = SubResource("Curve3D_n2k7l")
+visible = false
+curve = SubResource("Curve3D_glb41")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T1_Plat_NW_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=503890262]
-transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -38, 5.58, -32.7)
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -45.37775, 5.58, -32.7)
+visible = false
+curve = SubResource("Curve3D_i3ypt")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T1_Plat_SW_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=2008108704]
-transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -38, 5.58, 23.3)
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -45.43128, 5.58, 23.3)
+visible = false
+curve = SubResource("Curve3D_tliix")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T1_Plat_NE_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=1771008082]
-transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 38, 5.58, -32.7)
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 30.431269, 5.58, -32.7)
+visible = false
+curve = SubResource("Curve3D_5d5eo")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T1_Plat_SE_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=522222882]
-transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 38, 5.58, 23.3)
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 30.483997, 5.58, 23.3)
+visible = false
+curve = SubResource("Curve3D_um5fe")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T1_Plat_N_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=965688004]
-transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 5.58, -33.7)
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -9.4730625, 5.58, -33.7)
+visible = false
+curve = SubResource("Curve3D_8b0fx")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T1_Plat_S_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=1851288110]
-transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 5.58, 26.3)
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -9.43676, 5.58, 26.3)
+visible = false
+curve = SubResource("Curve3D_3fa4t")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T1_Plat_W_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=1493342551]
-transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -44, 5.58, -7.7)
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -47.437466, 5.58, -7.7)
+visible = false
+curve = SubResource("Curve3D_r8qqj")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T1_Plat_E_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=1385671685]
-transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 44, 5.58, -7.7)
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 40.520943, 5.58, -7.7)
+visible = false
+curve = SubResource("Curve3D_i0ojs")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T1_Plat_Interior_NW_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=1259837604]
-transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -28, 5.58, -21.7)
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -32.49353, 5.58, -21.7)
+visible = false
+curve = SubResource("Curve3D_qnnea")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T1_Plat_Interior_NE_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=496129303]
-transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 28, 5.58, -21.7)
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 23.577806, 5.58, -21.7)
+visible = false
+curve = SubResource("Curve3D_2g60j")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T1_Plat_Interior_SW_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=1504217249]
-transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -28, 5.58, 14.3)
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -32.514225, 5.58, 14.3)
+visible = false
+curve = SubResource("Curve3D_f0koq")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T1_Plat_Interior_SE_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=2021187410]
-transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 28, 5.58, 14.3)
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 23.495234, 5.58, 14.3)
+visible = false
+curve = SubResource("Curve3D_etl70")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T1_Bridge_NW_N_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=1188821952]
-transform = Transform3D(5.9604645e-08, 0.99503726, 0.099503726, -1.0000001, 5.9604645e-08, 1.1175871e-08, 0, -0.099503726, 0.9950372, -20, 5.58, -29)
+transform = Transform3D(5.9604645e-08, 0.99503726, 0.099503726, -1.0000001, 5.9604645e-08, 1.1175871e-08, 0, -0.099503726, 0.9950372, -29.980366, 5.58, -27.99293)
+visible = false
+curve = SubResource("Curve3D_58r6f")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T1_Bridge_NE_N_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=485850805]
-transform = Transform3D(-1.1920929e-07, -0.99503714, 0.09950372, -0.99999994, 1.1920929e-07, -7.450581e-09, 0, -0.09950372, -0.9950371, 20, 5.58, -29)
+transform = Transform3D(-1.1920929e-07, -0.99503714, 0.09950372, -0.99999994, 1.1920929e-07, -7.450581e-09, 0, -0.09950372, -0.9950371, 10.037087, 5.58, -29.980566)
+visible = false
+curve = SubResource("Curve3D_rptrn")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T1_Bridge_SW_S_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=1639832761]
-transform = Transform3D(5.9604645e-08, 0.99503726, -0.099503726, -1.0000001, 5.9604645e-08, -1.1175871e-08, 0, 0.099503726, 0.9950372, -20, 5.58, 29)
+transform = Transform3D(5.9604645e-08, 0.99503726, -0.099503726, -1.0000001, 5.9604645e-08, -1.1175871e-08, 0, 0.099503726, 0.9950372, -29.959023, 5.58, 28.003271)
+visible = false
+curve = SubResource("Curve3D_tlbs1")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T1_Bridge_SE_S_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=1047410958]
-transform = Transform3D(-1.1920929e-07, -0.99503714, -0.09950372, -0.99999994, 1.1920929e-07, 7.450581e-09, 0, 0.09950372, -0.9950371, 20, 5.58, 29)
+transform = Transform3D(-1.1920929e-07, -0.99503714, -0.09950372, -0.99999994, 1.1920929e-07, 7.450581e-09, 0, 0.09950372, -0.9950371, 9.994988, 5.58, 30.017647)
+visible = false
+curve = SubResource("Curve3D_mnyac")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T1_Bridge_NW_Interior_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=396493356]
-transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -33, 5.58, -22)
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -37.99619, 5.58, -22)
+visible = false
+curve = SubResource("Curve3D_ef3y3")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T1_Bridge_NE_Interior_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=391766732]
-transform = Transform3D(0, -1, -4.3711392e-08, -1, 0, -4.3711392e-08, 4.3711392e-08, 4.3711392e-08, -1, 33, 5.58, -22)
+transform = Transform3D(0, -1, -4.3711392e-08, -1, 0, -4.3711392e-08, 4.3711392e-08, 4.3711392e-08, -1, 28.008858, 5.58, -22)
+visible = false
+curve = SubResource("Curve3D_ol2fl")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T1_Bridge_SW_Interior_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=1888079182]
-transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -33, 5.58, 22)
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -38.004116, 5.58, 22)
+visible = false
+curve = SubResource("Curve3D_1bk3k")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T1_Bridge_SE_Interior_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=163619225]
-transform = Transform3D(0, -1, -4.3711392e-08, -1, 0, -4.3711392e-08, 4.3711392e-08, 4.3711392e-08, -1, 33, 5.58, 22)
+transform = Transform3D(0, -1, -4.3711392e-08, -1, 0, -4.3711392e-08, 4.3711392e-08, 4.3711392e-08, -1, 28.045235, 5.58, 22)
+visible = false
+curve = SubResource("Curve3D_ja86d")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T2_Catwalk_W_Rail_-1_Path3D" type="Path3D" parent="warehouse" unique_id=2019541269]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -47.55, 10.58, 0)
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -47.55, 10.58, -19.718739)
+visible = false
+curve = ExtResource("4_n2k7l")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T2_Catwalk_W_Rail_1_Path3D" type="Path3D" parent="warehouse" unique_id=1151077499]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -44.45, 10.58, 0)
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -44.45, 10.58, -19.71886)
+visible = false
+curve = ExtResource("4_n2k7l")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T2_Catwalk_E_Rail_-1_Path3D" type="Path3D" parent="warehouse" unique_id=1518698623]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 44.45, 10.58, 0)
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 44.45, 10.58, -19.693266)
+visible = false
+curve = ExtResource("4_n2k7l")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T2_Catwalk_E_Rail_1_Path3D" type="Path3D" parent="warehouse" unique_id=918804038]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 47.55, 10.58, 0)
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 47.55, 10.58, -19.733385)
+visible = false
+curve = ExtResource("4_n2k7l")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T2_Hub_NW_Rail_-1_Path3D" type="Path3D" parent="warehouse" unique_id=1609749529]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -43.8, 10.58, -30)
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -43.8, 10.58, -33.762733)
+visible = false
+curve = ExtResource("5_dvqtg")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T2_Hub_NW_Rail_1_Path3D" type="Path3D" parent="warehouse" unique_id=1807955235]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -36.2, 10.58, -30)
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -36.2, 10.58, -33.730927)
+visible = false
+curve = ExtResource("5_dvqtg")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T2_Hub_NE_Rail_-1_Path3D" type="Path3D" parent="warehouse" unique_id=618557642]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 36.2, 10.58, -30)
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 36.2, 10.58, -33.742226)
+visible = false
+curve = ExtResource("5_dvqtg")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T2_Hub_NE_Rail_1_Path3D" type="Path3D" parent="warehouse" unique_id=1869264623]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 43.8, 10.58, -30)
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 43.8, 10.58, -33.76703)
+visible = false
+curve = ExtResource("5_dvqtg")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T2_Hub_SW_Rail_-1_Path3D" type="Path3D" parent="warehouse" unique_id=1808468803]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -43.8, 10.58, 30)
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -43.8, 10.58, 26.24756)
+visible = false
+curve = ExtResource("5_dvqtg")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T2_Hub_SW_Rail_1_Path3D" type="Path3D" parent="warehouse" unique_id=1321981522]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -36.2, 10.58, 30)
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -36.2, 10.58, 26.264896)
+visible = false
+curve = ExtResource("5_dvqtg")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T2_Hub_SE_Rail_-1_Path3D" type="Path3D" parent="warehouse" unique_id=475134072]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 36.2, 10.58, 30)
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 36.2, 10.58, 26.261526)
+visible = false
+curve = ExtResource("5_dvqtg")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T2_Hub_SE_Rail_1_Path3D" type="Path3D" parent="warehouse" unique_id=188681883]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 43.8, 10.58, 30)
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 43.8, 10.58, 26.230844)
+visible = false
+curve = ExtResource("5_dvqtg")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_T2_Center_Rail_1_Path3D" type="Path3D" parent="warehouse" unique_id=1396441963]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 5.8, 10.58, 0)
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 5.8, 10.58, -5.751528)
+visible = false
+curve = ExtResource("3_151gk")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_SkyLine_NW_NE_Path3D" type="Path3D" parent="warehouse" unique_id=1482140140]
+visible = false
 curve = SubResource("Curve3D_dvqtg")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_SkyLine_SW_SE_Path3D" type="Path3D" parent="warehouse" unique_id=1308660635]
+visible = false
 curve = SubResource("Curve3D_151gk")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_SkyLine_Diagonal_A_Path3D" type="Path3D" parent="warehouse" unique_id=1765593626]
+visible = false
 curve = SubResource("Curve3D_k2c8k")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_SkyLine_Diagonal_B_Path3D" type="Path3D" parent="warehouse" unique_id=1053267560]
+visible = false
 curve = SubResource("Curve3D_7xiu8")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_Solo_Rail_COPY_ME_Path3D" type="Path3D" parent="warehouse" unique_id=1782377187]
-transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -15, 0.45, -25)
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -20.00731, 0.45, -25)
+visible = false
+curve = SubResource("Curve3D_n75fq")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_Ledge_Street_Edge_Path3D" type="Path3D" parent="warehouse" unique_id=1676032424]
-transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -32, 0.54, 14.72)
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -38.005157, 0.54, 14.72)
+visible = false
+curve = ExtResource("3_151gk")
 script = ExtResource("3_n2k7l")
 
 [node name="GR_QP_SW_Coping_Path3D" type="Path3D" parent="warehouse" unique_id=735068501]
-transform = Transform3D(5.9604645e-08, 0.7071067, 0.7071068, -1, 0, 2.9802322e-08, 2.9802322e-08, -0.7071068, 0.70710677, -44.333454, 2.86, 15.666548)
+transform = Transform3D(5.9604645e-08, 0.7071067, 0.7071068, -1, 0, 2.9802322e-08, 2.9802322e-08, -0.7071068, 0.70710677, -47.15781, 2.8600001, 18.485336)
+visible = false
+curve = SubResource("Curve3D_kj42j")
 script = ExtResource("3_n2k7l")
 
 [node name="Node3D" parent="." unique_id=1782707226 instance=ExtResource("2_25wl0")]
