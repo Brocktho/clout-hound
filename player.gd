@@ -8,6 +8,9 @@ class_name Player
 @export var friction: float = 50.0
 @export var air_resistance: float = 1.0
 @export var jump_velocity: float = 5.0
+@export var ramp_jump_boost: float = 0.25 # Scales speed->vertical boost when jumping off ramps
+@export var ramp_jump_min_speed: float = 3.0
+@export var ramp_jump_max_boost: float = 6.0
 @export var diagonal_boost: float = 2.0
 @export var jump_buffer_time: float = 0.15 # Time before landing that a jump press is still registered
 @export var landing_grace_time: float = 0.1 # Time after landing where friction is reduced
@@ -672,6 +675,13 @@ func _physics_process(delta: float) -> void:
 		elif is_on_floor():
 			jump_buffer_timer = 0
 			velocity.y = jump_velocity
+			var floor_normal: Vector3 = get_floor_normal()
+			if floor_normal != Vector3.UP:
+				var slope_steepness: float = 1.0 - floor_normal.dot(Vector3.UP)
+				var speed: float = velocity.length()
+				if speed >= ramp_jump_min_speed:
+					var ramp_boost : float = clamp(speed * slope_steepness * ramp_jump_boost, 0.0, ramp_jump_max_boost)
+					velocity.y += ramp_boost
 			_play_jump_sfx()
 			_start_airborne_sfx()
 			if !is_sliding:
@@ -688,7 +698,7 @@ func _physics_process(delta: float) -> void:
 		pending_rail_landing = _is_rail_landing_surface()
 		_stop_airborne_sfx()
 
-		 # Check if landing is aligned (successful) before banking score
+		# Check if landing is aligned (successful) before banking score
 		var landing_success := check_landing_alignment()
 		
 		# Reset trick staleness on landing
