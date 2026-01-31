@@ -5,6 +5,8 @@
 [ext_resource type="AudioStream" uid="uid://em6vk6wpdssa" path="res://Assets/Audio/SFX/UI_Change.wav" id="3_ui_change"]
 [ext_resource type="Shader" uid="uid://bsrludiireds1" path="res://Assets/Shaders/starfield_spatial.gdshader" id="4_starfield_spatial"]
 [ext_resource type="AudioStream" uid="uid://cisx6puhqr4rg" path="res://Assets/Audio/Music/ElectronicLoop.wav" id="5_fos0i"]
+[ext_resource type="PackedScene" uid="uid://bap42v8u55v5r" path="res://Credits.tscn" id="6_credits"]
+
 
 [sub_resource type="Environment" id="Environment_main_menu"]
 background_mode = 1
