@@ -235,160 +235,217 @@ point_count = 5
 
 [node name="Warehouse" type="Node3D" unique_id=1754844202]
 
-[node name="warehouse" parent="." unique_id=1014671168 instance=ExtResource("1_vudxo")]
+[node name="warehouse" parent="." unique_id=549370499 instance=ExtResource("1_vudxo")]
 
-[node name="CollisionShape3D" parent="warehouse/SM_MegaVolcano/StaticBody3D" parent_id_path=PackedInt32Array(1014671168, 1826814807) index="0" unique_id=1435589261]
+[node name="CollisionShape3D" parent="warehouse/SM_MegaVolcano/StaticBody3D" parent_id_path=PackedInt32Array(549370499, 140601243) index="0" unique_id=709236257]
 transform = Transform3D(1.05, 0, 0, 0, 1.05, 0, 0, 0, 1.05, 0, 0, 0)
 
-[node name="CollisionShape3D" parent="warehouse/SM_Volcano_Entry_North/StaticBody3D" parent_id_path=PackedInt32Array(1014671168, 1298981850) index="0" unique_id=1588990552]
+[node name="CollisionShape3D" parent="warehouse/SM_Volcano_Entry_North/StaticBody3D" parent_id_path=PackedInt32Array(549370499, 1880528649) index="0" unique_id=614485701]
 transform = Transform3D(1.05, 0, 0, 0, 1.05, 0, 0, 0, 1.05, 0, 0, 0)
 
-[node name="CollisionShape3D" parent="warehouse/SM_Volcano_Entry_South/StaticBody3D" parent_id_path=PackedInt32Array(1014671168, 639571494) index="0" unique_id=140767034]
+[node name="CollisionShape3D" parent="warehouse/SM_Volcano_Entry_South/StaticBody3D" parent_id_path=PackedInt32Array(549370499, 1743250706) index="0" unique_id=414056891]
 transform = Transform3D(1.05, 0, 0, 0, 1.05, 0, 0, 0, 1.05, 0, 0, 0)
 
-[node name="GR_Volcano_Coping" parent="warehouse" index="94" unique_id=197007441]
+[node name="CollisionShape3D" parent="warehouse/SM_Volcano_Entry_East/StaticBody3D" parent_id_path=PackedInt32Array(549370499, 1468020303) index="0" unique_id=1273676894]
+transform = Transform3D(1.05, 0, 0, 0, 1.05, 0, 0, 0, 1.05, 0, 0, 0)
+
+[node name="SM_Volcano_Entry_West" parent="warehouse" index="34" unique_id=232694678]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.971212, 0, -14)
+
+[node name="CollisionShape3D" parent="warehouse/SM_Volcano_Entry_West/StaticBody3D" parent_id_path=PackedInt32Array(549370499, 184794968) index="0" unique_id=1736123879]
+transform = Transform3D(1.05, 0, 0, 0, 1.05, 0, 0, 0, 1.05, 0, 0, 0)
+
+[node name="CollisionShape3D" parent="warehouse/T1_Ramp_NW/StaticBody3D" parent_id_path=PackedInt32Array(549370499, 1665946259) index="0" unique_id=1412254623]
+transform = Transform3D(1.05, 0, 0, 0, 1.05, 0, 0, 0, 1.05, 0, 0, 0)
+
+[node name="CollisionShape3D" parent="warehouse/T1_Ramp_NE/StaticBody3D" parent_id_path=PackedInt32Array(549370499, 880622140) index="0" unique_id=1902643259]
+transform = Transform3D(1.05, 0, 0, 0, 1.05, 0, 0, 0, 1.05, 0, 0, 0)
+
+[node name="CollisionShape3D" parent="warehouse/T1_Ramp_SW/StaticBody3D" parent_id_path=PackedInt32Array(549370499, 2106841151) index="0" unique_id=474698305]
+transform = Transform3D(1.05, 0, 0, 0, 1.05, 0, 0, 0, 1.05, 0, 0, 0)
+
+[node name="T1_Ramp_SE" parent="warehouse" index="50" unique_id=1141945967]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 51.08168, 0, 23)
+
+[node name="CollisionShape3D" parent="warehouse/T1_Ramp_SE/StaticBody3D" parent_id_path=PackedInt32Array(549370499, 399717268) index="0" unique_id=400351597]
+transform = Transform3D(1.05, 0, 0, 0, 1.05, 0, 0, 0, 1.05, 0, 0, 0)
+
+[node name="T1_Ramp_W" parent="warehouse" index="51" unique_id=572992980]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -42.37081, 0, 2.5)
+
+[node name="CollisionShape3D" parent="warehouse/T1_Ramp_W/StaticBody3D" parent_id_path=PackedInt32Array(549370499, 1187697522) index="0" unique_id=1939230822]
+transform = Transform3D(1.05, 0, 0, 0, 1.05, 0, 0, 0, 1.05, 0, 0, 0)
+
+[node name="CollisionShape3D" parent="warehouse/T1_Ramp_E/StaticBody3D" parent_id_path=PackedInt32Array(549370499, 822437181) index="0" unique_id=1562318696]
+transform = Transform3D(1.05, 0, 0, 0, 1.05, 0, 0, 0, 1.05, 0, 0, 0)
+
+[node name="CollisionShape3D" parent="warehouse/T2T3_Ramp_NE/StaticBody3D" parent_id_path=PackedInt32Array(549370499, 2057563079) index="0" unique_id=609761219]
+transform = Transform3D(1.05, 0, 0, 0, 1.05, 0, 0, 0, 1.05, 0, 0, 0)
+
+[node name="T2T3_Ramp_SE" parent="warehouse" index="76" unique_id=1927141967]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 47.39395, 8.190857, 29.993912)
+
+[node name="CollisionShape3D" parent="warehouse/T2T3_Ramp_SE/StaticBody3D" parent_id_path=PackedInt32Array(549370499, 1808473404) index="0" unique_id=686159880]
+transform = Transform3D(1.05, 0, 0, 0, 1.05, 0, 0, 0, 1.05, 0, 0, 0)
+
+[node name="T3_Landing_QP" parent="warehouse" index="77" unique_id=1543948777]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, -13.122004, -3)
+
+[node name="SM_QP_SW" parent="warehouse" index="86" unique_id=625417771]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -42, -6.8051996, 18)
+
+[node name="SM_QP_SE" parent="warehouse" index="87" unique_id=1294172002]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, -10.740563, 18)
+
+[node name="CollisionShape3D" parent="warehouse/SM_FunBox_Ramp_N/StaticBody3D" parent_id_path=PackedInt32Array(549370499, 470289699) index="0" unique_id=1807963089]
+transform = Transform3D(1.05, 0, 0, 0, 1.05, 0, 0, 0, 1.05, 0, 0, 0)
+
+[node name="GR_Volcano_Coping" parent="warehouse" index="94" unique_id=323432471]
 script = ExtResource("2_hxk2g")
 path_mode = 2
 min_hit_distance = 0.1
 closed_edge_penalty = 15.0
 
-[node name="GR_T1_Plat_NW_Rail" parent="warehouse" index="97" unique_id=21282731]
+[node name="GR_T1_Plat_NW_Rail" parent="warehouse" index="97" unique_id=1073012150]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T1_Plat_NE_Rail" parent="warehouse" index="98" unique_id=1134809177]
+[node name="GR_T1_Plat_NE_Rail" parent="warehouse" index="98" unique_id=198810923]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T1_Plat_SW_Rail" parent="warehouse" index="99" unique_id=1850371909]
+[node name="GR_T1_Plat_SW_Rail" parent="warehouse" index="99" unique_id=622482758]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T1_Plat_SE_Rail" parent="warehouse" index="100" unique_id=294943163]
+[node name="GR_T1_Plat_SE_Rail" parent="warehouse" index="100" unique_id=1729234600]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T1_Plat_N_Rail" parent="warehouse" index="101" unique_id=162162683]
+[node name="GR_T1_Plat_N_Rail" parent="warehouse" index="101" unique_id=1824616591]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T1_Plat_S_Rail" parent="warehouse" index="102" unique_id=1809018494]
+[node name="GR_T1_Plat_S_Rail" parent="warehouse" index="102" unique_id=315774302]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T1_Plat_W_Rail" parent="warehouse" index="103" unique_id=1427360938]
+[node name="GR_T1_Plat_W_Rail" parent="warehouse" index="103" unique_id=1398299736]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T1_Plat_E_Rail" parent="warehouse" index="104" unique_id=1678342577]
+[node name="GR_T1_Plat_E_Rail" parent="warehouse" index="104" unique_id=278358800]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T1_Plat_Interior_NW_Rail" parent="warehouse" index="105" unique_id=1596821160]
+[node name="GR_T1_Plat_Interior_NW_Rail" parent="warehouse" index="105" unique_id=1518834310]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T1_Plat_Interior_NE_Rail" parent="warehouse" index="106" unique_id=1361049536]
+[node name="GR_T1_Plat_Interior_NE_Rail" parent="warehouse" index="106" unique_id=866446155]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T1_Plat_Interior_SW_Rail" parent="warehouse" index="107" unique_id=1007066568]
+[node name="GR_T1_Plat_Interior_SW_Rail" parent="warehouse" index="107" unique_id=887021582]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T1_Plat_Interior_SE_Rail" parent="warehouse" index="108" unique_id=1276832858]
+[node name="GR_T1_Plat_Interior_SE_Rail" parent="warehouse" index="108" unique_id=1086536402]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T1_Bridge_NW_N_Rail" parent="warehouse" index="109" unique_id=1230420791]
+[node name="GR_T1_Bridge_NW_N_Rail" parent="warehouse" index="109" unique_id=1938841045]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T1_Bridge_NE_N_Rail" parent="warehouse" index="110" unique_id=444950141]
+[node name="GR_T1_Bridge_NE_N_Rail" parent="warehouse" index="110" unique_id=2026162571]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T1_Bridge_SW_S_Rail" parent="warehouse" index="111" unique_id=1108426509]
+[node name="GR_T1_Bridge_SW_S_Rail" parent="warehouse" index="111" unique_id=1697016250]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T1_Bridge_SE_S_Rail" parent="warehouse" index="112" unique_id=1148052381]
+[node name="GR_T1_Bridge_SE_S_Rail" parent="warehouse" index="112" unique_id=92893820]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T1_Bridge_NW_Interior_Rail" parent="warehouse" index="113" unique_id=198775374]
+[node name="GR_T1_Bridge_NW_Interior_Rail" parent="warehouse" index="113" unique_id=2040373354]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T1_Bridge_NE_Interior_Rail" parent="warehouse" index="114" unique_id=436747350]
+[node name="GR_T1_Bridge_NE_Interior_Rail" parent="warehouse" index="114" unique_id=1316143012]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T1_Bridge_SW_Interior_Rail" parent="warehouse" index="115" unique_id=1071155626]
+[node name="GR_T1_Bridge_SW_Interior_Rail" parent="warehouse" index="115" unique_id=791824668]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T1_Bridge_SE_Interior_Rail" parent="warehouse" index="116" unique_id=1203375288]
+[node name="GR_T1_Bridge_SE_Interior_Rail" parent="warehouse" index="116" unique_id=1843177890]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T2_Catwalk_W_Rail_-1" parent="warehouse" index="117" unique_id=1223389817]
+[node name="GR_T2_Catwalk_W_Rail_-1" parent="warehouse" index="117" unique_id=1488941914]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T2_Catwalk_W_Rail_1" parent="warehouse" index="118" unique_id=279799733]
+[node name="GR_T2_Catwalk_W_Rail_1" parent="warehouse" index="118" unique_id=1945525608]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T2_Catwalk_E_Rail_-1" parent="warehouse" index="119" unique_id=105116771]
+[node name="GR_T2_Catwalk_E_Rail_-1" parent="warehouse" index="119" unique_id=781840639]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T2_Catwalk_E_Rail_1" parent="warehouse" index="120" unique_id=1435508260]
+[node name="GR_T2_Catwalk_E_Rail_1" parent="warehouse" index="120" unique_id=1731803031]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T2_Hub_NW_Rail_-1" parent="warehouse" index="121" unique_id=1635628363]
+[node name="GR_T2_Hub_NW_Rail_-1" parent="warehouse" index="121" unique_id=1737669138]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T2_Hub_NW_Rail_1" parent="warehouse" index="122" unique_id=1839341754]
+[node name="GR_T2_Hub_NW_Rail_1" parent="warehouse" index="122" unique_id=1896618570]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T2_Hub_NE_Rail_-1" parent="warehouse" index="123" unique_id=639982125]
+[node name="GR_T2_Hub_NE_Rail_-1" parent="warehouse" index="123" unique_id=1248014418]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T2_Hub_NE_Rail_1" parent="warehouse" index="124" unique_id=2125581287]
+[node name="GR_T2_Hub_NE_Rail_1" parent="warehouse" index="124" unique_id=1380331683]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T2_Hub_SW_Rail_-1" parent="warehouse" index="125" unique_id=1969354367]
+[node name="GR_T2_Hub_SW_Rail_-1" parent="warehouse" index="125" unique_id=1270277447]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T2_Hub_SW_Rail_1" parent="warehouse" index="126" unique_id=1261642252]
+[node name="GR_T2_Hub_SW_Rail_1" parent="warehouse" index="126" unique_id=1901807818]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T2_Hub_SE_Rail_-1" parent="warehouse" index="127" unique_id=1643736562]
+[node name="GR_T2_Hub_SE_Rail_-1" parent="warehouse" index="127" unique_id=786525310]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T2_Hub_SE_Rail_1" parent="warehouse" index="128" unique_id=1762260143]
+[node name="GR_T2_Hub_SE_Rail_1" parent="warehouse" index="128" unique_id=1271104762]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T2_Center_Rail_-1" parent="warehouse" index="129" unique_id=1989663497]
+[node name="GR_T2_Center_Rail_-1" parent="warehouse" index="129" unique_id=962383061]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_T2_Center_Rail_1" parent="warehouse" index="130" unique_id=2006025167]
+[node name="GR_T2_Center_Rail_1" parent="warehouse" index="130" unique_id=966715865]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_SkyLine_NW_NE" parent="warehouse" index="131" unique_id=165980334]
+[node name="GR_SkyLine_NW_NE" parent="warehouse" index="131" unique_id=794843662]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_SkyLine_SW_SE" parent="warehouse" index="132" unique_id=750945528]
+[node name="GR_SkyLine_SW_SE" parent="warehouse" index="132" unique_id=1602328802]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_SkyLine_Diagonal_A" parent="warehouse" index="133" unique_id=1887548242]
+[node name="GR_SkyLine_Diagonal_A" parent="warehouse" index="133" unique_id=882195983]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_SkyLine_Diagonal_B" parent="warehouse" index="134" unique_id=1314784503]
+[node name="GR_SkyLine_Diagonal_B" parent="warehouse" index="134" unique_id=119607205]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_Solo_Rail_COPY_ME" parent="warehouse" index="135" unique_id=647422854]
+[node name="GR_Solo_Rail_COPY_ME" parent="warehouse" index="135" unique_id=25457032]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_Ledge_Street_Edge" parent="warehouse" index="136" unique_id=557947328]
+[node name="GR_Ledge_Street_Edge" parent="warehouse" index="136" unique_id=1768872080]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_QP_SW_Coping" parent="warehouse" index="137" unique_id=568212948]
+[node name="GR_QP_SW_Coping" parent="warehouse" index="137" unique_id=1362482543]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_QP_SE_Coping" parent="warehouse" index="138" unique_id=1916981797]
+[node name="GR_QP_SE_Coping" parent="warehouse" index="138" unique_id=1460672860]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_FlatRail_A" parent="warehouse" index="139" unique_id=741993970]
+[node name="GR_FlatRail_A" parent="warehouse" index="139" unique_id=1464557576]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_FlatRail_B" parent="warehouse" index="140" unique_id=715875688]
+[node name="GR_FlatRail_B" parent="warehouse" index="140" unique_id=1617789370]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_FlatRail_C" parent="warehouse" index="141" unique_id=871878363]
+[node name="GR_FlatRail_C" parent="warehouse" index="141" unique_id=262563065]
 script = ExtResource("2_hxk2g")
 
-[node name="GR_FunBox_Rail" parent="warehouse" index="142" unique_id=1246196116]
+[node name="GR_FunBox_Rail" parent="warehouse" index="142" unique_id=1754929076]
 script = ExtResource("2_hxk2g")
+
+[node name="SM_Barrel_02" parent="warehouse" index="150" unique_id=1282000857]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.915897, 0.6, 25)
 
 [node name="GR_T2_Center_Rail_-1_Path3D" type="Path3D" parent="warehouse" unique_id=1644309165]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -5.8, 10.58, -5.661513)
