@@ -85,12 +85,12 @@ func _process(_delta: float) -> void:
 	if not Engine.is_editor_hint() or not update_in_editor:
 		return
 
-	var corner_a := _resolve_corner(corner_a, corner_a_path)
-	var corner_b := _resolve_corner(corner_b, corner_b_path)
-	if corner_a == null or corner_b == null:
+	var resolved_corner_a := _resolve_corner(corner_a, corner_a_path)
+	var resolved_corner_b := _resolve_corner(corner_b, corner_b_path)
+	if resolved_corner_a == null or resolved_corner_b == null:
 		return
 
-	if corner_a.position != _last_corner_a or corner_b.position != _last_corner_b:
+	if resolved_corner_a.position != _last_corner_a or resolved_corner_b.position != _last_corner_b:
 		_update_visual()
 
 func _resolve_corner(node: Node3D, path: NodePath) -> Node3D:
@@ -110,32 +110,32 @@ func _resolve_mesh_instance(node: MeshInstance3D, path: NodePath) -> MeshInstanc
 	return resolved as MeshInstance3D
 
 func _update_visual() -> void:
-	var corner_a := _resolve_corner(corner_a, corner_a_path)
-	var corner_b := _resolve_corner(corner_b, corner_b_path)
-	var mesh_instance := _resolve_mesh_instance(mesh_instance, mesh_path)
+	var resolved_corner_a := _resolve_corner(corner_a, corner_a_path)
+	var resolved_corner_b := _resolve_corner(corner_b, corner_b_path)
+	var resolved_mesh_instance := _resolve_mesh_instance(mesh_instance, mesh_path)
 
-	if corner_a == null or corner_b == null or mesh_instance == null:
+	if resolved_corner_a == null or resolved_corner_b == null or resolved_mesh_instance == null:
 		return
 
-	var a_pos = corner_a.global_position
-	var b_pos = corner_b.global_position
+	var a_pos = resolved_corner_a.global_position
+	var b_pos = resolved_corner_b.global_position
 	var span_x = abs(a_pos.x - b_pos.x)
 	var span_z = abs(a_pos.z - b_pos.z)
 	var size = Vector2(max(span_x, 0.1), max(span_z, 0.1))
 
 	var center = (a_pos + b_pos) * 0.5
-	mesh_instance.global_position = Vector3(center.x, center.y, center.z)
+	resolved_mesh_instance.global_position = Vector3(center.x, center.y, center.z)
 
-	var plane := mesh_instance.mesh as PlaneMesh
+	var plane := resolved_mesh_instance.mesh as PlaneMesh
 	if plane == null:
 		plane = PlaneMesh.new()
-		mesh_instance.mesh = plane
+		resolved_mesh_instance.mesh = plane
 
 	plane.size = size
 	plane.subdivide_width = subdivisions
 	plane.subdivide_depth = subdivisions
 
-	var shader_material := mesh_instance.material_override as ShaderMaterial
+	var shader_material := resolved_mesh_instance.material_override as ShaderMaterial
 	if shader_material != null:
 		shader_material.set_shader_parameter("half_size", size * 0.5)
 		shader_material.set_shader_parameter("bottom_depth", bottom_depth)

@@ -96,6 +96,7 @@ func _format_time(seconds_value: float) -> String:
 	if seconds_value < 0.0:
 		return "--:--"
 	var total_seconds := int(seconds_value)
+	@warning_ignore("integer_division")
 	var minutes := total_seconds / 60
 	var seconds := total_seconds % 60
 	return "%d:%02d" % [minutes, seconds]

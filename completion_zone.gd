@@ -6,14 +6,18 @@ extends Area3D
 var _player: CharacterBody3D
 var _was_on_floor: bool = false
 var _completed: bool = false
-
-@onready var _popup: Node = get_node_or_null(popup_path)
+var _completion_timer: Timer
 
 func _ready() -> void:
 	if not body_entered.is_connected(_on_body_entered):
 		body_entered.connect(_on_body_entered)
 	if not body_exited.is_connected(_on_body_exited):
 		body_exited.connect(_on_body_exited)
+	_completion_timer = Timer.new()
+	_completion_timer.one_shot = true
+	_completion_timer.wait_time = 0.1
+	_completion_timer.timeout.connect(_on_completion_timeout)
+	add_child(_completion_timer)
 
 func _physics_process(_delta: float) -> void:
 	if _completed or not _player:
@@ -41,11 +45,13 @@ func _on_body_exited(body: Node) -> void:
 
 func _complete() -> void:
 	_completed = true
-	var popup := _popup if _popup else get_node_or_null(popup_path)
-	if popup and popup.has_method("show_popup"):
-		popup.call_deferred("show_popup")
+	if _completion_timer:
+		_completion_timer.start()
 	else:
-		push_warning("CompletionZone: popup not found at %s" % [popup_path])
+		Global.emit_level_completed()
 	if one_shot:
 		monitoring = false
 		monitorable = false
+
+func _on_completion_timeout() -> void:
+	Global.emit_level_completed()

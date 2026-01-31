@@ -14,6 +14,9 @@ var _watcher_count: int = 1240
 var _target_watcher_count: float = 1240.0
 var _msg_timer: Timer
 
+# Pending tricks to be scored on landing
+var _pending_tricks: Array[Dictionary] = []
+
 # Deduplication History
 var _recent_msgs: Array[String] = []
 var _recent_users: Array[String] = []
@@ -199,6 +202,15 @@ func add_chat_message(username: String, text: String, name_color: Color = Color.
 	
 	var lbl = RichTextLabel.new()
 	lbl.bbcode_enabled = true
+	
+	# Create a FontVariation with emoji as fallback instead of replacing the main font
+	var emoji_font = preload("res://Assets/Fonts/NotoColorEmoji-Regular.ttf")
+	if emoji_font:
+		var font_variation = FontVariation.new()
+		font_variation.base_font = ThemeDB.fallback_font
+		font_variation.fallbacks = [emoji_font]
+		lbl.add_theme_font_override("normal_font", font_variation)
+	
 	# Format: [Avatar] [Name]: Payload
 	lbl.text = "%s [color=#%s][b]%s:[/b][/color] %s" % [avatar, name_html, username, text]
 	lbl.fit_content = true
@@ -345,35 +357,34 @@ func _cleanup_chat() -> void:
 	chat_panel.position.y = get_viewport().get_visible_rect().size.y - chat_panel.get_rect().size.y - 20
 
 
-func trigger_trick_reaction() -> void:
-	var _previous_multiplier = tracker.get_multiplier()
-	tracker.add_trick_score(150.0)
+func trigger_trick_reaction(trick_name: String = "", score_amount: float = 150.0) -> void:
+	# Queue the trick for scoring on landing
+	var safe_trick_name = trick_name if trick_name != "" else "Trick"
+	_pending_tricks.append({"name": safe_trick_name, "score": score_amount})
+	
+	# Still show chat reactions immediately for feedback
 	var current_multiplier = tracker.get_multiplier()
-	
-	_target_watcher_count += _rng.randf_range(10, 50) * current_multiplier
-	
-	# High combo = High chance of donation or sub
-	if current_multiplier > 4 and _rng.randf() > 0.85:
-		trigger_donation()
-	elif current_multiplier > 2 and _rng.randf() > 0.9:
-		trigger_sub()
+	_target_watcher_count += _rng.randf_range(10, 50) * (current_multiplier + 1)
 	
 	var count = _rng.randi_range(1, 3)
 	for i in count:
 		var user = _get_unique_item(USERNAMES, _recent_users)
-		var msg = _get_unique_item(COMMENTS_TRICK, _recent_msgs)
-		
-		# Hype up comments on high chains
+		var msg = ""
+		if trick_name != "" and _rng.randf() < 0.3:
+			msg = "%s!!" % trick_name
+			if current_multiplier > 4:
+				msg = "Insane %s 🔥" % trick_name
+		else:
+			msg = _get_unique_item(COMMENTS_TRICK, _recent_msgs)
 		if current_multiplier > 4:
 			msg = "🔥 " + msg + " 🔥"
-			
 		add_chat_message(user, msg, Color.GOLD)
 
 func trigger_grind_start() -> void:
 	# Initial burst for locking onto the rail
-	tracker.add_trick_score(50.0) 
+	tracker.add_trick_score("Grind Start", 50.0) 
 	_target_watcher_count += _rng.randf_range(5, 10)
-
+	
 	# High chance of initial "Locked in" message
 	if _rng.randf() > 0.4:
 		var user = _get_unique_item(USERNAMES, _recent_users)
@@ -381,7 +392,7 @@ func trigger_grind_start() -> void:
 		add_chat_message(user, msg, Color.ORANGE)
 
 func process_grind_tick(delta: float) -> void:
-	# Continuous score per second (e.g. 500 base points per sec)
+	# Continuous score per second
 	tracker.add_grind_score(500.0 * delta)
 
 	# Continuous viewer gain
@@ -393,11 +404,13 @@ func process_grind_tick(delta: float) -> void:
 		var msg = _get_unique_item(COMMENTS_GRIND, _recent_msgs)
 		add_chat_message(user, msg, Color.ORANGE)
 
-	# Kept for backward compatibility if needed, but redirects to start
+# Kept for backward compatibility
 func trigger_grind_reaction() -> void:
 	trigger_grind_start()
 
 func trigger_bail_reaction() -> void:
+	# Failing cancels pending tricks
+	_pending_tricks.clear()
 	tracker.fail_combo()
 	
 	_target_watcher_count -= _rng.randf_range(50, 200)
@@ -427,6 +440,7 @@ func trigger_sub() -> void:
 	_spawn_center_notification("NEW SUBSCRIBER!", user, Color(0.5, 0.2, 0.8, 0.9))
 
 func _on_score_changed(_current_score: float, display_score: float) -> void:
+	Global.set_current_hype_score(_current_score)
 	score_label.text = "HYPE: %d (x%d)" % [int(display_score), tracker.get_multiplier()]
 	# Pulse effect on high multiplier
 	if tracker.get_multiplier() >= 4:
@@ -442,3 +456,19 @@ func _on_idle_timer() -> void:
 		var user = _get_unique_item(USERNAMES, _recent_users)
 		var msg = _get_unique_item(COMMENTS_IDLE, _recent_msgs)
 		add_chat_message(user, msg, Color.LIGHT_GRAY)
+
+func on_player_landed() -> void:
+	# Score all pending tricks now that player landed
+	for trick_data in _pending_tricks:
+		tracker.add_trick_score(trick_data["name"], trick_data["score"])
+	
+	# Check for donations/subs based on final multiplier
+	var current_multiplier = tracker.get_multiplier()
+	if current_multiplier > 4 and _rng.randf() > 0.85:
+		trigger_donation()
+	elif current_multiplier > 2 and _rng.randf() > 0.9:
+		trigger_sub()
+	
+	# Clear pending tricks and bank the combo
+	_pending_tricks.clear()
+	tracker.bank_combo()

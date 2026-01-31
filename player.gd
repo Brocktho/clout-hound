@@ -112,6 +112,10 @@ class_name Player
 	preload("res://Assets/Audio/SFX/grind_10.wav"),
 	preload("res://Assets/Audio/SFX/grind_11.wav")
 ]
+@export var trick_completion_sfx: Array[AudioStream] = [
+	preload("res://Assets/Audio/SFX/Trick_Completion0.wav"),
+	preload("res://Assets/Audio/SFX/Trick_Completion1.wav")
+]
 
 @export_group("Slow Mo")
 @export var slowmo_time_scale: float = 0.1
@@ -169,6 +173,9 @@ var _allow_settings_on_mouse_release: bool = false
 var _has_captured_once: bool = false
 var _settings_opening: bool = false
 var _camera_pivot_pos: Vector3 = Vector3.ZERO
+var _level_start_ticks_msec: int = 0
+var _record_queue: Array[String] = []
+var _record_showing: bool = false
 
 @onready var camera: Camera3D = get_parent().get_node("SpringArm3D/Camera3D")
 @onready var spring_arm: SpringArm3D = get_parent().get_node("SpringArm3D")
@@ -194,6 +201,7 @@ var _camera_pivot_pos: Vector3 = Vector3.ZERO
 @onready var airborne_sfx_player: AudioStreamPlayer3D = $AirborneSfx
 @onready var moving_sfx_player: AudioStreamPlayer3D = $MovingSfx
 @onready var grind_sfx_player: AudioStreamPlayer3D = $GrindSfx
+@onready var trick_completion_sfx_player: AudioStreamPlayer3D = $TrickCompletionSfx
 
 var outline_material: ShaderMaterial
 var trick_outline_material: ShaderMaterial
@@ -251,6 +259,10 @@ func _ready() -> void:
 	add_to_group("player")
 	if not Global.kill_zone_triggered.is_connected(_on_kill_zone_triggered):
 		Global.kill_zone_triggered.connect(_on_kill_zone_triggered)
+	if not Global.level_record_achieved.is_connected(_on_level_record_achieved):
+		Global.level_record_achieved.connect(_on_level_record_achieved)
+	_level_start_ticks_msec = Time.get_ticks_msec()
+	Global.start_level_timer()
 	ragdoll_reset_timer = Timer.new()
 	ragdoll_reset_timer.one_shot = true
 	ragdoll_reset_timer.wait_time = ragdoll_reset_seconds
@@ -355,7 +367,64 @@ func get_horizontal_boost_dir() -> Vector3:
 func _exit_tree() -> void:
 	if Engine.time_scale != 1.0:
 		Engine.time_scale = 1.0
+	var elapsed_msec := Time.get_ticks_msec() - _level_start_ticks_msec
+	print("Level timer: %s" % _format_elapsed_msec(elapsed_msec))
 	_reset_state_for_exit()
+
+func _format_elapsed_msec(elapsed_msec: int) -> String:
+	@warning_ignore("integer_division")
+	var total_seconds := int(elapsed_msec / 1000)
+	@warning_ignore("integer_division")
+	var minutes := int(total_seconds / 60)
+	var seconds := int(total_seconds % 60)
+	var milliseconds := int(elapsed_msec % 1000)
+	return "%02d:%02d.%03d" % [minutes, seconds, milliseconds]
+
+func _on_level_record_achieved(record_type: StringName) -> void:
+	var text := ""
+	if record_type == &"high_score":
+		text = "NEW HIGH SCORE!!!!"
+	elif record_type == &"fastest_time":
+		text = "NEW FASTEST TIME!!!!"
+	else:
+		return
+	_record_queue.append(text)
+	if not _record_showing:
+		_show_next_record_text()
+
+func _show_next_record_text() -> void:
+	if _record_queue.is_empty():
+		_record_showing = false
+		return
+	_record_showing = true
+	var text : String = _record_queue.pop_front()
+	_spawn_record_text(text)
+
+func _spawn_record_text(text: String) -> void:
+	if not live_overlay or not live_overlay.container:
+		_record_showing = false
+		return
+	var label := Label.new()
+	label.text = text
+	label.add_theme_font_size_override("font_size", 28)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.modulate = Color(1.0, 0.9, 0.2)
+	label.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	label.offset_left = -260
+	label.offset_right = 260
+	label.offset_top = 80
+	label.offset_bottom = 120
+	live_overlay.container.add_child(label)
+	var tween := create_tween()
+	tween.tween_property(label, "scale", Vector2(1.08, 1.08), 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tween.tween_property(label, "scale", Vector2(1.0, 1.0), 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(label, "modulate:a", 0.0, 0.6).set_delay(0.5)
+	tween.tween_callback(label.queue_free)
+	tween.tween_callback(_on_record_text_done)
+
+func _on_record_text_done() -> void:
+	_show_next_record_text()
 
 func _reset_state_for_exit() -> void:
 	# Ensure we don't carry ragdoll/animation state across scene changes.
@@ -618,6 +687,21 @@ func _physics_process(delta: float) -> void:
 		pending_landing_sfx = true
 		pending_rail_landing = _is_rail_landing_surface()
 		_stop_airborne_sfx()
+
+		 # Check if landing is aligned (successful) before banking score
+		var landing_success := check_landing_alignment()
+		
+		# Reset trick staleness on landing
+		_reset_trick_staleness()
+		
+		# Only bank combo if landing was successful
+		if landing_success and live_overlay:
+			live_overlay.on_player_landed()
+			
+		_play_landing_sfx(false)
+		
+		# Visual Squash
+		visual.scale = Vector3(1.2, 0.6, 1.2) * default_visual_scale
 	
 	was_on_floor = is_on_floor()
 
@@ -924,6 +1008,7 @@ func handle_trick_input(_delta: float) -> void:
 	for trick in trick_resources:
 		if trick and trick.check_completion(self, _delta):
 			trick.grant_reward(self)
+			_play_trick_completion_sfx()
 
 	for trick in trick_resources:
 		if trick:
@@ -987,17 +1072,18 @@ func apply_spin_boost(multiplier: float = 1.0) -> void:
 func start_trick_pose() -> void:
 	if is_ragdolling or trick_frames.is_empty():
 		return
-	
-	# TRIGGER OVERLAY for generic tricks
-	if live_overlay:
-		live_overlay.trigger_trick_reaction()
-		
+
 	trick_pose_active = true
 	trick_pose_end_us = Time.get_ticks_usec() + 500_000
 	var frame_index := trick_rng.randi_range(0, trick_frames.size() - 1)
 	body_mesh.mesh = trick_frames[frame_index]
 	body_mesh.scale = default_body_scale
 	_set_body_outline(true)
+
+# New helper for tricks to call
+func report_trick(trick_name: String, score: float) -> void:
+	if live_overlay:
+		live_overlay.trigger_trick_reaction(trick_name, score)
 
 func _set_body_outline(active: bool) -> void:
 	if not trick_outline_material:
@@ -1181,6 +1267,12 @@ func _play_landing_sfx(use_rail: bool) -> void:
 		return
 	var clip_index := trick_rng.randi_range(0, clips.size() - 1)
 	_play_sfx_with_variation(landing_sfx_player, clips[clip_index], 0.95, 1.03, -1.5, 0.5)
+
+func _play_trick_completion_sfx() -> void:
+	if trick_completion_sfx.is_empty():
+		return
+	var clip_index := trick_rng.randi_range(0, trick_completion_sfx.size() - 1)
+	_play_sfx_with_variation(trick_completion_sfx_player, trick_completion_sfx[clip_index], 0.95, 1.05, -6.0, -2.0)
 
 func _start_grind_sfx() -> void:
 	if Global.disable_grind_sfx:

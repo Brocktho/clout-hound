@@ -360,6 +360,9 @@ bus = "SFX"
 [node name="LandingSfx" type="AudioStreamPlayer3D" parent="CharacterBody3D"]
 bus = "SFX"
 
+[node name="TrickCompletionSfx" type="AudioStreamPlayer3D" parent="CharacterBody3D"]
+bus = "SFX"
+
 [node name="AirborneSfx" type="AudioStreamPlayer3D" parent="CharacterBody3D"]
 bus = "SFX"
 

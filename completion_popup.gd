@@ -9,6 +9,8 @@ extends CanvasLayer
 func _ready() -> void:
 	visible = false
 	add_to_group("completion_popup")
+	if not Global._level_completed.is_connected(_on_level_completed):
+		Global._level_completed.connect(_on_level_completed)
 	if message_label:
 		message_label.text = message
 	if return_button:
@@ -23,6 +25,9 @@ func show_popup() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	if return_button:
 		return_button.grab_focus()
+
+func _on_level_completed(_level_info: LevelInformation, _elapsed_seconds: float) -> void:
+	show_popup()
 
 func _on_return_pressed() -> void:
 	Global.completion_popup_active = false

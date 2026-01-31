@@ -262,7 +262,9 @@ func _on_disable_grind_sfx_toggled(pressed: bool) -> void:
 
 func _apply_sfx_volume(value: float) -> void:
 	var db := -80.0 if value <= 0.001 else linear_to_db(value)
-	var bus_index : int = Global.ensure_bus(&"SFX")
+	var bus_index := AudioServer.get_bus_index("SFX")
+	if bus_index == -1:
+		return
 	AudioServer.set_bus_volume_db(bus_index, db)
 
 

@@ -25,6 +25,8 @@ extends CanvasLayer
 @onready var challenges_panel: Control = $Control/Panel/VBoxContainer/ContentArea/ChallengesPanel
 @onready var free_skate_panel: Control = $Control/Panel/VBoxContainer/ContentArea/FreeSkatePanel
 @onready var tutorial_rows_container: VBoxContainer = $Control/Panel/VBoxContainer/ContentArea/TutorialsPanel/ContentRow/LevelsScroll/LevelsContent
+@onready var challenge_rows_container: VBoxContainer = $Control/Panel/VBoxContainer/ContentArea/ChallengesPanel/ContentRow/LevelsScroll/LevelsContent
+@onready var free_skate_rows_container: VBoxContainer = $Control/Panel/VBoxContainer/ContentArea/FreeSkatePanel/ContentRow/LevelsScroll/LevelsContent
 @onready var preview_texture_rect: TextureRect = $Control/Panel/VBoxContainer/ContentArea/TutorialsPanel/ContentRow/PreviewPanel/PreviewTexture
 
 var _tabs: Array[StringName] = [&"Tutorials", &"Challenges", &"FreeSkate"]
@@ -70,14 +72,14 @@ func _show_tab(tab_name: StringName) -> void:
 	challenges_panel.visible = tab_name == &"Challenges"
 	free_skate_panel.visible = tab_name == &"FreeSkate"
 	if tab_name == &"Tutorials":
-		_populate_rows(tutorial_levels)
-		_focus_first_row()
+		_populate_rows(tutorial_rows_container, tutorial_levels)
+		_defer_focus_first_row(tutorial_rows_container)
 	elif tab_name == &"Challenges":
-		_clear_rows()
-		_focus_first_in(challenges_panel)
+		_populate_rows(challenge_rows_container, challenge_levels)
+		_defer_focus_first_row(challenge_rows_container)
 	else:
-		_clear_rows()
-		_focus_first_in(free_skate_panel)
+		_populate_rows(free_skate_rows_container, free_skate_levels)
+		_defer_focus_first_row(free_skate_rows_container)
 	_update_tab_labels()
 
 func _cycle_tab(direction: int) -> void:
@@ -93,8 +95,8 @@ func _on_tab_gui_input(event: InputEvent, tab_index: int) -> void:
 		_show_tab(_tabs[_current_tab_index])
 		_play_ui_change()
 
-func _populate_rows(levels: Array[LevelInformation]) -> void:
-	_clear_rows()
+func _populate_rows(container: VBoxContainer, levels: Array[LevelInformation]) -> void:
+	_clear_rows(container)
 	var icons := {
 		"star_filled": star_filled,
 		"star_empty": star_empty,
@@ -109,19 +111,20 @@ func _populate_rows(levels: Array[LevelInformation]) -> void:
 			row.call("setup", level_info, icons)
 			row.connect("play_requested", _on_play_requested)
 			row.connect("preview_requested", _on_preview_requested)
-			tutorial_rows_container.add_child(row)
+			container.add_child(row)
 	if preview_placeholder and preview_texture_rect:
 		preview_texture_rect.texture = preview_placeholder
 
-func _clear_rows() -> void:
-	if not tutorial_rows_container:
+func _clear_rows(container: VBoxContainer) -> void:
+	if not container:
 		return
-	for child in tutorial_rows_container.get_children():
+	for child in container.get_children():
 		child.queue_free()
 
 func _on_play_requested(level_info: LevelInformation) -> void:
 	if not level_info or level_info.scene_path == "":
 		return
+	Global.set_current_level(level_info)
 	var current_scene := get_tree().current_scene
 	if current_scene and current_scene.has_method("start_level"):
 		current_scene.call_deferred("start_level", level_info.scene_path)
@@ -185,14 +188,20 @@ func _on_close_pressed() -> void:
 		current_scene.call_deferred("return_to_menu")
 	queue_free()
 
-func _focus_first_row() -> void:
-	if not tutorial_rows_container:
+func _focus_first_row(container: VBoxContainer) -> void:
+	if not container:
 		return
-	for child in tutorial_rows_container.get_children():
+	for child in container.get_children():
 		var control := child as Control
 		if control and control.focus_mode != Control.FOCUS_NONE and control.visible:
 			control.grab_focus()
 			return
+
+func _defer_focus_first_row(container: VBoxContainer) -> void:
+	if not container:
+		return
+	await get_tree().process_frame
+	_focus_first_row(container)
 
 func _focus_first_in(root: Node) -> void:
 	for child in root.get_children():

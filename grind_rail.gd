@@ -270,7 +270,8 @@ func _find_distance_index(distance: float) -> int:
 	var low = 1
 	var high = count - 1
 	while low <= high:
-		var mid = (low + high) / 2
+		@warning_ignore("integer_division")
+		var mid: int = (low + high) / 2
 		if _cached_global_distances[mid] < distance:
 			low = mid + 1
 		else:
