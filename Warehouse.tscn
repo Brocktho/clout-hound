@@ -1,0 +1,432 @@
+[gd_scene format=3 uid="uid://cvk6i6g5s61c"]
+
+[ext_resource type="PackedScene" uid="uid://bsk8mbhvd2lp8" path="res://Assets/models/warehouse.glb" id="1_vudxo"]
+[ext_resource type="PackedScene" uid="uid://dtlxuyo830w2f" path="res://player.tscn" id="2_25wl0"]
+[ext_resource type="Script" uid="uid://d08f4jslh7o2c" path="res://grind_rail_from_mesh.gd" id="2_hxk2g"]
+[ext_resource type="Script" uid="uid://mb435j3rb08x" path="res://grind_rail.gd" id="3_n2k7l"]
+
+[sub_resource type="Curve3D" id="Curve3D_hxk2g"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 11.5, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 7
+
+[sub_resource type="Curve3D" id="Curve3D_n2k7l"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -8.239407, 0.0002804026, -1.0005574, 0, 0, 0, 0, 0, 0, -8.299658, 0.0003194362, -0.00013486517, 0, 0, 0, 0, 0, 0, -8.239213, 0.000102467835, 1.0003402, 0, 0, 0, 0, 0, 0, -8.058364, -0.000105157495, 1.9860373, 0, 0, 0, 0, 0, 0, -7.7605104, -0.0001896657, 2.943059, 0, 0, 0, 0, 0, 0, -7.3492565, -0.00019364338, 3.8570814, 0, 0, 0, 0, 0, 0, 7.8201294e-05, -0.00015930412, 0.00015282631, 0, 0, 0, 0, 0, 0, -8.239477, -0.00018271338, -1.0005426),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 8
+
+[sub_resource type="Curve3D" id="Curve3D_dvqtg"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 36.00295, 16.011364, -29.993355, 0, 0, 0, 0, 0, 0, 34.999744, 16.08463, -29.504852, 0, 0, 0, 0, 0, 0, 34.037956, 16.15812, -29.015114, 0, 0, 0, 0, 0, 0, 33.111458, 16.23156, -28.525345, 0, 0, 0, 0, 0, 0, 32.218002, 16.304886, -28.03658, 0, 0, 0, 0, 0, 0, 31.352196, 16.377836, -27.549612, 0, 0, 0, 0, 0, 0, 30.511671, 16.4505, -27.066048, 0, 0, 0, 0, 0, 0, 29.691164, 16.52247, -26.586071, 0, 0, 0, 0, 0, 0, 28.887264, 16.593685, -26.111118, 0, 0, 0, 0, 0, 0, 28.091644, 16.652615, -25.64842, 0, 0, 0, 0, 0, 0, 27.307709, 16.72211, -25.186232, 0, 0, 0, 0, 0, 0, 26.52987, 16.790188, -24.732052, 0, 0, 0, 0, 0, 0, 25.751877, 16.856964, -24.286922, 0, 0, 0, 0, 0, 0, 24.97034, 16.922201, -23.851711, 0, 0, 0, 0, 0, 0, 24.18109, 16.98597, -23.427185, 0, 0, 0, 0, 0, 0, 23.380543, 17.047832, -23.014545, 0, 0, 0, 0, 0, 0, 22.564474, 17.107807, -22.614855, 0, 0, 0, 0, 0, 0, 21.729511, 17.165676, -22.22921, 0, 0, 0, 0, 0, 0, 20.870243, 17.221323, -21.858246, 0, 0, 0, 0, 0, 0, 19.984394, 17.2745, -21.5033, 0, 0, 0, 0, 0, 0, 19.065605, 17.325329, -21.16478, 0, 0, 0, 0, 0, 0, 18.112574, 17.373356, -20.844603, 0, 0, 0, 0, 0, 0, 17.11994, 17.418575, -20.543015, 0, 0, 0, 0, 0, 0, 16.083729, 17.460829, -20.261229, 0, 0, 0, 0, 0, 0, 14.983261, 17.499231, -20.06827, 0, 0, 0, 0, 0, 0, 13.579113, 17.545492, -19.759874, 0, 0, 0, 0, 0, 0, 12.21455, 17.587748, -19.478176, 0, 0, 0, 0, 0, 0, 10.900079, 17.626839, -19.154512, 0, 0, 0, 0, 0, 0, 9.59428, 17.660187, -18.99524, 0, 0, 0, 0, 0, 0, 8.329781, 17.690369, -18.794186, 0, 0, 0, 0, 0, 0, 7.0916634, 17.716518, -18.619827, 0, 0, 0, 0, 0, 0, 5.8755417, 17.738632, -18.472351, 0, 0, 0, 0, 0, 0, 4.678112, 17.756712, -18.351755, 0, 0, 0, 0, 0, 0, 3.494976, 17.770788, -18.257854, 0, 0, 0, 0, 0, 0, 2.3239365, 17.780859, -18.190838, 0, 0, 0, 0, 0, 0, 1.1594925, 17.786896, -18.1507, 0, 0, 0, 0, 0, 0, -0.0005493164, 17.788898, -18.13726, 0, 0, 0, 0, 0, 0, -1.1605949, 17.786896, -18.1507, 0, 0, 0, 0, 0, 0, -2.325039, 17.780859, -18.190838, 0, 0, 0, 0, 0, 0, -3.4960785, 17.770788, -18.257854, 0, 0, 0, 0, 0, 0, -4.6792107, 17.756712, -18.351755, 0, 0, 0, 0, 0, 0, -5.876642, 17.738632, -18.472351, 0, 0, 0, 0, 0, 0, -7.092762, 17.716518, -18.619827, 0, 0, 0, 0, 0, 0, -8.330877, 17.690369, -18.794186, 0, 0, 0, 0, 0, 0, -9.595379, 17.660187, -18.99524, 0, 0, 0, 0, 0, 0, -10.888472, 17.626, -19.22336, 0, 0, 0, 0, 0, 0, -12.215651, 17.587748, -19.478176, 0, 0, 0, 0, 0, 0, -13.580214, 17.545492, -19.759874, 0, 0, 0, 0, 0, 0, -14.984362, 17.499231, -20.06827, 0, 0, 0, 0, 0, 0, -16.084827, 17.46083, -20.261229, 0, 0, 0, 0, 0, 0, -17.101032, 17.41796, -20.610123, 0, 0, 0, 0, 0, 0, -18.092842, 17.37279, -20.911154, 0, 0, 0, 0, 0, 0, -19.067223, 17.325256, -21.16502, 0, 0, 0, 0, 0, 0, -19.959908, 17.274202, -21.568447, 0, 0, 0, 0, 0, 0, -20.84506, 17.22105, -21.92287, 0, 0, 0, 0, 0, 0, -21.701622, 17.165514, -22.293129, 0, 0, 0, 0, 0, 0, -22.566174, 17.107727, -22.615108, 0, 0, 0, 0, 0, 0, -23.350975, 17.047905, -23.07728, 0, 0, 0, 0, 0, 0, -24.15036, 16.986126, -23.489147, 0, 0, 0, 0, 0, 0, -24.937653, 16.922522, -23.912983, 0, 0, 0, 0, 0, 0, -25.718346, 16.857298, -24.347866, 0, 0, 0, 0, 0, 0, -26.49574, 16.790573, -24.79269, 0, 0, 0, 0, 0, 0, -27.309582, 16.722069, -25.186245, 0, 0, 0, 0, 0, 0, -28.092594, 16.652767, -25.64845, 0, 0, 0, 0, 0, 0, -28.883379, 16.582436, -26.117273, 0, 0, 0, 0, 0, 0, -29.687283, 16.511158, -26.592262, 0, 0, 0, 0, 0, 0, -30.507954, 16.439228, -27.071991, 0, 0, 0, 0, 0, 0, -31.348541, 16.366642, -27.555922, 0, 0, 0, 0, 0, 0, -32.21452, 16.293598, -28.042763, 0, 0, 0, 0, 0, 0, -33.108116, 16.220242, -28.531693, 0, 0, 0, 0, 0, 0, -34.03485, 16.1468, -29.021343, 0, 0, 0, 0, 0, 0, -34.99691, 16.073349, -29.511154, 0, 0, 0, 0, 0, 0, -35.999825, 15.986676, -29.997005),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 73
+
+[sub_resource type="Curve3D" id="Curve3D_151gk"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 35.969616, 15.973255, 30.057491, 0, 0, 0, 0, 0, 0, 34.996353, 16.073326, 29.510958, 0, 0, 0, 0, 0, 0, 34.03379, 16.14681, 29.02126, 0, 0, 0, 0, 0, 0, 33.14043, 16.220016, 28.469858, 0, 0, 0, 0, 0, 0, 32.213615, 16.29358, 28.042679, 0, 0, 0, 0, 0, 0, 31.381115, 16.392986, 27.500488, 0, 0, 0, 0, 0, 0, 30.54105, 16.465542, 27.016813, 0, 0, 0, 0, 0, 0, 29.686188, 16.51115, 26.592077, 0, 0, 0, 0, 0, 0, 28.916988, 16.608711, 26.062355, 0, 0, 0, 0, 0, 0, 28.09153, 16.652655, 25.648228, 0, 0, 0, 0, 0, 0, 27.306202, 16.708763, 25.187935, 0, 0, 0, 0, 0, 0, 26.527428, 16.776836, 24.733685, 0, 0, 0, 0, 0, 0, 25.749498, 16.843597, 24.288506, 0, 0, 0, 0, 0, 0, 24.967972, 16.908916, 23.85337, 0, 0, 0, 0, 0, 0, 24.179733, 16.972607, 23.429056, 0, 0, 0, 0, 0, 0, 23.379246, 17.034466, 23.016632, 0, 0, 0, 0, 0, 0, 22.563206, 17.094404, 22.616837, 0, 0, 0, 0, 0, 0, 21.727293, 17.152225, 22.231033, 0, 0, 0, 0, 0, 0, 20.869087, 17.207916, 21.860332, 0, 0, 0, 0, 0, 0, 19.982347, 17.261133, 21.505074, 0, 0, 0, 0, 0, 0, 19.06467, 17.311874, 21.166931, 0, 0, 0, 0, 0, 0, 18.11171, 17.359917, 20.846588, 0, 0, 0, 0, 0, 0, 17.11806, 17.405174, 20.545033, 0, 0, 0, 0, 0, 0, 16.082624, 17.44744, 20.26334, 0, 0, 0, 0, 0, 0, 14.99798, 17.486568, 20.00224, 0, 0, 0, 0, 0, 0, 13.592793, 17.532858, 19.693592, 0, 0, 0, 0, 0, 0, 12.22739, 17.57513, 19.41166, 0, 0, 0, 0, 0, 0, 10.89927, 17.613415, 19.156677, 0, 0, 0, 0, 0, 0, 9.605118, 17.647665, 18.92856, 0, 0, 0, 0, 0, 0, 8.339523, 17.677835, 18.72715, 0, 0, 0, 0, 0, 0, 7.1001816, 17.704044, 18.55275, 0, 0, 0, 0, 0, 0, 5.8827825, 17.726166, 18.405067, 0, 0, 0, 0, 0, 0, 4.684005, 17.744255, 18.284275, 0, 0, 0, 0, 0, 0, 3.4994483, 17.758358, 18.190292, 0, 0, 0, 0, 0, 0, 2.326941, 17.768433, 18.123188, 0, 0, 0, 0, 0, 0, 1.1610043, 17.774475, 18.082941, 0, 0, 0, 0, 0, 0, -0.00054723717, 17.776478, 18.06951, 0, 0, 0, 0, 0, 0, -1.1621019, 17.774475, 18.082941, 0, 0, 0, 0, 0, 0, -2.3280432, 17.768433, 18.123188, 0, 0, 0, 0, 0, 0, -3.5005412, 17.758358, 18.190292, 0, 0, 0, 0, 0, 0, -4.6851034, 17.744255, 18.284275, 0, 0, 0, 0, 0, 0, -5.8838787, 17.726166, 18.405066, 0, 0, 0, 0, 0, 0, -7.1012754, 17.704044, 18.55275, 0, 0, 0, 0, 0, 0, -8.340615, 17.677835, 18.72715, 0, 0, 0, 0, 0, 0, -9.606207, 17.647665, 18.928558, 0, 0, 0, 0, 0, 0, -10.900362, 17.613413, 19.156677, 0, 0, 0, 0, 0, 0, -12.228485, 17.57513, 19.41166, 0, 0, 0, 0, 0, 0, -13.593889, 17.532856, 19.693592, 0, 0, 0, 0, 0, 0, -14.999071, 17.486568, 20.00224, 0, 0, 0, 0, 0, 0, -16.083717, 17.447437, 20.263336, 0, 0, 0, 0, 0, 0, -17.119146, 17.405174, 20.545029, 0, 0, 0, 0, 0, 0, -18.112812, 17.359915, 20.846588, 0, 0, 0, 0, 0, 0, -19.065765, 17.311872, 21.166931, 0, 0, 0, 0, 0, 0, -19.98344, 17.261131, 21.505074, 0, 0, 0, 0, 0, 0, -20.870178, 17.207916, 21.860329, 0, 0, 0, 0, 0, 0, -21.728386, 17.152225, 22.23103, 0, 0, 0, 0, 0, 0, -22.564304, 17.094404, 22.616837, 0, 0, 0, 0, 0, 0, -23.38034, 17.034466, 23.01663, 0, 0, 0, 0, 0, 0, -24.180832, 16.972607, 23.429058, 0, 0, 0, 0, 0, 0, -24.969067, 16.908916, 23.853367, 0, 0, 0, 0, 0, 0, -25.750599, 16.843597, 24.288507, 0, 0, 0, 0, 0, 0, -26.52853, 16.776836, 24.733685, 0, 0, 0, 0, 0, 0, -27.307297, 16.708761, 25.187931, 0, 0, 0, 0, 0, 0, -28.090347, 16.639473, 25.650059, 0, 0, 0, 0, 0, 0, -28.88111, 16.56905, 26.118916, 0, 0, 0, 0, 0, 0, -29.685745, 16.497845, 26.593985, 0, 0, 0, 0, 0, 0, -30.505733, 16.425835, 27.073729, 0, 0, 0, 0, 0, 0, -31.346455, 16.353252, 27.557648, 0, 0, 0, 0, 0, 0, -32.212276, 16.280218, 28.044502, 0, 0, 0, 0, 0, 0, -33.106487, 16.20694, 28.533447, 0, 0, 0, 0, 0, 0, -34.03263, 16.133427, 29.023178, 0, 0, 0, 0, 0, 0, -34.994904, 16.059969, 29.513174, 0, 0, 0, 0, 0, 0, -35.97072, 15.999992, 30.0632),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 73
+
+[sub_resource type="Curve3D" id="Curve3D_k2c8k"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 35.95635, 15.973211, 30.047733, 0, 0, 0, 0, 0, 0, 34.030304, 16.136875, 28.327179, 0, 0, 0, 0, 0, 0, 32.135277, 16.268948, 26.703753, 0, 0, 0, 0, 0, 0, 30.302677, 16.406044, 25.130123, 0, 0, 0, 0, 0, 0, 28.526276, 16.547367, 23.60313, 0, 0, 0, 0, 0, 0, 26.799362, 16.691702, 22.115553, 0, 0, 0, 0, 0, 0, 25.116417, 16.837925, 20.66465, 0, 0, 0, 0, 0, 0, 23.47414, 16.973488, 19.237436, 0, 0, 0, 0, 0, 0, 21.85837, 17.120308, 17.842297, 0, 0, 0, 0, 0, 0, 20.267628, 17.265242, 16.46756, 0, 0, 0, 0, 0, 0, 18.694565, 17.407764, 15.109171, 0, 0, 0, 0, 0, 0, 17.132603, 17.546753, 13.76163, 0, 0, 0, 0, 0, 0, 15.577042, 17.68067, 12.420622, 0, 0, 0, 0, 0, 0, 14.019278, 17.808609, 11.080466, 0, 0, 0, 0, 0, 0, 12.454874, 17.929466, 9.735711, 0, 0, 0, 0, 0, 0, 10.876011, 18.041916, 8.382793, 0, 0, 0, 0, 0, 0, 9.277549, 18.145363, 7.016761, 0, 0, 0, 0, 0, 0, 7.6524405, 18.237988, 5.630792, 0, 0, 0, 0, 0, 0, 5.9945374, 18.319355, 4.222521, 0, 0, 0, 0, 0, 0, 4.2967763, 18.387651, 2.7851646, 0, 0, 0, 0, 0, 0, 2.5541468, 18.44247, 1.3145025, 0, 0, 0, 0, 0, 0, 0.7596816, 18.482126, -0.19454591, 0, 0, 0, 0, 0, 0, -1.0931972, 18.5055, -1.7465677, 0, 0, 0, 0, 0, 0, -3.011971, 18.511854, -3.3473463, 0, 0, 0, 0, 0, 0, -5.00102, 18.500053, -5.000532, 0, 0, 0, 0, 0, 0, -6.473282, 18.477455, -6.2205324, 0, 0, 0, 0, 0, 0, -7.898033, 18.442749, -7.395877, 0, 0, 0, 0, 0, 0, -9.27791, 18.395908, -8.530588, 0, 0, 0, 0, 0, 0, -10.618565, 18.338194, -9.628941, 0, 0, 0, 0, 0, 0, -11.924618, 18.2704, -10.694162, 0, 0, 0, 0, 0, 0, -13.199909, 18.19288, -11.730885, 0, 0, 0, 0, 0, 0, -14.448772, 18.106564, -12.742828, 0, 0, 0, 0, 0, 0, -15.676714, 18.012114, -13.734564, 0, 0, 0, 0, 0, 0, -16.885962, 17.910202, -14.708794, 0, 0, 0, 0, 0, 0, -18.08357, 17.801872, -15.670708, 0, 0, 0, 0, 0, 0, -19.272816, 17.687614, -16.62287, 0, 0, 0, 0, 0, 0, -20.457762, 17.56827, -17.571148, 0, 0, 0, 0, 0, 0, -21.643648, 17.444399, -18.517746, 0, 0, 0, 0, 0, 0, -22.833778, 17.316696, -19.467209, 0, 0, 0, 0, 0, 0, -24.03392, 17.186197, -20.423853, 0, 0, 0, 0, 0, 0, -25.24833, 17.053638, -21.391613, 0, 0, 0, 0, 0, 0, -26.443024, 16.946085, -22.42626, 0, 0, 0, 0, 0, 0, -27.736782, 16.7845, -23.375603, 0, 0, 0, 0, 0, 0, -29.01949, 16.649563, -24.399284, 0, 0, 0, 0, 0, 0, -30.334236, 16.51511, -25.450344, 0, 0, 0, 0, 0, 0, -31.685122, 16.382496, -26.531963, 0, 0, 0, 0, 0, 0, -33.077164, 16.251942, -27.647934, 0, 0, 0, 0, 0, 0, -34.514404, 16.124199, -28.803154, 0, 0, 0, 0, 0, 0, -36.000454, 15.999944, -30.000263),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 49
+
+[sub_resource type="Curve3D" id="Curve3D_7xiu8"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -36.04215, 15.973251, 29.949596, 0, 0, 0, 0, 0, 0, -34.0419, 16.136871, 28.315754, 0, 0, 0, 0, 0, 0, -32.146652, 16.268776, 26.692402, 0, 0, 0, 0, 0, 0, -30.31398, 16.406122, 25.118725, 0, 0, 0, 0, 0, 0, -28.536682, 16.547174, 23.591312, 0, 0, 0, 0, 0, 0, -26.805126, 16.680412, 22.109661, 0, 0, 0, 0, 0, 0, -25.12104, 16.826641, 20.65784, 0, 0, 0, 0, 0, 0, -23.475397, 16.973759, 19.237247, 0, 0, 0, 0, 0, 0, -21.859821, 17.120235, 17.842104, 0, 0, 0, 0, 0, 0, -20.268156, 17.265114, 16.468063, 0, 0, 0, 0, 0, 0, -18.695225, 17.40786, 15.10897, 0, 0, 0, 0, 0, 0, -17.134218, 17.54658, 13.761561, 0, 0, 0, 0, 0, 0, -15.57756, 17.680569, 12.420519, 0, 0, 0, 0, 0, 0, -14.020872, 17.808537, 11.080357, 0, 0, 0, 0, 0, 0, -12.456066, 17.929415, 9.736139, 0, 0, 0, 0, 0, 0, -10.877281, 18.042011, 8.383085, 0, 0, 0, 0, 0, 0, -9.278679, 18.145294, 7.0162106, 0, 0, 0, 0, 0, 0, -7.6536345, 18.238071, 5.6310005, 0, 0, 0, 0, 0, 0, -5.9955854, 18.319332, 4.222809, 0, 0, 0, 0, 0, 0, -4.297881, 18.387758, 2.7852921, 0, 0, 0, 0, 0, 0, -2.5551, 18.442453, 1.314698, 0, 0, 0, 0, 0, 0, -0.76059395, 18.482124, -0.19438542, 0, 0, 0, 0, 0, 0, 1.0922856, 18.505432, -1.7465224, 0, 0, 0, 0, 0, 0, 3.0100117, 18.511784, -3.3473425, 0, 0, 0, 0, 0, 0, 4.999175, 18.499989, -5.000491, 0, 0, 0, 0, 0, 0, 6.4724836, 18.477562, -6.2206745, 0, 0, 0, 0, 0, 0, 7.8963065, 18.442667, -7.3959093, 0, 0, 0, 0, 0, 0, 9.277264, 18.395859, -8.530733, 0, 0, 0, 0, 0, 0, 10.617468, 18.3382, -9.628933, 0, 0, 0, 0, 0, 0, 11.923521, 18.270401, -10.6941595, 0, 0, 0, 0, 0, 0, 13.198812, 18.192883, -11.730875, 0, 0, 0, 0, 0, 0, 14.447676, 18.106565, -12.742819, 0, 0, 0, 0, 0, 0, 15.675619, 18.012115, -13.734558, 0, 0, 0, 0, 0, 0, 16.884865, 17.91021, -14.708786, 0, 0, 0, 0, 0, 0, 18.081936, 17.801834, -15.670214, 0, 0, 0, 0, 0, 0, 19.271633, 17.687733, -16.622833, 0, 0, 0, 0, 0, 0, 20.500748, 17.568243, -17.515652, 0, 0, 0, 0, 0, 0, 21.641953, 17.444391, -18.517626, 0, 0, 0, 0, 0, 0, 22.874577, 17.343538, -19.417892, 0, 0, 0, 0, 0, 0, 24.032827, 17.18639, -20.42411, 0, 0, 0, 0, 0, 0, 25.24708, 17.05366, -21.391613, 0, 0, 0, 0, 0, 0, 26.479675, 16.919418, -22.374384, 0, 0, 0, 0, 0, 0, 27.735683, 16.784504, -23.375603, 0, 0, 0, 0, 0, 0, 29.018398, 16.649567, -24.399288, 0, 0, 0, 0, 0, 0, 30.33314, 16.515114, -25.450338, 0, 0, 0, 0, 0, 0, 31.684025, 16.382504, -26.53196, 0, 0, 0, 0, 0, 0, 33.07581, 16.251705, -27.648193, 0, 0, 0, 0, 0, 0, 34.512627, 16.123964, -28.80308, 0, 0, 0, 0, 0, 0, 35.960335, 16.026707, -30.051737),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 49
+
+[node name="Warehouse" type="Node3D" unique_id=1754844202]
+
+[node name="warehouse" parent="." unique_id=1014671168 instance=ExtResource("1_vudxo")]
+
+[node name="CollisionShape3D" parent="warehouse/SM_MegaVolcano/StaticBody3D" parent_id_path=PackedInt32Array(1014671168, 1826814807) index="0" unique_id=1435589261]
+transform = Transform3D(1.05, 0, 0, 0, 1.05, 0, 0, 0, 1.05, 0, 0, 0)
+
+[node name="CollisionShape3D" parent="warehouse/SM_Volcano_Entry_North/StaticBody3D" parent_id_path=PackedInt32Array(1014671168, 1298981850) index="0" unique_id=1588990552]
+transform = Transform3D(1.05, 0, 0, 0, 1.05, 0, 0, 0, 1.05, 0, 0, 0)
+
+[node name="CollisionShape3D" parent="warehouse/SM_Volcano_Entry_South/StaticBody3D" parent_id_path=PackedInt32Array(1014671168, 639571494) index="0" unique_id=140767034]
+transform = Transform3D(1.05, 0, 0, 0, 1.05, 0, 0, 0, 1.05, 0, 0, 0)
+
+[node name="GR_Volcano_Coping" parent="warehouse" index="94" unique_id=197007441]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T1_Plat_NW_Rail" parent="warehouse" index="97" unique_id=21282731]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T1_Plat_NE_Rail" parent="warehouse" index="98" unique_id=1134809177]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T1_Plat_SW_Rail" parent="warehouse" index="99" unique_id=1850371909]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T1_Plat_SE_Rail" parent="warehouse" index="100" unique_id=294943163]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T1_Plat_N_Rail" parent="warehouse" index="101" unique_id=162162683]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T1_Plat_S_Rail" parent="warehouse" index="102" unique_id=1809018494]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T1_Plat_W_Rail" parent="warehouse" index="103" unique_id=1427360938]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T1_Plat_E_Rail" parent="warehouse" index="104" unique_id=1678342577]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T1_Plat_Interior_NW_Rail" parent="warehouse" index="105" unique_id=1596821160]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T1_Plat_Interior_NE_Rail" parent="warehouse" index="106" unique_id=1361049536]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T1_Plat_Interior_SW_Rail" parent="warehouse" index="107" unique_id=1007066568]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T1_Plat_Interior_SE_Rail" parent="warehouse" index="108" unique_id=1276832858]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T1_Bridge_NW_N_Rail" parent="warehouse" index="109" unique_id=1230420791]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T1_Bridge_NE_N_Rail" parent="warehouse" index="110" unique_id=444950141]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T1_Bridge_SW_S_Rail" parent="warehouse" index="111" unique_id=1108426509]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T1_Bridge_SE_S_Rail" parent="warehouse" index="112" unique_id=1148052381]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T1_Bridge_NW_Interior_Rail" parent="warehouse" index="113" unique_id=198775374]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T1_Bridge_NE_Interior_Rail" parent="warehouse" index="114" unique_id=436747350]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T1_Bridge_SW_Interior_Rail" parent="warehouse" index="115" unique_id=1071155626]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T1_Bridge_SE_Interior_Rail" parent="warehouse" index="116" unique_id=1203375288]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T2_Catwalk_W_Rail_-1" parent="warehouse" index="117" unique_id=1223389817]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T2_Catwalk_W_Rail_1" parent="warehouse" index="118" unique_id=279799733]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T2_Catwalk_E_Rail_-1" parent="warehouse" index="119" unique_id=105116771]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T2_Catwalk_E_Rail_1" parent="warehouse" index="120" unique_id=1435508260]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T2_Hub_NW_Rail_-1" parent="warehouse" index="121" unique_id=1635628363]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T2_Hub_NW_Rail_1" parent="warehouse" index="122" unique_id=1839341754]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T2_Hub_NE_Rail_-1" parent="warehouse" index="123" unique_id=639982125]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T2_Hub_NE_Rail_1" parent="warehouse" index="124" unique_id=2125581287]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T2_Hub_SW_Rail_-1" parent="warehouse" index="125" unique_id=1969354367]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T2_Hub_SW_Rail_1" parent="warehouse" index="126" unique_id=1261642252]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T2_Hub_SE_Rail_-1" parent="warehouse" index="127" unique_id=1643736562]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T2_Hub_SE_Rail_1" parent="warehouse" index="128" unique_id=1762260143]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T2_Center_Rail_-1" parent="warehouse" index="129" unique_id=1989663497]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T2_Center_Rail_1" parent="warehouse" index="130" unique_id=2006025167]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_SkyLine_NW_NE" parent="warehouse" index="131" unique_id=165980334]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_SkyLine_SW_SE" parent="warehouse" index="132" unique_id=750945528]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_SkyLine_Diagonal_A" parent="warehouse" index="133" unique_id=1887548242]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_SkyLine_Diagonal_B" parent="warehouse" index="134" unique_id=1314784503]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_Solo_Rail_COPY_ME" parent="warehouse" index="135" unique_id=647422854]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_Ledge_Street_Edge" parent="warehouse" index="136" unique_id=557947328]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_QP_SW_Coping" parent="warehouse" index="137" unique_id=568212948]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_QP_SE_Coping" parent="warehouse" index="138" unique_id=1916981797]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_FlatRail_A" parent="warehouse" index="139" unique_id=741993970]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_FlatRail_B" parent="warehouse" index="140" unique_id=715875688]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_FlatRail_C" parent="warehouse" index="141" unique_id=871878363]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_FunBox_Rail" parent="warehouse" index="142" unique_id=1246196116]
+script = ExtResource("2_hxk2g")
+
+[node name="GR_T2_Center_Rail_-1_Path3D" type="Path3D" parent="warehouse" unique_id=1644309165]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -5.8, 10.58, -5.661513)
+curve = SubResource("Curve3D_hxk2g")
+script = ExtResource("3_n2k7l")
+
+[node name="GR_FunBox_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=1316236660]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 35, 0.98, 0)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_FlatRail_C_Path3D" type="Path3D" parent="warehouse" unique_id=1345177745]
+transform = Transform3D(0, 0.9396927, -0.34202015, -1, 0, -1.4901161e-08, -1.4901161e-08, 0.34202015, 0.9396926, 18, 0.45, 12)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_FlatRail_B_Path3D" type="Path3D" parent="warehouse" unique_id=2000903149]
+transform = Transform3D(0, 0.9659259, 0.2588191, -1, 0, 1.4901161e-08, -1.4901161e-08, -0.2588191, 0.9659258, -25, 0.45, -8)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_FlatRail_A_Path3D" type="Path3D" parent="warehouse" unique_id=919855721]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 25, 0.45, -10)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_QP_SE_Coping_Path3D" type="Path3D" parent="warehouse" unique_id=1342850828]
+transform = Transform3D(5.9604645e-08, 0.7071067, -0.7071068, -1, 0, -2.9802322e-08, -2.9802322e-08, 0.7071068, 0.70710677, 44.333454, 2.86, 15.666548)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_Volcano_Coping_Path3D" type="Path3D" parent="warehouse" unique_id=69413433]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.57, 0)
+curve = SubResource("Curve3D_n2k7l")
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T1_Plat_NW_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=503890262]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -38, 5.58, -32.7)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T1_Plat_SW_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=2008108704]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -38, 5.58, 23.3)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T1_Plat_NE_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=1771008082]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 38, 5.58, -32.7)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T1_Plat_SE_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=522222882]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 38, 5.58, 23.3)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T1_Plat_N_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=965688004]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 5.58, -33.7)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T1_Plat_S_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=1851288110]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 5.58, 26.3)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T1_Plat_W_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=1493342551]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -44, 5.58, -7.7)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T1_Plat_E_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=1385671685]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 44, 5.58, -7.7)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T1_Plat_Interior_NW_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=1259837604]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -28, 5.58, -21.7)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T1_Plat_Interior_NE_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=496129303]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 28, 5.58, -21.7)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T1_Plat_Interior_SW_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=1504217249]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -28, 5.58, 14.3)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T1_Plat_Interior_SE_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=2021187410]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 28, 5.58, 14.3)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T1_Bridge_NW_N_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=1188821952]
+transform = Transform3D(5.9604645e-08, 0.99503726, 0.099503726, -1.0000001, 5.9604645e-08, 1.1175871e-08, 0, -0.099503726, 0.9950372, -20, 5.58, -29)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T1_Bridge_NE_N_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=485850805]
+transform = Transform3D(-1.1920929e-07, -0.99503714, 0.09950372, -0.99999994, 1.1920929e-07, -7.450581e-09, 0, -0.09950372, -0.9950371, 20, 5.58, -29)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T1_Bridge_SW_S_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=1639832761]
+transform = Transform3D(5.9604645e-08, 0.99503726, -0.099503726, -1.0000001, 5.9604645e-08, -1.1175871e-08, 0, 0.099503726, 0.9950372, -20, 5.58, 29)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T1_Bridge_SE_S_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=1047410958]
+transform = Transform3D(-1.1920929e-07, -0.99503714, -0.09950372, -0.99999994, 1.1920929e-07, 7.450581e-09, 0, 0.09950372, -0.9950371, 20, 5.58, 29)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T1_Bridge_NW_Interior_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=396493356]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -33, 5.58, -22)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T1_Bridge_NE_Interior_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=391766732]
+transform = Transform3D(0, -1, -4.3711392e-08, -1, 0, -4.3711392e-08, 4.3711392e-08, 4.3711392e-08, -1, 33, 5.58, -22)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T1_Bridge_SW_Interior_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=1888079182]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -33, 5.58, 22)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T1_Bridge_SE_Interior_Rail_Path3D" type="Path3D" parent="warehouse" unique_id=163619225]
+transform = Transform3D(0, -1, -4.3711392e-08, -1, 0, -4.3711392e-08, 4.3711392e-08, 4.3711392e-08, -1, 33, 5.58, 22)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T2_Catwalk_W_Rail_-1_Path3D" type="Path3D" parent="warehouse" unique_id=2019541269]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -47.55, 10.58, 0)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T2_Catwalk_W_Rail_1_Path3D" type="Path3D" parent="warehouse" unique_id=1151077499]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -44.45, 10.58, 0)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T2_Catwalk_E_Rail_-1_Path3D" type="Path3D" parent="warehouse" unique_id=1518698623]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 44.45, 10.58, 0)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T2_Catwalk_E_Rail_1_Path3D" type="Path3D" parent="warehouse" unique_id=918804038]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 47.55, 10.58, 0)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T2_Hub_NW_Rail_-1_Path3D" type="Path3D" parent="warehouse" unique_id=1609749529]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -43.8, 10.58, -30)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T2_Hub_NW_Rail_1_Path3D" type="Path3D" parent="warehouse" unique_id=1807955235]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -36.2, 10.58, -30)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T2_Hub_NE_Rail_-1_Path3D" type="Path3D" parent="warehouse" unique_id=618557642]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 36.2, 10.58, -30)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T2_Hub_NE_Rail_1_Path3D" type="Path3D" parent="warehouse" unique_id=1869264623]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 43.8, 10.58, -30)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T2_Hub_SW_Rail_-1_Path3D" type="Path3D" parent="warehouse" unique_id=1808468803]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -43.8, 10.58, 30)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T2_Hub_SW_Rail_1_Path3D" type="Path3D" parent="warehouse" unique_id=1321981522]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -36.2, 10.58, 30)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T2_Hub_SE_Rail_-1_Path3D" type="Path3D" parent="warehouse" unique_id=475134072]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 36.2, 10.58, 30)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T2_Hub_SE_Rail_1_Path3D" type="Path3D" parent="warehouse" unique_id=188681883]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 43.8, 10.58, 30)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_T2_Center_Rail_1_Path3D" type="Path3D" parent="warehouse" unique_id=1396441963]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 5.8, 10.58, 0)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_SkyLine_NW_NE_Path3D" type="Path3D" parent="warehouse" unique_id=1482140140]
+curve = SubResource("Curve3D_dvqtg")
+script = ExtResource("3_n2k7l")
+
+[node name="GR_SkyLine_SW_SE_Path3D" type="Path3D" parent="warehouse" unique_id=1308660635]
+curve = SubResource("Curve3D_151gk")
+script = ExtResource("3_n2k7l")
+
+[node name="GR_SkyLine_Diagonal_A_Path3D" type="Path3D" parent="warehouse" unique_id=1765593626]
+curve = SubResource("Curve3D_k2c8k")
+script = ExtResource("3_n2k7l")
+
+[node name="GR_SkyLine_Diagonal_B_Path3D" type="Path3D" parent="warehouse" unique_id=1053267560]
+curve = SubResource("Curve3D_7xiu8")
+script = ExtResource("3_n2k7l")
+
+[node name="GR_Solo_Rail_COPY_ME_Path3D" type="Path3D" parent="warehouse" unique_id=1782377187]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -15, 0.45, -25)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_Ledge_Street_Edge_Path3D" type="Path3D" parent="warehouse" unique_id=1676032424]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -32, 0.54, 14.72)
+script = ExtResource("3_n2k7l")
+
+[node name="GR_QP_SW_Coping_Path3D" type="Path3D" parent="warehouse" unique_id=735068501]
+transform = Transform3D(5.9604645e-08, 0.7071067, 0.7071068, -1, 0, 2.9802322e-08, 2.9802322e-08, -0.7071068, 0.70710677, -44.333454, 2.86, 15.666548)
+script = ExtResource("3_n2k7l")
+
+[node name="Node3D" parent="." unique_id=1782707226 instance=ExtResource("2_25wl0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 11.114243, 0.98243856)
+
+[node name="OmniLight3D" type="OmniLight3D" parent="." unique_id=207959068]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 27.254967, 0)
+light_energy = 1.5
+omni_range = 60.0
+
+[node name="OmniLight3D5" type="OmniLight3D" parent="." unique_id=1602050985]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.323717, 27.254967, 0)
+light_energy = 1.5
+omni_range = 60.0
+
+[node name="OmniLight3D6" type="OmniLight3D" parent="." unique_id=582908289]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.424988, 27.254967, 0)
+light_energy = 1.5
+omni_range = 60.0
+
+[node name="OmniLight3D7" type="OmniLight3D" parent="." unique_id=394235711]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -39.573704, 27.254967, 0)
+light_energy = 1.5
+omni_range = 60.0
+
+[node name="OmniLight3D2" type="OmniLight3D" parent="." unique_id=1999617341]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.695427, 27.00509, 0)
+light_energy = 1.5
+omni_range = 60.0
+
+[node name="OmniLight3D4" type="OmniLight3D" parent="." unique_id=1950415794]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39.691418, 27.00509, 0)
+light_energy = 1.5
+omni_range = 60.0
+
+[node name="OmniLight3D3" type="OmniLight3D" parent="." unique_id=845787832]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.669024, 27.00509, 0)
+light_energy = 1.5
+omni_range = 60.0
+
+[editable path="warehouse"]

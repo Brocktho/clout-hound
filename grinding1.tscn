@@ -1,4 +1,4 @@
-[gd_scene load_steps=34 format=3 uid="uid://l82dcowaeh2w"]
+[gd_scene format=3 uid="uid://l82dcowaeh2w"]
 
 [ext_resource type="PackedScene" uid="uid://dtlxuyo830w2f" path="res://player.tscn" id="1_yo0q5"]
 [ext_resource type="PackedScene" uid="uid://k7fal1cibb71" path="res://Assets/models/Grinding2.blend" id="2_4kfjl"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://d08f4jslh7o2c" path="res://grind_rail_from_mesh.gd" id="4_a4do0"]
 [ext_resource type="Script" uid="uid://mb435j3rb08x" path="res://grind_rail.gd" id="5_a4do0"]
 [ext_resource type="Curve3D" uid="uid://cjgkgeckjmehg" path="res://Assets/models/corkscrew_path.tres" id="6_oto1h"]
+[ext_resource type="PackedScene" uid="uid://dkut2wue10bvv" path="res://KillZone.tscn" id="7_tahvt"]
 
 [sub_resource type="Curve3D" id="Curve3D_tahvt"]
 _data = {
@@ -187,21 +188,21 @@ point_count = 15
 [sub_resource type="BoxMesh" id="BoxMesh_oto1h"]
 size = Vector3(0.1, 0.1, 0.1)
 
-[node name="Grinding1" type="Node3D"]
+[node name="Grinding1" type="Node3D" unique_id=1665218504]
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=386831970]
 transform = Transform3D(0.707107, -0.408248, 0.57735, 0, 0.816497, 0.57735, -0.707107, -0.408248, 0.57735, 0, 10, 0)
 light_energy = 2.0
 
-[node name="OmniLight3D" type="OmniLight3D" parent="."]
+[node name="OmniLight3D" type="OmniLight3D" parent="." unique_id=1537155528]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0)
 light_energy = 1.5
 omni_range = 60.0
 
-[node name="CharacterBody3D" parent="." instance=ExtResource("1_yo0q5")]
+[node name="CharacterBody3D" parent="." unique_id=1021992033 instance=ExtResource("1_yo0q5")]
 transform = Transform3D(0.008220473, 0, -0.9999662, 0, 1, 0, 0.9999662, 0, 0.008220473, -47.838844, -2.067783, 16.626297)
 
-[node name="Grinding2" parent="." instance=ExtResource("2_4kfjl")]
+[node name="Grinding2" parent="." unique_id=1410446959 instance=ExtResource("2_4kfjl")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.878413, 0, 0)
 script = ExtResource("3_4frl8")
 
@@ -209,7 +210,7 @@ script = ExtResource("3_4frl8")
 script = ExtResource("4_a4do0")
 path_suffix = "_Path3D"
 
-[node name="GR-Staircase-Rail_002__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post_004" index="2"]
+[node name="GR-Staircase-Rail_002__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post_004" index="2" unique_id=1177566743]
 curve = SubResource("Curve3D_tahvt")
 script = ExtResource("5_a4do0")
 
@@ -217,7 +218,7 @@ script = ExtResource("5_a4do0")
 script = ExtResource("4_a4do0")
 path_suffix = "_Path3D"
 
-[node name="GR-Staircase-Rail__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post" index="2"]
+[node name="GR-Staircase-Rail__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post" index="2" unique_id=450036659]
 curve = SubResource("Curve3D_7ejmv")
 script = ExtResource("5_a4do0")
 
@@ -227,7 +228,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.4031401, -2.5865035, -0.65
 [node name="GR_CoolantLoop_Rail" parent="Grinding2/SM_CoolantLoop_Support_01" index="0"]
 script = ExtResource("4_a4do0")
 
-[node name="GR_CoolantLoop_Rail_Path3D" type="Path3D" parent="Grinding2/SM_CoolantLoop_Support_01" index="2"]
+[node name="GR_CoolantLoop_Rail_Path3D" type="Path3D" parent="Grinding2/SM_CoolantLoop_Support_01" index="2" unique_id=1413337468]
 transform = Transform3D(1, 0, 0, 0, 0.8629535, 0, 0, 0, 0.8591319, 0, 0.776, 0)
 curve = SubResource("Curve3D_ysfy7")
 script = ExtResource("5_a4do0")
@@ -242,17 +243,17 @@ script = ExtResource("4_a4do0")
 script = ExtResource("4_a4do0")
 path_suffix = "_Path3D"
 
-[node name="GR_Catwalk_UtilitySecondary__Path3D" type="Path3D" parent="Grinding2/SM_Catwalk_Hanger_01" index="4"]
+[node name="GR_Catwalk_UtilitySecondary__Path3D" type="Path3D" parent="Grinding2/SM_Catwalk_Hanger_01" index="4" unique_id=8432682]
 transform = Transform3D(-1.1920929e-07, 0.99999994, 0, -0.99999994, -1.1920929e-07, 0, 0, 0, 1, 14.025, -0.37257767, 3.807002)
 curve = SubResource("Curve3D_oto1h")
 script = ExtResource("5_a4do0")
 
-[node name="GR-Rail-L_Path3D" type="Path3D" parent="Grinding2/SM_Catwalk_Hanger_01" index="5"]
+[node name="GR-Rail-L_Path3D" type="Path3D" parent="Grinding2/SM_Catwalk_Hanger_01" index="5" unique_id=1019991836]
 transform = Transform3D(-0.6861597, 0.6861599, -7.462e-08, 0.68615973, 0.68615985, 3.0908613e-08, 7.2409485e-08, -2.9993004e-08, -1, -10.4628105, -0.96410084, 1.0568743)
 curve = SubResource("Curve3D_4y11c")
 script = ExtResource("5_a4do0")
 
-[node name="GR-Rail-R_Path3D" type="Path3D" parent="Grinding2/SM_Catwalk_Hanger_01" index="6"]
+[node name="GR-Rail-R_Path3D" type="Path3D" parent="Grinding2/SM_Catwalk_Hanger_01" index="6" unique_id=1260389365]
 transform = Transform3D(-0.6861597, 0.6861599, -7.462e-08, 0.68615973, 0.68615985, 3.0908613e-08, 7.2409485e-08, -2.9993004e-08, -1, -10.451355, -0.71327233, 1.0568743)
 curve = SubResource("Curve3D_1u2xm")
 script = ExtResource("5_a4do0")
@@ -261,7 +262,7 @@ script = ExtResource("5_a4do0")
 script = ExtResource("4_a4do0")
 path_suffix = "_Path3D"
 
-[node name="GR_Overhead_Landing__Path3D" type="Path3D" parent="Grinding2/SM_Overhead_LandingSupport_Bracket" index="2"]
+[node name="GR_Overhead_Landing__Path3D" type="Path3D" parent="Grinding2/SM_Overhead_LandingSupport_Bracket" index="2" unique_id=1350921806]
 transform = Transform3D(1, 0, 0, 0, -3.5762787e-07, -0.99999994, 0, 0.99999994, -3.5762787e-07, 0, 0.121815205, -2.4749985)
 curve = SubResource("Curve3D_pl4po")
 script = ExtResource("5_a4do0")
@@ -271,7 +272,7 @@ script = ExtResource("4_a4do0")
 path_suffix = "_Path3D"
 path_mode = 1
 
-[node name="GR-Chandelier-Spiral__Path3D" type="Path3D" parent="Grinding2/SM_HangingSquare_Cable_SE" index="2"]
+[node name="GR-Chandelier-Spiral__Path3D" type="Path3D" parent="Grinding2/SM_HangingSquare_Cable_SE" index="2" unique_id=1074670780]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.593647, -6.91626, -6.544154)
 curve = SubResource("Curve3D_djx17")
 script = ExtResource("5_a4do0")
@@ -310,7 +311,7 @@ script = ExtResource("4_a4do0")
 script = ExtResource("4_a4do0")
 path_suffix = "_Path3D"
 
-[node name="GR-Staircase-Rail_001__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post_005" index="2"]
+[node name="GR-Staircase-Rail_001__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post_005" index="2" unique_id=918495886]
 curve = SubResource("Curve3D_bx768")
 script = ExtResource("5_a4do0")
 
@@ -318,7 +319,7 @@ script = ExtResource("5_a4do0")
 script = ExtResource("4_a4do0")
 path_suffix = "_Path3D"
 
-[node name="GR-Staircase-Rail_003__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post_002" index="2"]
+[node name="GR-Staircase-Rail_003__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post_002" index="2" unique_id=60868896]
 transform = Transform3D(0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0, 1, 0, 0, 0)
 curve = SubResource("Curve3D_yuwe1")
 script = ExtResource("5_a4do0")
@@ -327,7 +328,7 @@ script = ExtResource("5_a4do0")
 script = ExtResource("4_a4do0")
 path_suffix = "_Path3D"
 
-[node name="GR_Staircase_Horiz_01__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post_001" index="2"]
+[node name="GR_Staircase_Horiz_01__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post_001" index="2" unique_id=315200154]
 transform = Transform3D(0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0, 1, 0, -3.8146973e-06, 0)
 curve = SubResource("Curve3D_u34vq")
 script = ExtResource("5_a4do0")
@@ -336,12 +337,12 @@ script = ExtResource("5_a4do0")
 script = ExtResource("4_a4do0")
 path_suffix = "_Path3D"
 
-[node name="GR_Staircase_Horiz_01_001__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post_003" index="2"]
+[node name="GR_Staircase_Horiz_01_001__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post_003" index="2" unique_id=1103631048]
 transform = Transform3D(0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0, 1, -0.04378438, 0.008167267, 0)
 curve = SubResource("Curve3D_5fyg0")
 script = ExtResource("5_a4do0")
 
-[node name="GR-Corkscrew-Spiral__Path3D" type="Path3D" parent="Grinding2/SM-Corkscrew_004" index="12"]
+[node name="GR-Corkscrew-Spiral__Path3D" type="Path3D" parent="Grinding2/SM-Corkscrew_004" index="12" unique_id=160964974]
 transform = Transform3D(-9.598828e-08, -1.0562499, 2.7458503e-08, 0.22987568, 7.45247e-09, 0.97322, -0.97322005, 1.5956762e-07, 0.22987565, 12.63964, -2.4998522, -0.2581005)
 curve = ExtResource("6_oto1h")
 script = ExtResource("5_a4do0")
@@ -355,7 +356,7 @@ use_centerline_seed_y = true
 centerline_seed_y = 6.5
 pipe_radius = 0.375
 
-[node name="GR_CoolantRail__Path3D" type="Path3D" parent="Grinding2/Empty" index="4"]
+[node name="GR_CoolantRail__Path3D" type="Path3D" parent="Grinding2/Empty" index="4" unique_id=139188877]
 transform = Transform3D(0, 1, 0, -0.77194935, 0, 0, 0, 0, 0.77194935, -22.590963, 0.20817757, -8.099123)
 curve = SubResource("Curve3D_nsqis")
 script = ExtResource("5_a4do0")
@@ -363,7 +364,7 @@ script = ExtResource("5_a4do0")
 [node name="GR_Parallel_01_001" parent="Grinding2/Empty_001" index="0"]
 script = ExtResource("4_a4do0")
 
-[node name="GR_Parallel_01_001_Path3D" type="Path3D" parent="Grinding2/Empty_001" index="4"]
+[node name="GR_Parallel_01_001_Path3D" type="Path3D" parent="Grinding2/Empty_001" index="4" unique_id=1177671554]
 transform = Transform3D(1.1920929e-07, -0.01299721, 0.9999155, -0.99999994, 0, 8.940697e-08, 2.9802322e-08, -0.9999155, -0.01299715, -0.11439896, 0.36257625, 0.34641457)
 curve = SubResource("Curve3D_tpl54")
 script = ExtResource("5_a4do0")
@@ -371,64 +372,102 @@ script = ExtResource("5_a4do0")
 [node name="GR_Parallel_01" parent="Grinding2/Empty_002" index="0"]
 script = ExtResource("4_a4do0")
 
-[node name="GR_Parallel_01_Path3D" type="Path3D" parent="Grinding2/Empty_002" index="4"]
+[node name="GR_Parallel_01_Path3D" type="Path3D" parent="Grinding2/Empty_002" index="4" unique_id=283404472]
 transform = Transform3D(1.1920929e-07, -0.01299721, 0.9999155, -0.99999994, 0, 8.940697e-08, 2.9802322e-08, -0.9999155, -0.01299715, -0.11819458, -0.020494223, 0.5734558)
 curve = SubResource("Curve3D_4dt6n")
 script = ExtResource("5_a4do0")
 
-[node name="GR_HangingSquare_AccessPipe_Path3D" type="Path3D" parent="Grinding2"]
+[node name="GR_HangingSquare_AccessPipe_Path3D" type="Path3D" parent="Grinding2" unique_id=388739422]
 transform = Transform3D(0.75982827, 0.43374985, 0.48427483, -1.4901161e-08, 0.7448963, -0.66718036, -0.65012383, 0.50694245, 0.56599325, -5.8777475, 2.630217, -5.0900726)
 curve = SubResource("Curve3D_7ngts")
 script = ExtResource("5_a4do0")
 
-[node name="GR_Drainage_Lower_Path3D" type="Path3D" parent="Grinding2"]
+[node name="GR_Drainage_Lower_Path3D" type="Path3D" parent="Grinding2" unique_id=379200636]
 transform = Transform3D(1, 0, 0, 0, -3.5762787e-07, -0.99999994, 0, 0.99999994, -3.5762787e-07, 39.27401, -0.50478244, 2.4965763)
 curve = SubResource("Curve3D_7cpwp")
 script = ExtResource("5_a4do0")
 
-[node name="GR_Drainage_Upper_Path3D" type="Path3D" parent="Grinding2"]
+[node name="GR_Drainage_Upper_Path3D" type="Path3D" parent="Grinding2" unique_id=845209103]
 transform = Transform3D(1, 0, 0, 0, -3.5762787e-07, -0.99999994, 0, 0.99999994, -3.5762787e-07, 39.26551, 4.1152177, -0.803424)
 curve = SubResource("Curve3D_m4hqf")
 script = ExtResource("5_a4do0")
 
-[node name="GR_WallHighline_Main_Path3D" type="Path3D" parent="Grinding2"]
+[node name="GR_WallHighline_Main_Path3D" type="Path3D" parent="Grinding2" unique_id=949513884]
 transform = Transform3D(-1.1920929e-07, 0.99999994, 0, -0.99999994, -1.1920929e-07, 0, 0, 0, 1, 3.5609217, 2.4652174, -25.223425)
 curve = SubResource("Curve3D_75q4l")
 script = ExtResource("5_a4do0")
 
-[node name="GR_Manifold_Pipe_01_Path3D" type="Path3D" parent="Grinding2"]
+[node name="GR_Manifold_Pipe_01_Path3D" type="Path3D" parent="Grinding2" unique_id=1935026528]
 transform = Transform3D(-0.008007288, 0.5076661, 0.7258382, -0.95839226, 0.14897929, -0.20184691, -0.28534225, -0.51462984, 0.65758413, -8.719237, 0.6579859, -19.905317)
 curve = SubResource("Curve3D_t1hsv")
 script = ExtResource("5_a4do0")
 
-[node name="GR_Manifold_Pipe_02_Path3D" type="Path3D" parent="Grinding2"]
+[node name="GR_Manifold_Pipe_02_Path3D" type="Path3D" parent="Grinding2" unique_id=1111619546]
 transform = Transform3D(0, 0, 1, -1, 0, 0, 0, -0.62666667, 0, -14.589078, -0.50478244, -21.067955)
 curve = SubResource("Curve3D_bg8ng")
 script = ExtResource("5_a4do0")
 
-[node name="GR_Manifold_Pipe_03_Path3D" type="Path3D" parent="Grinding2"]
+[node name="GR_Manifold_Pipe_03_Path3D" type="Path3D" parent="Grinding2" unique_id=1427518960]
 transform = Transform3D(-2.3841858e-07, -0.7071068, 0.7071068, -1.0000001, 1.1920929e-07, -5.9604645e-08, -5.9604645e-08, -0.7071068, -0.7071068, -19.023006, -0.83478284, -18.61)
 curve = SubResource("Curve3D_u11ai")
 script = ExtResource("5_a4do0")
 
-[node name="GR_Manifold_Pipe_04_Path3D" type="Path3D" parent="Grinding2"]
+[node name="GR_Manifold_Pipe_04_Path3D" type="Path3D" parent="Grinding2" unique_id=1329611718]
 transform = Transform3D(0, -0.83809525, -4.3711392e-08, -1, 1.6013365e-15, -4.3711392e-08, 4.3711392e-08, 3.6634308e-08, -1, -21.426456, -0.3207421, -14.003423)
 curve = SubResource("Curve3D_vygrq")
 script = ExtResource("5_a4do0")
 
-[node name="GR_Manifold_Pipe_06_Path3D" type="Path3D" parent="Grinding2"]
+[node name="GR_Manifold_Pipe_06_Path3D" type="Path3D" parent="Grinding2" unique_id=1126526585]
 transform = Transform3D(0, 0, -1, -1, 0, 0, 0, 0.8296296, 0, -14.589078, -0.37311295, -5.6149106)
 curve = SubResource("Curve3D_v13rq")
 script = ExtResource("5_a4do0")
 
-[node name="GR_Manifold_Pipe_07_Path3D" type="Path3D" parent="Grinding2"]
+[node name="GR_Manifold_Pipe_07_Path3D" type="Path3D" parent="Grinding2" unique_id=1220974223]
 transform = Transform3D(0, 0.4799754, -0.70710695, -1, -2.8608778e-08, -4.2146837e-08, -5.9604645e-08, 0.47997564, 0.7071066, -10.923266, -0.33978295, -10.378573)
 curve = SubResource("Curve3D_1ljw1")
 script = ExtResource("5_a4do0")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=2070184577]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.360193, 6.5819497, -0.79693604)
 top_level = true
 mesh = SubResource("BoxMesh_oto1h")
 
+[node name="KillZone" parent="." unique_id=365226044 instance=ExtResource("7_tahvt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60.46442, 0, 0)
+visible = false
+
+[node name="CollisionShape3D" parent="KillZone" index="0"]
+transform = Transform3D(1, 0, 0, 0, 500, 0, 0, 0, 100, -21.908562, 0, 0)
+
+[node name="KillZone4" parent="." unique_id=1849587963 instance=ExtResource("7_tahvt")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 15.514629, 0, -54.44272)
+
+[node name="CollisionShape3D" parent="KillZone4" index="0"]
+transform = Transform3D(1, 0, 0, 0, 500, 0, 0, 0, 100, -21.908562, 0, 0)
+
+[node name="KillZone5" parent="." unique_id=1600554791 instance=ExtResource("7_tahvt")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 15.514629, 0, 38.233788)
+
+[node name="CollisionShape3D" parent="KillZone5" index="0"]
+transform = Transform3D(1, 0, 0, 0, 500, 0, 0, 0, 100, -21.908562, 0, 0)
+
+[node name="KillZone2" parent="." unique_id=1626943265 instance=ExtResource("7_tahvt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -43.549606, 0, 0)
+visible = false
+
+[node name="CollisionShape3D" parent="KillZone2" index="0"]
+transform = Transform3D(1, 0, 0, 0, 500, 0, 0, 0, 100, -21.908562, 0, 0)
+
+[node name="KillZone3" parent="." unique_id=1874942749 instance=ExtResource("7_tahvt")]
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, -11.21904, 2.728489, -1.9633026)
+visible = false
+
+[node name="CollisionShape3D" parent="KillZone3" index="0"]
+transform = Transform3D(1, 0, 0, 0, 500, 0, 0, 0, 100, -21.908562, 0, 0)
+
 [editable path="Grinding2"]
+[editable path="KillZone"]
+[editable path="KillZone4"]
+[editable path="KillZone5"]
+[editable path="KillZone2"]
+[editable path="KillZone3"]
