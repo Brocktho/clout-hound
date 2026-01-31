@@ -5,6 +5,7 @@
 [ext_resource type="AudioStream" uid="uid://em6vk6wpdssa" path="res://Assets/Audio/SFX/UI_Change.wav" id="3_ui_change"]
 [ext_resource type="Shader" uid="uid://bsrludiireds1" path="res://Assets/Shaders/starfield_spatial.gdshader" id="4_starfield_spatial"]
 [ext_resource type="AudioStream" uid="uid://dy03ms6pohmui" path="res://Assets/Audio/Music/ElectronicLoop.wav" id="5_fos0i"]
+[ext_resource type="PackedScene" uid="uid://bap42v8u55v5r" path="res://Credits.tscn" id="6_credits"]
 
 [sub_resource type="Environment" id="Environment_main_menu"]
 background_mode = 1
@@ -30,6 +31,7 @@ rings = 16
 [node name="Main" type="Node3D" unique_id=2026450890]
 script = ExtResource("1_main")
 play_scene = ExtResource("2_gq5w1")
+credits_scene = ExtResource("6_credits")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1066168966]
 shadow_enabled = true
@@ -96,6 +98,10 @@ text = "Settings"
 layout_mode = 2
 text = "Controls"
 
+[node name="CreditsButton" type="Button" parent="UI/MainMenu/VBoxContainer"]
+layout_mode = 2
+text = "Credits"
+
 [node name="AudioUnlock" type="Control" parent="UI" unique_id=715852729]
 layout_mode = 3
 anchors_preset = 15
@@ -131,4 +137,5 @@ stream = ExtResource("5_fos0i")
 [connection signal="pressed" from="UI/MainMenu/VBoxContainer/PlayButton" to="." method="_on_play_button_pressed"]
 [connection signal="pressed" from="UI/MainMenu/VBoxContainer/SettingsButton" to="." method="_on_settings_button_pressed"]
 [connection signal="pressed" from="UI/MainMenu/VBoxContainer/ControlsButton" to="." method="_on_controls_button_pressed"]
+[connection signal="pressed" from="UI/MainMenu/VBoxContainer/CreditsButton" to="." method="_on_credits_button_pressed"]
 [connection signal="pressed" from="UI/AudioUnlock/CenterContainer/VBoxContainer/EnableAudioButton" to="." method="_on_audio_unlock_pressed"]

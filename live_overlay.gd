@@ -159,7 +159,7 @@ func _setup_ui() -> void:
 	# Score
 	score_label.add_theme_font_size_override("font_size", 16)
 	score_label.modulate = Color(1, 0.8, 0.2)
-	score_label.text = "HYPE: 0 (x1)"
+	score_label.text = "Clout: 0 (x1)"
 	hbox.add_child(score_label)
 	
 	container.add_child(top_bar)
@@ -441,7 +441,7 @@ func trigger_sub() -> void:
 
 func _on_score_changed(_current_score: float, display_score: float) -> void:
 	Global.set_current_hype_score(_current_score)
-	score_label.text = "HYPE: %d (x%d)" % [int(display_score), tracker.get_multiplier()]
+	score_label.text = "Clout: %d (x%d)" % [int(display_score), tracker.get_multiplier()]
 	# Pulse effect on high multiplier
 	if tracker.get_multiplier() >= 4:
 		score_label.modulate = Color.RED.lerp(Color.GOLD, abs(sin(Time.get_ticks_msec() * 0.005)))
