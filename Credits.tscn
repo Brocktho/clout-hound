@@ -1,0 +1,138 @@
+[gd_scene load_steps=4 format=3 uid="uid://bap42v8u55v5r"]
+
+[ext_resource type="Script" path="res://Credits.gd" id="1_credits_script"]
+[ext_resource type="AudioStream" uid="uid://em6vk6wpdssa" path="res://Assets/Audio/SFX/UI_Change.wav" id="2_sfx_click"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_credit_row"]
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 8.0
+bg_color = Color(0.15, 0.12, 0.2, 0.85)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="Credits" type="CanvasLayer"]
+layer = 100
+script = ExtResource("1_credits_script")
+
+[node name="UIChangeSfx" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_sfx_click")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="ColorRect" type="ColorRect" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.02, 0.02, 0.05, 0.95)
+
+[node name="CenterContainer" type="CenterContainer" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/CenterContainer"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 24
+
+[node name="TitleLabel" type="Label" parent="Control/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 42
+text = "🐕 Clout Hound 🛹"
+horizontal_alignment = 1
+
+[node name="CreditsScroll" type="ScrollContainer" parent="Control/CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(480, 320)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CreditsVBox" type="VBoxContainer" parent="Control/CenterContainer/VBoxContainer/CreditsScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 28
+
+[node name="DevSection" type="VBoxContainer" parent="Control/CenterContainer/VBoxContainer/CreditsScroll/CreditsVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DevHeader" type="Label" parent="Control/CenterContainer/VBoxContainer/CreditsScroll/CreditsVBox/DevSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Development & Art"
+horizontal_alignment = 1
+
+[node name="BrockthoPanel" type="PanelContainer" parent="Control/CenterContainer/VBoxContainer/CreditsScroll/CreditsVBox/DevSection"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_credit_row")
+
+[node name="BrockthoLabel" type="Label" parent="Control/CenterContainer/VBoxContainer/CreditsScroll/CreditsVBox/DevSection/BrockthoPanel"]
+layout_mode = 2
+text = "Brocktho — Developer & Artist"
+horizontal_alignment = 1
+
+[node name="JRPanel" type="PanelContainer" parent="Control/CenterContainer/VBoxContainer/CreditsScroll/CreditsVBox/DevSection"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_credit_row")
+
+[node name="JRLabel" type="Label" parent="Control/CenterContainer/VBoxContainer/CreditsScroll/CreditsVBox/DevSection/JRPanel"]
+layout_mode = 2
+text = "JR — Developer & Artist"
+horizontal_alignment = 1
+
+[node name="MusicSection" type="VBoxContainer" parent="Control/CenterContainer/VBoxContainer/CreditsScroll/CreditsVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="MusicHeader" type="Label" parent="Control/CenterContainer/VBoxContainer/CreditsScroll/CreditsVBox/MusicSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Music"
+horizontal_alignment = 1
+
+[node name="JohnWilliamsPanel" type="PanelContainer" parent="Control/CenterContainer/VBoxContainer/CreditsScroll/CreditsVBox/MusicSection"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_credit_row")
+
+[node name="JohnWilliamsLabel" type="Label" parent="Control/CenterContainer/VBoxContainer/CreditsScroll/CreditsVBox/MusicSection/JohnWilliamsPanel"]
+layout_mode = 2
+text = "John Williams — AMAZING Music 🎵"
+horizontal_alignment = 1
+
+[node name="ThanksSection" type="VBoxContainer" parent="Control/CenterContainer/VBoxContainer/CreditsScroll/CreditsVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ThanksHeader" type="Label" parent="Control/CenterContainer/VBoxContainer/CreditsScroll/CreditsVBox/ThanksSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Special Thanks"
+horizontal_alignment = 1
+
+[node name="ThanksPanel" type="PanelContainer" parent="Control/CenterContainer/VBoxContainer/CreditsScroll/CreditsVBox/ThanksSection"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_credit_row")
+
+[node name="ThanksLabel" type="Label" parent="Control/CenterContainer/VBoxContainer/CreditsScroll/CreditsVBox/ThanksSection/ThanksPanel"]
+layout_mode = 2
+text = "You, for playing! 🎮"
+horizontal_alignment = 1
+
+[node name="CloseButton" type="Button" parent="Control/CenterContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Back to Menu"
+
+[connection signal="pressed" from="Control/CenterContainer/VBoxContainer/CloseButton" to="." method="_on_close_button_pressed"]

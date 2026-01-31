@@ -2,10 +2,12 @@ extends Node3D
 
 @export var play_scene: PackedScene
 @export var settings_scene: PackedScene
+@export var credits_scene: PackedScene
 
 @onready var play_button: Button = $UI/MainMenu/VBoxContainer/PlayButton
 @onready var settings_button: Button = $UI/MainMenu/VBoxContainer/SettingsButton
 @onready var controls_button: Button = $UI/MainMenu/VBoxContainer/ControlsButton
+@onready var credits_button: Button = $UI/MainMenu/VBoxContainer/CreditsButton
 @onready var ui_change_sfx: AudioStreamPlayer = $UIChangeSfx
 @onready var music_player: AudioStreamPlayer = $MusicPlayer
 @onready var scene_host: Node3D = $SceneHost
@@ -45,15 +47,18 @@ func _ready():
 	# Load scenes if not set in editor (though usually set via editor)
 	if not play_scene: play_scene = load("res://LevelSelect.tscn")
 	if not settings_scene: settings_scene = load("res://Settings.tscn")
+	if not credits_scene: credits_scene = load("res://Credits.tscn")
 	# Ensure mouse is visible for the menu
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	play_button.focus_mode = Control.FOCUS_ALL
 	settings_button.focus_mode = Control.FOCUS_ALL
 	controls_button.focus_mode = Control.FOCUS_ALL
+	credits_button.focus_mode = Control.FOCUS_ALL
 	play_button.grab_focus()
 	_register_ui_change(play_button)
 	_register_ui_change(settings_button)
 	_register_ui_change(controls_button)
+	_register_ui_change(credits_button)
 	_rng.randomize()
 	_start_floater_loop()
 	_set_menu_visible(true)
@@ -136,6 +141,16 @@ func _on_controls_button_pressed() -> void:
 		settings_instance.set_initial_tab(&"Controls")
 	add_child(settings_instance)
 	settings_instance.tree_exited.connect(_on_settings_closed)
+
+func _on_credits_button_pressed() -> void:
+	if not credits_scene:
+		return
+	var focused := get_viewport().gui_get_focus_owner()
+	if focused:
+		_return_focus_path = focused.get_path()
+	var credits_instance = credits_scene.instantiate()
+	add_child(credits_instance)
+	credits_instance.tree_exited.connect(_on_settings_closed)
 
 func return_to_menu() -> void:
 	if _active_scene and is_instance_valid(_active_scene):

@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://h8ebndewl7xp"]
+[gd_scene load_steps=0 format=3 uid="uid://h8ebndewl7xp"]
 
 [ext_resource type="Script" uid="uid://bd04sjsa2b2jk" path="res://Scripts/HelpText.gd" id="1_help_text"]
 

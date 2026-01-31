@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://beyytm8kd3m8p"
-path="res://.godot/imported/halfpipe.glb-f3b36b53dd32d37d6a8873effdda558c.scn"
+path="res://.godot/imported/halfpipe.glb-d4785b0eadbd08930cfd0ea1b814488f.scn"
 
 [deps]
 
-source_file="res://assets/models/halfpipe.glb"
-dest_files=["res://.godot/imported/halfpipe.glb-f3b36b53dd32d37d6a8873effdda558c.scn"]
+source_file="res://Assets/models/halfpipe.glb"
+dest_files=["res://.godot/imported/halfpipe.glb-d4785b0eadbd08930cfd0ea1b814488f.scn"]
 
 [params]
 

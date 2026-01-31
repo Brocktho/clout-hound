@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://b0ogdlpricd0m"]
+[gd_scene load_steps=0 format=3 uid="uid://b0ogdlpricd0m"]
 
 [ext_resource type="PackedScene" uid="uid://dtlxuyo830w2f" path="res://player.tscn" id="1_aug74"]
 [ext_resource type="PackedScene" uid="uid://bbaytx8uog70d" path="res://Assets/models/AdvancedTricks.glb" id="2_ffcrn"]
