@@ -139,3 +139,4 @@ stream = ExtResource("5_fos0i")
 [connection signal="pressed" from="UI/MainMenu/VBoxContainer/ControlsButton" to="." method="_on_controls_button_pressed"]
 [connection signal="pressed" from="UI/MainMenu/VBoxContainer/CreditsButton" to="." method="_on_credits_button_pressed"]
 [connection signal="pressed" from="UI/AudioUnlock/CenterContainer/VBoxContainer/EnableAudioButton" to="." method="_on_audio_unlock_pressed"]
+
