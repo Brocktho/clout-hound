@@ -207,6 +207,8 @@ func _play_ui_change() -> void:
 	if not is_inside_tree():
 		return
 	if ui_change_sfx and ui_change_sfx.is_inside_tree():
+		ui_change_sfx.set_meta("sfx_base_db", 0.0)
+		ui_change_sfx.volume_db = Global.get_sfx_volume_db(0.0)
 		ui_change_sfx.pitch_scale = _ui_rng.randf_range(0.94, 1.06)
 		ui_change_sfx.play()
 
@@ -260,12 +262,8 @@ func _on_disable_grind_sfx_toggled(pressed: bool) -> void:
 	Global.disable_grind_sfx = pressed
 	_apply_disable_grind_sfx(pressed)
 
-func _apply_sfx_volume(value: float) -> void:
-	var db := -80.0 if value <= 0.001 else linear_to_db(value)
-	var bus_index = AudioServer.get_bus_index("SFX")
-	if bus_index == -1:
-		return
-	AudioServer.set_bus_volume_db(bus_index, db)
+func _apply_sfx_volume(_value: float) -> void:
+	Global.apply_sfx_volume_to_tree()
 
 
 func _apply_disable_grind_sfx(disabled: bool) -> void:
@@ -279,7 +277,10 @@ func _apply_disable_grind_sfx(disabled: bool) -> void:
 		grind_player.stop()
 		grind_player.volume_db = -80.0
 	else:
-		grind_player.volume_db = 0.0
+		var base_db := 0.0
+		if grind_player.has_meta("sfx_base_db"):
+			base_db = float(grind_player.get_meta("sfx_base_db"))
+		grind_player.volume_db = Global.get_sfx_volume_db(base_db)
 
 func _play_sfx_preview() -> void:
 	if not ui_change_sfx or not ui_change_sfx.is_inside_tree():
@@ -288,5 +289,7 @@ func _play_sfx_preview() -> void:
 	if now_ms - _last_sfx_preview_ms < 120:
 		return
 	_last_sfx_preview_ms = now_ms
+	ui_change_sfx.set_meta("sfx_base_db", 0.0)
+	ui_change_sfx.volume_db = Global.get_sfx_volume_db(0.0)
 	ui_change_sfx.pitch_scale = _ui_rng.randf_range(0.96, 1.04)
 	ui_change_sfx.play()

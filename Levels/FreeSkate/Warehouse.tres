@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="LevelInformation" format=3 uid="uid://ba8abf3dot2vc"]
+
+[ext_resource type="Script" path="res://level_information.gd" id="1_dw5x7"]
+
+[resource]
+script = ExtResource("1_dw5x7")
+scene_path = "res://Warehouse.tscn"
+preview_image_path = "res://Assets/Pics/Warehouse.tres"
+level_name = "The Warehouse (Prototype)"

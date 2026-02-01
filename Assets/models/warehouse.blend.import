@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c6sfgwfbld7p4"
-path="res://.godot/imported/warehouse.blend-60a0af3fcc2146a96e86b5d61f913b8e.scn"
+valid=false
 
 [deps]
 
 source_file="res://Assets/models/warehouse.blend"
-dest_files=["res://.godot/imported/warehouse.blend-60a0af3fcc2146a96e86b5d61f913b8e.scn"]
 
 [params]
 
@@ -48,6 +47,7 @@ blender/meshes/colors=false
 blender/meshes/uvs=true
 blender/meshes/normals=true
 blender/meshes/export_geometry_nodes_instances=false
+blender/meshes/gpu_instances=false
 blender/meshes/tangents=true
 blender/meshes/skins=2
 blender/meshes/export_bones_deforming_mesh_only=false

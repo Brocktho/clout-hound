@@ -1,6 +1,8 @@
 extends CharacterBody3D
 class_name Player
 
+signal trick_completed(trick_name: String)
+
 
 @export_group("Movement")
 @export var max_speed: float = 10.0
@@ -694,24 +696,31 @@ func _physics_process(delta: float) -> void:
 	# Landing detection for grace period
 	if is_on_floor() and not was_on_floor:
 		landing_grace_timer = landing_grace_time
-		pending_landing_sfx = true
-		pending_rail_landing = _is_rail_landing_surface()
 		_stop_airborne_sfx()
 
-		# Check if landing is aligned (successful) before banking score
-		var landing_success := check_landing_alignment()
-		
-		# Reset trick staleness on landing
-		_reset_trick_staleness()
-		
-		# Only bank combo if landing was successful
-		if landing_success and live_overlay:
-			live_overlay.on_player_landed()
+		var rail_preferred := false
+		if rail_cooldown_timer <= 0 and is_falling_on_rail():
+			var rail_target := _find_rail_from_sphere_cast(board_node.global_position)
+			if rail_target:
+				enter_rail(rail_target)
+				rail_preferred = true
+		if not rail_preferred:
+			pending_landing_sfx = true
+			pending_rail_landing = _is_rail_landing_surface()
+			# Check if landing is aligned (successful) before banking score
+			var landing_success := check_landing_alignment()
 			
-		_play_landing_sfx(false)
-		
-		# Visual Squash
-		visual.scale = Vector3(1.2, 0.6, 1.2) * default_visual_scale
+			# Reset trick staleness on landing
+			_reset_trick_staleness()
+			
+			# Only bank combo if landing was successful
+			if landing_success and live_overlay:
+				live_overlay.on_player_landed()
+				
+			_play_landing_sfx(false)
+			
+			# Visual Squash
+			visual.scale = Vector3(1.2, 0.6, 1.2) * default_visual_scale
 	
 	was_on_floor = is_on_floor()
 
@@ -730,7 +739,9 @@ func _physics_process(delta: float) -> void:
 		if is_on_floor() and not is_grinding:
 			# During rail cooldown, skip alignment checks entirely.
 			if rail_cooldown_timer <= 0 and is_falling_on_rail():
-				check_for_rails()
+				var rail_target := _find_rail_from_sphere_cast(board_node.global_position)
+				if rail_target:
+					enter_rail(rail_target)
 			elif rail_cooldown_timer <= 0:
 				var success: bool = check_landing_alignment()
 				if !success: return
@@ -1019,6 +1030,7 @@ func handle_trick_input(_delta: float) -> void:
 		if trick and trick.check_completion(self, _delta):
 			trick.grant_reward(self)
 			_play_trick_completion_sfx()
+			trick_completed.emit(trick.display_name)
 
 	for trick in trick_resources:
 		if trick:
@@ -1361,7 +1373,10 @@ func _apply_grind_sfx_setting() -> void:
 		grind_sfx_player.stop()
 		grind_sfx_player.volume_db = -80.0
 	else:
-		grind_sfx_player.volume_db = 0.0
+		var base_db := 0.0
+		if grind_sfx_player.has_meta("sfx_base_db"):
+			base_db = float(grind_sfx_player.get_meta("sfx_base_db"))
+		grind_sfx_player.volume_db = Global.get_sfx_volume_db(base_db)
 
 func _handle_grind_sfx_end() -> void:
 	if is_grinding:
@@ -1421,7 +1436,9 @@ func _play_sfx_with_variation(
 ) -> void:
 	player.stream = stream
 	player.pitch_scale = randf_range(pitch_min, pitch_max)
-	player.volume_db = randf_range(vol_min_db, vol_max_db)
+	var base_db := randf_range(vol_min_db, vol_max_db)
+	player.set_meta("sfx_base_db", base_db)
+	player.volume_db = Global.get_sfx_volume_db(base_db)
 	player.play(start_pos)
 
 func _is_rail_landing_surface() -> bool:

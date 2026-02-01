@@ -111,8 +111,8 @@ body {
 
 		<script src="index.js"></script>
 		<script>
-const GODOT_CONFIG = {{{ GODOT_CONFIG }}};
-const GODOT_THREADS_ENABLED = {{{ GODOT_THREADS_ENABLED }}};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":16,"ensureCrossOriginIsolationHeaders":false,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":70005976,"index.wasm":36022222},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":8};
+const GODOT_THREADS_ENABLED = true;
 const engine = new Engine(GODOT_CONFIG);
 
 (function () {
@@ -162,17 +162,6 @@ const engine = new Engine(GODOT_CONFIG);
 		initializing = false;
 	}
 
-	let audioResumeRequested = false;
-	const requestAudioResume = () => {
-		audioResumeRequested = true;
-		if (window.godotResumeAudio) {
-			window.godotResumeAudio();
-		}
-	};
-	const resumeOnce = () => requestAudioResume();
-	document.addEventListener('pointerdown', resumeOnce, { once: true });
-	document.addEventListener('keydown', resumeOnce, { once: true });
-
 	const missing = Engine.getMissingFeatures({
 		threads: GODOT_THREADS_ENABLED,
 	});
@@ -221,15 +210,6 @@ const engine = new Engine(GODOT_CONFIG);
 				}
 			},
 		}).then(() => {
-			window.godotModule = engine.rtenv || null;
-			window.godotResumeAudio = () => {
-				if (window.godotModule && window.godotModule._godot_audio_resume) {
-					window.godotModule._godot_audio_resume();
-				}
-			};
-			if (audioResumeRequested) {
-				window.godotResumeAudio();
-			}
 			setStatusMode('hidden');
 		}, displayFailureNotice);
 	}

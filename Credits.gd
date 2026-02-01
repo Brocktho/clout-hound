@@ -80,6 +80,8 @@ func _setup_button_feedback(btn: Control) -> void:
 
 func _play_feedback_sound() -> void:
     if sfx_player:
+        sfx_player.set_meta("sfx_base_db", 0.0)
+        sfx_player.volume_db = Global.get_sfx_volume_db(0.0)
         sfx_player.pitch_scale = _pitch_rng.randf_range(0.94, 1.06)
         sfx_player.play()
 

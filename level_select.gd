@@ -27,7 +27,9 @@ extends CanvasLayer
 @onready var tutorial_rows_container: VBoxContainer = $Control/Panel/VBoxContainer/ContentArea/TutorialsPanel/ContentRow/LevelsScroll/LevelsContent
 @onready var challenge_rows_container: VBoxContainer = $Control/Panel/VBoxContainer/ContentArea/ChallengesPanel/ContentRow/LevelsScroll/LevelsContent
 @onready var free_skate_rows_container: VBoxContainer = $Control/Panel/VBoxContainer/ContentArea/FreeSkatePanel/ContentRow/LevelsScroll/LevelsContent
-@onready var preview_texture_rect: TextureRect = $Control/Panel/VBoxContainer/ContentArea/TutorialsPanel/ContentRow/PreviewPanel/PreviewTexture
+@onready var tutorials_preview_texture_rect: TextureRect = $Control/Panel/VBoxContainer/ContentArea/TutorialsPanel/ContentRow/PreviewPanel/PreviewTexture
+@onready var challenges_preview_texture_rect: TextureRect = $Control/Panel/VBoxContainer/ContentArea/ChallengesPanel/ContentRow/PreviewPanel/PreviewTexture
+@onready var free_skate_preview_texture_rect: TextureRect = $Control/Panel/VBoxContainer/ContentArea/FreeSkatePanel/ContentRow/PreviewPanel/PreviewTexture
 
 var _tabs: Array[StringName] = [&"Tutorials", &"Challenges", &"FreeSkate"]
 var _current_tab_index: int = 0
@@ -112,8 +114,9 @@ func _populate_rows(container: VBoxContainer, levels: Array[LevelInformation]) -
 			row.connect("play_requested", _on_play_requested)
 			row.connect("preview_requested", _on_preview_requested)
 			container.add_child(row)
-	if preview_placeholder and preview_texture_rect:
-		preview_texture_rect.texture = preview_placeholder
+	var preview_rect := _get_preview_texture_rect()
+	if preview_placeholder and preview_rect:
+		preview_rect.texture = preview_placeholder
 
 func _clear_rows(container: VBoxContainer) -> void:
 	if not container:
@@ -133,16 +136,27 @@ func _on_play_requested(level_info: LevelInformation) -> void:
 	queue_free()
 
 func _on_preview_requested(level_info: LevelInformation) -> void:
-	if not preview_texture_rect:
+	var preview_rect := _get_preview_texture_rect()
+	if not preview_rect:
 		return
 	if not level_info or level_info.preview_image_path == "":
-		preview_texture_rect.texture = preview_placeholder
+		preview_rect.texture = preview_placeholder
 		return
 	var tex := load(level_info.preview_image_path) as Texture2D
 	if tex:
-		preview_texture_rect.texture = tex
+		preview_rect.texture = tex
 	else:
-		preview_texture_rect.texture = preview_placeholder
+		preview_rect.texture = preview_placeholder
+
+func _get_preview_texture_rect() -> TextureRect:
+	match _tabs[_current_tab_index]:
+		&"Tutorials":
+			return tutorials_preview_texture_rect
+		&"Challenges":
+			return challenges_preview_texture_rect
+		&"FreeSkate":
+			return free_skate_preview_texture_rect
+	return tutorials_preview_texture_rect
 
 func _update_tab_labels() -> void:
 	var tutorials_active := _tabs[_current_tab_index] == &"Tutorials"
@@ -176,6 +190,8 @@ func _play_ui_change() -> void:
 	if not is_inside_tree():
 		return
 	if ui_change_sfx and ui_change_sfx.is_inside_tree():
+		ui_change_sfx.set_meta("sfx_base_db", 0.0)
+		ui_change_sfx.volume_db = Global.get_sfx_volume_db(0.0)
 		ui_change_sfx.pitch_scale = _ui_rng.randf_range(0.94, 1.06)
 		ui_change_sfx.play()
 

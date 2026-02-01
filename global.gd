@@ -16,6 +16,8 @@ var current_level_info: LevelInformation = null
 var level_start_ticks_msec: int = 0
 var current_hype_score: float = 0.0
 var _music_players: Array[AudioStreamPlayer] = []
+const SFX_MUTE_DB: float = -80.0
+const SFX_MIN_LINEAR: float = 0.0001
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -67,6 +69,46 @@ func _on_level_completed(level_info: LevelInformation, elapsed_seconds: float) -
 func set_music_level(value: float) -> void:
 	music_level = clamp(value, 0.0, 2.0)
 	_apply_music_volume(music_level)
+
+func get_sfx_volume_db(base_db: float) -> float:
+	var level : float = clamp(sfx_level, 0.0, 2.0)
+	if level <= 0.001:
+		return SFX_MUTE_DB
+	var scaled_linear := db_to_linear(base_db) * level
+	if scaled_linear <= SFX_MIN_LINEAR:
+		return SFX_MUTE_DB
+	return linear_to_db(scaled_linear)
+
+func apply_sfx_volume_to_tree() -> void:
+	if not get_tree():
+		return
+	var root := get_tree().root
+	if root:
+		_apply_sfx_volume_recursive(root)
+
+func _apply_sfx_volume_recursive(node: Node) -> void:
+	if not node:
+		return
+	_apply_sfx_volume_to_node(node)
+	for child in node.get_children():
+		_apply_sfx_volume_recursive(child)
+
+func _apply_sfx_volume_to_node(node: Node) -> void:
+	var player := node as AudioStreamPlayer
+	if player:
+		_apply_sfx_volume_to_player(player)
+		return
+	var player_3d := node as AudioStreamPlayer3D
+	if player_3d:
+		_apply_sfx_volume_to_player(player_3d)
+
+func _apply_sfx_volume_to_player(player: Object) -> void:
+	if not player:
+		return
+	if not player.has_meta("sfx_base_db"):
+		return
+	var base_db := float(player.get_meta("sfx_base_db"))
+	player.set("volume_db", get_sfx_volume_db(base_db))
 
 func set_mouse_sensitivity_slider(value: float) -> void:
 	mouse_sensitivity_slider = clamp(value, 0.0, 0.5)

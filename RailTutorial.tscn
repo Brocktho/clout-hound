@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" path="res://CompletionZone.tscn" id="7_halpd"]
 [ext_resource type="PackedScene" uid="uid://h8ebndewl7xp" path="res://Scenes/HelpText.tscn" id="7_ii6oi"]
 [ext_resource type="PackedScene" uid="uid://hctlcc47o306" path="res://Assets/models/RailTeaching.glb" id="8_ii6oi"]
+[ext_resource type="Script" uid="uid://bd04sjsa2b2jk" path="res://Scripts/HelpText.gd" id="8_qje8h"]
 
 [sub_resource type="Curve3D" id="Curve3D_halpd"]
 _data = {
@@ -68,6 +69,27 @@ transform = Transform3D(0.35262573, -0.93576443, -4.090356e-08, 0, -4.371139e-08
 transform = Transform3D(1.0000002, -1.2976518e-15, 0, 0, -4.3711392e-08, -1.0000001, 3.5527137e-15, 0.99999994, -4.3711392e-08, 0.10372114, 0.03908348, 0.059999943)
 text = "LEFT CLICK ABOVE A PIPE
 TO START GRINDING"
+
+[node name="Sign2" type="Node3D" parent="HelpText" unique_id=1307285337]
+transform = Transform3D(-0.29053518, -0.9568645, -4.1825864e-08, 2.9150298e-15, -4.3711392e-08, 1, -0.9568645, 0.29053518, 1.26996955e-08, -25.277334, 1.3999999, 12.69538)
+script = ExtResource("8_qje8h")
+
+[node name="FaceTarget" type="Node3D" parent="HelpText/Sign2" unique_id=909382003]
+
+[node name="HelpLabel" type="Label3D" parent="HelpText/Sign2/FaceTarget" unique_id=1574498615]
+transform = Transform3D(1.0000002, -1.2976518e-15, 0, 0, -4.3711392e-08, -1.0000001, 3.5527137e-15, 0.99999994, -4.3711392e-08, 0.10372114, 0.03908348, 0.059999943)
+pixel_size = 0.01
+modulate = Color(0.9, 0.98, 1, 1)
+text = "YOU CAN PERFORM TRICKS
+WHILE GRINDING ON RAILS!
+"
+font_size = 40
+
+[node name="SignLight" type="OmniLight3D" parent="HelpText/Sign2/FaceTarget" unique_id=1200068138]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.4)
+light_energy = 1.2
+omni_range = 6.0
+omni_attenuation = 2.0
 
 [editable path="CompletionZone"]
 [editable path="RailTeaching2"]
