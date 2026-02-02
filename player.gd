@@ -2,6 +2,18 @@ extends CharacterBody3D
 class_name Player
 
 signal trick_completed(trick_name: String)
+signal request_grind_entry(origin: Vector3)
+signal jump_started
+signal airborne_started
+signal landed(success: bool, rail_landing: bool)
+signal grind_started(speed: float)
+signal grind_tick(speed: float, velocity: Vector3)
+signal grind_ended
+signal ragdoll_started(severity: float)
+signal ragdoll_ended
+signal slide_started(speed: float)
+signal slide_ended
+signal locomotion_state_updated(state: int, speed: float)
 
 
 @export_group("Movement")
@@ -140,6 +152,7 @@ signal trick_completed(trick_name: String)
 
 # Add the overlay variable
 var live_overlay: LiveOverlay
+var feedback: PlayerFeedback
 
 var is_third_person: bool = true
 var is_sliding: bool = false
@@ -163,10 +176,6 @@ var initial_spawn_pos: Vector3
 var jump_buffer_timer: float = 0.0
 var landing_grace_timer: float = 0.0
 var was_on_floor: bool = false
-var pending_landing_sfx: bool = false
-var pending_rail_landing: bool = false
-var grind_sfx_play_id: int = 0
-var was_sliding: bool = false
 var slowmo_time_left: float = 0.0
 var slowmo_active: bool = false
 var slowmo_last_ticks: int = 0
@@ -191,7 +200,6 @@ var _record_showing: bool = false
 @onready var body_mesh: MeshInstance3D = $Visual/Body
 @onready var visual : Node3D = $Visual
 @onready var body_collision: CollisionShape3D = $BodyCollision
-@onready var grind_sparks: GPUParticles3D = $GrindSparks
 @onready var speed_lines: ColorRect = $SpeedLines
 @onready var slowmo_waves: ColorRect = $SlowMoWaves
 @onready var slowmo_container: Control = $HUD/SlowMoContainer
@@ -200,22 +208,10 @@ var _record_showing: bool = false
 @onready var slowmo_base: ColorRect = $HUD/SlowMoContainer/SlowMoBase
 @onready var slowmo_left_sparks: GPUParticles2D = $HUD/SlowMoContainer/SlowMoLeftSparks
 @onready var slowmo_right_sparks: GPUParticles2D = $HUD/SlowMoContainer/SlowMoRightSparks
-@onready var ragdoll_sfx_player: AudioStreamPlayer3D = $RagdollSfx
-@onready var jump_sfx_player: AudioStreamPlayer3D = $JumpSfx
-@onready var landing_sfx_player: AudioStreamPlayer3D = $LandingSfx
-@onready var airborne_sfx_player: AudioStreamPlayer3D = $AirborneSfx
-@onready var moving_sfx_player: AudioStreamPlayer3D = $MovingSfx
-@onready var grind_sfx_player: AudioStreamPlayer3D = $GrindSfx
-@onready var trick_completion_sfx_player: AudioStreamPlayer3D = $TrickCompletionSfx
 
 var outline_material: ShaderMaterial
 var trick_outline_material: ShaderMaterial
 
-const GRIND_SFX_END_TRIM: float = 0.1
-const GRIND_SFX_NEXT_START: float = 0.1
-const MOVING_SFX_MIN_SPEED: float = 0.5
-const MOVING_SFX_SLIDE_PITCH_MIN: float = 0.8
-const MOVING_SFX_SLIDE_PITCH_MAX: float = 0.9
 
 @export_group("Rail Settings")
 @export var rail_jump_force: float = 10.0
@@ -246,6 +242,9 @@ var trick_stale_count: int = 0
 
 enum AnimState { IDLE, WALK }
 var state: AnimState = AnimState.IDLE
+
+enum LocomotionState { GROUND, AIR, SLIDE, GRIND, RAGDOLL }
+var locomotion_state: LocomotionState = LocomotionState.GROUND
 
 var _frame_index: int = 0
 var _time_accum: float = 0.0
@@ -314,11 +313,9 @@ func _ready() -> void:
 			KickflipTrick.new(),
 			ForwardBackBoostTrick.new()
 		]
-	if not grind_sfx_player.finished.is_connected(_on_grind_sfx_finished):
-		grind_sfx_player.finished.connect(_on_grind_sfx_finished)
-	if not moving_sfx_player.finished.is_connected(_on_moving_sfx_finished):
-		moving_sfx_player.finished.connect(_on_moving_sfx_finished)
-	_apply_grind_sfx_setting()
+	feedback = load("res://player_feedback.gd").new()
+	feedback.player = self
+	add_child(feedback)
 	
 	_set_state(AnimState.IDLE)
 	
@@ -537,9 +534,6 @@ func _unhandled_input(event: InputEvent) -> void:
 		camera.rotate_x(-event.relative.y * mouse_sensitivity)
 		camera.rotation.x = clamp(camera.rotation.x, deg_to_rad(-80), deg_to_rad(80))
 
-	if event.is_action_pressed("toggle_camera"):
-		toggle_camera_mode()
-
 	if event.is_action_pressed("toggle_overlay"):
 		if live_overlay:
 			live_overlay.visible = !live_overlay.visible
@@ -645,138 +639,125 @@ func _process(delta: float) -> void:
 	_apply_frame(frames)
 	_update_slowmo_ui(delta)
 
+func _resolve_locomotion_state(on_floor: bool, slide_pressed: bool) -> LocomotionState:
+	if is_grinding:
+		return LocomotionState.GRIND
+	if is_ragdolling:
+		return LocomotionState.RAGDOLL
+	if slide_pressed:
+		return LocomotionState.SLIDE
+	return LocomotionState.GROUND if on_floor else LocomotionState.AIR
+
+func _process_ragdoll_motion(delta: float, on_floor: bool) -> void:
+	apply_ragdoll_physics(delta)
+	_update_camera_pivot(delta)
+	update_visual_alignment(delta)
+	move_and_slide()
+	if is_on_floor() and velocity.length() < reset_speed_threshold:
+		reset_player()
+	locomotion_state_updated.emit(LocomotionState.RAGDOLL, Vector2(velocity.x, velocity.z).length())
+	update_speed_effects(delta)
+	update_outline_color()
+	was_on_floor = on_floor
+
 func _physics_process(delta: float) -> void:
 	_update_slowmo(delta)
+	var jump_pressed := Input.is_action_just_pressed("jump")
+	var slide_pressed := Input.is_action_pressed("slide")
+	var input_dir_2d: Vector2 = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
+	var on_floor := is_on_floor()
 
-	if is_ragdolling:
-		apply_ragdoll_physics(delta)
-		return	
-		
-	_update_camera_pivot(delta)
-	update_visual_alignment(delta)	
-
-	if rail_cooldown_timer > 0:
+	if rail_cooldown_timer > 0.0:
 		rail_cooldown_timer -= delta
-
-	if jump_buffer_timer > 0:
+	if jump_buffer_timer > 0.0:
 		jump_buffer_timer -= delta
-	
-	if landing_grace_timer > 0:
+	if landing_grace_timer > 0.0:
 		landing_grace_timer -= delta
-
-	if Input.is_action_just_pressed("jump"):
+	if jump_pressed:
 		jump_buffer_timer = jump_buffer_time
 
-	if jump_buffer_timer > 0:
-		if is_grinding:
-			jump_buffer_timer = 0
-			jump_exit_rail()
-			velocity.y = jump_velocity
-			_play_jump_sfx()
-			_start_airborne_sfx()
-		elif is_on_floor():
-			jump_buffer_timer = 0
-			velocity.y = jump_velocity
-			var floor_normal: Vector3 = get_floor_normal()
-			if floor_normal != Vector3.UP:
-				var slope_steepness: float = 1.0 - floor_normal.dot(Vector3.UP)
-				var speed: float = velocity.length()
-				if speed >= ramp_jump_min_speed:
-					var ramp_boost : float = clamp(speed * slope_steepness * ramp_jump_boost, 0.0, ramp_jump_max_boost)
-					velocity.y += ramp_boost
-			_play_jump_sfx()
-			_start_airborne_sfx()
-			if !is_sliding:
-				# Diagonal Momentum Exploit
-				var input_dir_exploit: Vector2 = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
-				if abs(input_dir_exploit.x) > 0.5 and abs(input_dir_exploit.y) > 0.5:
-					var boost_vec: Vector3 = (_get_movement_basis() * Vector3(input_dir_exploit.x, 0, input_dir_exploit.y)).normalized()
-					velocity += boost_vec * diagonal_boost	
+	var prev_state := locomotion_state
+	locomotion_state = _resolve_locomotion_state(on_floor, slide_pressed)
+	is_sliding = locomotion_state == LocomotionState.SLIDE
+	is_grinding = locomotion_state == LocomotionState.GRIND
 
-	# Landing detection for grace period
-	if is_on_floor() and not was_on_floor:
-		landing_grace_timer = landing_grace_time
-		_stop_airborne_sfx()
+	if prev_state != locomotion_state:
+		if prev_state == LocomotionState.SLIDE:
+			slide_ended.emit()
+		if locomotion_state == LocomotionState.SLIDE:
+			var slide_speed := Vector2(velocity.x, velocity.z).length()
+			slide_started.emit(slide_speed)
 
-		var rail_preferred := false
-		if rail_cooldown_timer <= 0 and is_falling_on_rail():
-			var rail_target := _find_rail_from_sphere_cast(board_node.global_position)
-			if rail_target:
-				enter_rail(rail_target)
-				rail_preferred = true
-		if not rail_preferred:
-			pending_landing_sfx = true
-			pending_rail_landing = _is_rail_landing_surface()
-			# Check if landing is aligned (successful) before banking score
-			var landing_success := check_landing_alignment()
-			
-			# Reset trick staleness on landing
-			_reset_trick_staleness()
-			
-			# Only bank combo if landing was successful
-			if landing_success and live_overlay:
-				live_overlay.on_player_landed()
-				
-			_play_landing_sfx(false)
-			
-			# Visual Squash
-			visual.scale = Vector3(1.2, 0.6, 1.2) * default_visual_scale
-	
-	was_on_floor = is_on_floor()
-
-	# Grinding logic is here, but honestly I feel like a good portion of it should be in the GrindRail script.
-	# But thats what game jamming is all about. Sloppy code to get it out the door.
-	if is_grinding:
-		apply_grind_movement(delta)
-		handle_trick_input(delta) # Allow rotation while grinding
-		update_outline_color()
+	if locomotion_state == LocomotionState.RAGDOLL:
+		_process_ragdoll_motion(delta, on_floor)
 		return
-	else:
-		if not is_on_floor():
-			handle_trick_input(delta)
-		
-		# Landing check
-		if is_on_floor() and not is_grinding:
-			# During rail cooldown, skip alignment checks entirely.
-			if rail_cooldown_timer <= 0 and is_falling_on_rail():
-				var rail_target := _find_rail_from_sphere_cast(board_node.global_position)
-				if rail_target:
-					enter_rail(rail_target)
-			elif rail_cooldown_timer <= 0:
-				var success: bool = check_landing_alignment()
-				if !success: return
-	
-	if pending_landing_sfx and not is_ragdolling:
-		_play_landing_sfx(pending_rail_landing)
-		pending_landing_sfx = false
-		pending_rail_landing = false
-				
-	if rail_cooldown_timer <= 0:
-		check_for_rails()	
 
-	# Add the gravity.
-	if not is_on_floor() or is_sliding:
+	_update_camera_pivot(delta)
+	update_visual_alignment(delta)
+
+	if not on_floor and was_on_floor and locomotion_state == LocomotionState.AIR:
+		airborne_started.emit()
+
+	if locomotion_state == LocomotionState.SLIDE and not on_floor and rail_cooldown_timer <= 0.0:
+		request_grind_entry.emit(board_node.global_position)
+
+	if jump_pressed and locomotion_state == LocomotionState.GRIND:
+		jump_exit_rail()
+		velocity.y = jump_velocity
+		jump_started.emit()
+		airborne_started.emit()
+		jump_buffer_timer = 0.0
+
+	if jump_buffer_timer > 0.0 and on_floor:
+		jump_buffer_timer = 0.0
+		velocity.y = jump_velocity
+		var floor_normal: Vector3 = get_floor_normal()
+		if floor_normal != Vector3.UP:
+			var slope_steepness: float = 1.0 - floor_normal.dot(Vector3.UP)
+			var speed: float = velocity.length()
+			if speed >= ramp_jump_min_speed:
+				var ramp_boost : float = clamp(speed * slope_steepness * ramp_jump_boost, 0.0, ramp_jump_max_boost)
+				velocity.y += ramp_boost
+		jump_started.emit()
+		airborne_started.emit()
+		if not is_sliding:
+			# Diagonal Momentum Exploit
+			if abs(input_dir_2d.x) > 0.5 and abs(input_dir_2d.y) > 0.5:
+				var boost_vec: Vector3 = (_get_movement_basis() * Vector3(input_dir_2d.x, 0, input_dir_2d.y)).normalized()
+				velocity += boost_vec * diagonal_boost
+
+	if on_floor and not was_on_floor:
+		landing_grace_timer = landing_grace_time
+		var rail_landing := _is_rail_landing_surface()
+		var landing_success := check_landing_alignment()
+		_reset_trick_staleness()
+		if landing_success and live_overlay:
+			live_overlay.on_player_landed()
+		if not is_ragdolling:
+			landed.emit(landing_success, rail_landing)
+		visual.scale = Vector3(1.2, 0.6, 1.2) * default_visual_scale
+		if is_ragdolling:
+			_process_ragdoll_motion(delta, on_floor)
+			return
+
+	if locomotion_state == LocomotionState.GRIND:
+		apply_grind_movement(delta)
+		grind_tick.emit(rail_speed, velocity)
+		handle_trick_input(delta)
+		locomotion_state_updated.emit(locomotion_state, Vector2(velocity.x, velocity.z).length())
+		update_outline_color()
+		was_on_floor = on_floor
+		return
+
+	if locomotion_state == LocomotionState.AIR:
+		handle_trick_input(delta)
+
+	if locomotion_state != LocomotionState.GROUND:
 		velocity.y -= gravity * delta
 
-	# Handle Slide input
-	if Input.is_action_pressed("slide"):
-		is_sliding = true
-	else:
-		is_sliding = false
+	var direction: Vector3 = (_get_movement_basis() * Vector3(input_dir_2d.x, 0.0, input_dir_2d.y))
 
-	var input_dir: Vector3 = Vector3.ZERO
-	if Input.is_action_pressed("move_forward"):
-		input_dir -= _get_movement_basis().z
-	if Input.is_action_pressed("move_backward"):
-		input_dir += _get_movement_basis().z
-	if Input.is_action_pressed("move_left"):
-		input_dir -= _get_movement_basis().x
-	if Input.is_action_pressed("move_right"):
-		input_dir += _get_movement_basis().x
-	
-	var direction: Vector3 = input_dir
-
-	if is_sliding:
+	if locomotion_state == LocomotionState.SLIDE:
 		apply_sliding_movement(direction, delta)
 	else:
 		apply_standard_movement(direction, delta)
@@ -784,9 +765,10 @@ func _physics_process(delta: float) -> void:
 	handle_dynamic_snapping()
 
 	move_and_slide()
-	_update_movement_sfx()
+	locomotion_state_updated.emit(locomotion_state, Vector2(velocity.x, velocity.z).length())
 	update_speed_effects(delta)
 	update_outline_color()
+	was_on_floor = on_floor
 
 func _update_camera_pivot(delta: float) -> void:
 	if not spring_arm:
@@ -1029,7 +1011,6 @@ func handle_trick_input(_delta: float) -> void:
 	for trick in trick_resources:
 		if trick and trick.check_completion(self, _delta):
 			trick.grant_reward(self)
-			_play_trick_completion_sfx()
 			trick_completed.emit(trick.display_name)
 
 	for trick in trick_resources:
@@ -1170,16 +1151,11 @@ func start_ragdoll(bail_severity: float = 1.0) -> void:
 	is_ragdolling = true
 	_start_ragdoll_reset_timer()
 	_prepare_ragdoll_pose()
-	pending_landing_sfx = false
-	pending_rail_landing = false
-	_stop_grind_sfx()
-	_stop_airborne_sfx()
-	_stop_moving_sfx()
 	var horizontal_speed: float = Vector2(velocity.x, velocity.z).length()
-	_play_ragdoll_bail_sfx()
 	
 	# 1. Calculate how "bad" the landing was (0.0 to 1.0)
 	bail_severity = clamp(bail_severity, 0.0, 1.0)
+	ragdoll_started.emit(bail_severity)
 	
 	# 2. Set rotational momentum based on severity and speed
 	# We'll tumble on X and Z for a chaotic look
@@ -1271,175 +1247,6 @@ func _get_board_drop_transform(original: Transform3D) -> Transform3D:
 	var offset := hit_normal * 0.4
 	return Transform3D(new_basis, hit_pos + offset)
 
-func _play_ragdoll_bail_sfx() -> void:
-	if ragdoll_bail_sfx.is_empty():
-		return
-	var clip_index := trick_rng.randi_range(0, ragdoll_bail_sfx.size() - 1)
-	_play_sfx_with_variation(ragdoll_sfx_player, ragdoll_bail_sfx[clip_index], 0.93, 1.02, -2.0, 0.5)
-
-func _play_jump_sfx() -> void:
-	if jump_sfx.is_empty():
-		return
-	var clip_index := trick_rng.randi_range(0, jump_sfx.size() - 1)
-	_play_sfx_with_variation(jump_sfx_player, jump_sfx[clip_index], 0.97, 1.05, -1.5, 0.5)
-
-func _play_landing_sfx(use_rail: bool) -> void:
-	var clips := land_rail_sfx if use_rail else landing_sfx
-	if clips.is_empty():
-		return
-	var clip_index := trick_rng.randi_range(0, clips.size() - 1)
-	_play_sfx_with_variation(landing_sfx_player, clips[clip_index], 0.95, 1.03, -1.5, 0.5)
-
-func _play_trick_completion_sfx() -> void:
-	if trick_completion_sfx.is_empty():
-		return
-	var clip_index := trick_rng.randi_range(0, trick_completion_sfx.size() - 1)
-	_play_sfx_with_variation(trick_completion_sfx_player, trick_completion_sfx[clip_index], 0.95, 1.05, -6.0, -2.0)
-
-func _start_grind_sfx() -> void:
-	if Global.disable_grind_sfx:
-		return
-	if grind_sfx.is_empty():
-		return
-	_play_grind_sfx_once(0.0)
-
-func _stop_grind_sfx() -> void:
-	if grind_sfx_player.playing:
-		grind_sfx_player.stop()
-	grind_sfx_player.stream = null
-	grind_sfx_play_id += 1
-
-func _start_airborne_sfx() -> void:
-	if not airborne_sfx:
-		return
-	if airborne_sfx_player.playing:
-		return
-	var stream := airborne_sfx
-	if stream is AudioStreamWAV:
-		var wav := (stream as AudioStreamWAV).duplicate()
-		wav.loop_mode = AudioStreamWAV.LOOP_FORWARD
-		wav.loop_begin = 0
-		wav.loop_end = int(wav.get_length() * wav.mix_rate)
-		stream = wav
-	_play_sfx_with_variation(airborne_sfx_player, stream, 0.98, 1.02, -10.0, -6.0)
-
-func _stop_airborne_sfx() -> void:
-	if airborne_sfx_player.playing:
-		airborne_sfx_player.stop()
-	airborne_sfx_player.stream = null
-
-func _start_moving_sfx() -> void:
-	if moving_sfx.is_empty():
-		return
-	if moving_sfx_player.playing:
-		return
-	_play_moving_sfx_once()
-
-func _stop_moving_sfx() -> void:
-	if moving_sfx_player.playing:
-		moving_sfx_player.stop()
-	moving_sfx_player.stream = null
-
-func _play_moving_sfx_once(pitch_min: float = 0.98, pitch_max: float = 1.02) -> void:
-	if moving_sfx.is_empty():
-		return
-	var clip_index := trick_rng.randi_range(0, moving_sfx.size() - 1)
-	var stream := moving_sfx[clip_index]
-	_play_sfx_with_variation(moving_sfx_player, stream, pitch_min, pitch_max, -3.0, 0.0)
-
-func _play_grind_sfx_once(start_offset: float) -> void:
-	if grind_sfx.is_empty():
-		return
-	grind_sfx_play_id += 1
-	var play_id := grind_sfx_play_id
-	var clip_index := trick_rng.randi_range(0, grind_sfx.size() - 1)
-	var stream := grind_sfx[clip_index]
-	_play_sfx_with_variation(grind_sfx_player, stream, 0.98, 1.02, -36.0, -18.0, start_offset)
-	var clip_length := stream.get_length()
-	var play_duration := maxf(0.0, clip_length - GRIND_SFX_END_TRIM - start_offset)
-	_schedule_grind_sfx_stop(play_id, play_duration)
-
-func _on_grind_sfx_finished() -> void:
-	_handle_grind_sfx_end()
-
-func _on_moving_sfx_finished() -> void:
-	if _should_play_moving_sfx():
-		_play_moving_sfx_once()
-
-func _apply_grind_sfx_setting() -> void:
-	if not grind_sfx_player:
-		return
-	if Global.disable_grind_sfx:
-		grind_sfx_player.stop()
-		grind_sfx_player.volume_db = -80.0
-	else:
-		var base_db := 0.0
-		if grind_sfx_player.has_meta("sfx_base_db"):
-			base_db = float(grind_sfx_player.get_meta("sfx_base_db"))
-		grind_sfx_player.volume_db = Global.get_sfx_volume_db(base_db)
-
-func _handle_grind_sfx_end() -> void:
-	if is_grinding:
-		_play_grind_sfx_once(GRIND_SFX_NEXT_START)
-
-func _update_movement_sfx() -> void:
-	if is_ragdolling:
-		_stop_airborne_sfx()
-		_stop_moving_sfx()
-		_was_sliding_state_update()
-		return
-	if _should_play_airborne_sfx():
-		_stop_moving_sfx()
-		_start_airborne_sfx()
-	else:
-		_stop_airborne_sfx()
-		if _should_play_moving_sfx():
-			_start_moving_sfx()
-			if is_sliding and not was_sliding:
-				_stop_moving_sfx()
-				_play_moving_sfx_once(MOVING_SFX_SLIDE_PITCH_MIN, MOVING_SFX_SLIDE_PITCH_MAX)
-		else:
-			_stop_moving_sfx()
-	_was_sliding_state_update()
-
-func _was_sliding_state_update() -> void:
-	was_sliding = is_sliding
-
-func _should_play_airborne_sfx() -> bool:
-	return not is_on_floor() and not is_grinding
-
-func _should_play_moving_sfx() -> bool:
-	if is_grinding or not is_on_floor():
-		return false
-	var horizontal_speed := Vector2(velocity.x, velocity.z).length()
-	return horizontal_speed > MOVING_SFX_MIN_SPEED
-
-func _schedule_grind_sfx_stop(play_id: int, duration: float) -> void:
-	if duration <= 0.0:
-		return
-	await get_tree().create_timer(duration).timeout
-	if play_id != grind_sfx_play_id:
-		return
-	if not is_grinding or not grind_sfx_player.playing:
-		return
-	grind_sfx_player.stop()
-	_handle_grind_sfx_end()
-
-func _play_sfx_with_variation(
-	player: AudioStreamPlayer3D,
-	stream: AudioStream,
-	pitch_min: float,
-	pitch_max: float,
-	vol_min_db: float,
-	vol_max_db: float,
-	start_pos: float = 0.0
-) -> void:
-	player.stream = stream
-	player.pitch_scale = randf_range(pitch_min, pitch_max)
-	var base_db := randf_range(vol_min_db, vol_max_db)
-	player.set_meta("sfx_base_db", base_db)
-	player.volume_db = Global.get_sfx_volume_db(base_db)
-	player.play(start_pos)
 
 func _is_rail_landing_surface() -> bool:
 	var space_state: PhysicsDirectSpaceState3D = get_world_3d().direct_space_state
@@ -1487,25 +1294,18 @@ func apply_ragdoll_physics(delta: float) -> void:
 	velocity.x = horizontal_vel.x
 	velocity.z = horizontal_vel.y
 
-	move_and_slide()
-	# Reset if we've come to a stop
-	if is_on_floor() and velocity.length() < reset_speed_threshold:
-		reset_player()
-
 func _is_board_physics_active() -> bool:
 	return board_physics and not board_physics.freeze and board_physics_shape and not board_physics_shape.disabled
 	
 	
 
 func reset_player() -> void:
+	var was_ragdolling := is_ragdolling
 	is_ragdolling = false
 	if ragdoll_reset_timer:
 		ragdoll_reset_timer.stop()
-	pending_landing_sfx = false
-	pending_rail_landing = false
-	_stop_grind_sfx()
-	_stop_airborne_sfx()
-	_stop_moving_sfx()
+	if was_ragdolling:
+		ragdoll_ended.emit()
 	for trick in trick_resources:
 		if trick:
 			trick.reset_trick_state()
@@ -1662,11 +1462,6 @@ func check_for_rails() -> void:
 
 func enter_rail(rail: Node) -> void:
 	is_grinding = true
-	if not is_ragdolling:
-		_play_landing_sfx(true)
-	_stop_airborne_sfx()
-	_stop_moving_sfx()
-	_start_grind_sfx()
 	# TRIGGER OVERLAY for grind start
 	if live_overlay:
 		live_overlay.trigger_grind_reaction()
@@ -1698,6 +1493,9 @@ func enter_rail(rail: Node) -> void:
 		rail_direction = 1
 	else:
 		rail_direction = -1
+
+	if not is_ragdolling:
+		grind_started.emit(rail_speed)
 	
 	# Initial snap
 	global_position = current_rail.get_pos_at_offset(rail_offset)
@@ -1763,19 +1561,7 @@ func apply_grind_movement(delta: float) -> void:
 		return
 		
 	rail_offset += rail_speed * rail_direction * delta
-	
-	# Update sparks
-	if grind_sparks:
-		grind_sparks.emitting = true
-		# Point sparks opposite to velocity
-		if velocity.length() > 0.1:
-			grind_sparks.look_at(global_position - velocity.normalized(), Vector3.UP)
-		
-		# Scale amount of sparks with speed; max at 2x max_speed, few below max_speed.
-		var speed_ratio = clamp(rail_speed / (max_speed * 4.0), 0.0, 1.0)
-		var speed_factor = clamp(pow(speed_ratio, 2.0), 0.05, 1.0)
-		grind_sparks.amount_ratio = speed_factor	
-	
+
 	# Check if we've reached the end of the rail
 	var rail_length = 0.0
 	if current_rail.has_method("get_rail_length"):
@@ -1805,10 +1591,8 @@ func apply_grind_movement(delta: float) -> void:
 
 func exit_rail() -> void:
 	if is_grinding:
-		if grind_sparks:
-			grind_sparks.emitting = false	
-		_stop_grind_sfx()
 		velocity = last_rail_direction
+		grind_ended.emit()
 		# Prevent clipping: Lift player slightly off the rail
 		global_position += Vector3.UP * 1.5
 		if current_rail_body:
@@ -1821,9 +1605,7 @@ func exit_rail() -> void:
 
 func jump_exit_rail() -> void:
 	if is_grinding:
-		if grind_sparks:
-			grind_sparks.emitting = false	
-		_stop_grind_sfx()
+		grind_ended.emit()
 		# 1. Start with forward momentum
 		var exit_velocity: Vector3 = last_rail_direction
 		
