@@ -68,6 +68,7 @@ signal locomotion_state_updated(state: int, speed: float)
 @export var lean_speed: float = 8.0 # How fast the lean responds
 @export var ragdoll_friction: float = 25.0
 @export var reset_speed_threshold: float = 0.5
+@export var ragdoll_buffer_time: float = 0.09
 @export var trick_resources: Array[TrickResource] = []
 @export var trick_stale_factor: float = 0.3
 
@@ -175,6 +176,8 @@ var initial_spawn_pos: Vector3
 
 var jump_buffer_timer: float = 0.0
 var landing_grace_timer: float = 0.0
+var ragdoll_buffer_timer: float = 0.0
+var ragdoll_buffer_severity: float = 0.0
 var was_on_floor: bool = false
 var slowmo_time_left: float = 0.0
 var slowmo_active: bool = false
@@ -245,6 +248,9 @@ var state: AnimState = AnimState.IDLE
 
 enum LocomotionState { GROUND, AIR, SLIDE, GRIND, RAGDOLL }
 var locomotion_state: LocomotionState = LocomotionState.GROUND
+
+enum StanceState { DEFAULT, SLIDE }
+var stance_state: StanceState = StanceState.DEFAULT
 
 var _frame_index: int = 0
 var _time_accum: float = 0.0
@@ -639,14 +645,19 @@ func _process(delta: float) -> void:
 	_apply_frame(frames)
 	_update_slowmo_ui(delta)
 
-func _resolve_locomotion_state(on_floor: bool, slide_pressed: bool) -> LocomotionState:
+func _resolve_locomotion_state(on_floor: bool, stance: StanceState) -> LocomotionState:
 	if is_grinding:
 		return LocomotionState.GRIND
 	if is_ragdolling:
 		return LocomotionState.RAGDOLL
-	if slide_pressed:
+	if !on_floor:
+		return LocomotionState.AIR
+	if stance == StanceState.SLIDE:
 		return LocomotionState.SLIDE
-	return LocomotionState.GROUND if on_floor else LocomotionState.AIR
+	return LocomotionState.GROUND
+
+func _resolve_stance_state(slide_pressed: bool) -> StanceState:
+	return StanceState.SLIDE if slide_pressed else StanceState.DEFAULT
 
 func _process_ragdoll_motion(delta: float, on_floor: bool) -> void:
 	apply_ragdoll_physics(delta)
@@ -659,6 +670,15 @@ func _process_ragdoll_motion(delta: float, on_floor: bool) -> void:
 	update_speed_effects(delta)
 	update_outline_color()
 	was_on_floor = on_floor
+
+func _start_ragdoll_buffer(severity: float) -> void:
+	ragdoll_buffer_timer = ragdoll_buffer_time
+	ragdoll_buffer_severity = clamp(severity, 0.0, 1.0)
+	jump_buffer_timer = 0.0
+
+func _clear_ragdoll_buffer() -> void:
+	ragdoll_buffer_timer = 0.0
+	ragdoll_buffer_severity = 0.0
 
 func _physics_process(delta: float) -> void:
 	_update_slowmo(delta)
@@ -673,20 +693,27 @@ func _physics_process(delta: float) -> void:
 		jump_buffer_timer -= delta
 	if landing_grace_timer > 0.0:
 		landing_grace_timer -= delta
-	if jump_pressed:
+	if ragdoll_buffer_timer > 0.0:
+		ragdoll_buffer_timer -= delta
+		jump_buffer_timer = 0.0
+		if ragdoll_buffer_timer <= 0.0 and not is_grinding and not is_ragdolling:
+			start_ragdoll(ragdoll_buffer_severity)
+			_clear_ragdoll_buffer()
+	if jump_pressed and ragdoll_buffer_timer <= 0.0:
 		jump_buffer_timer = jump_buffer_time
 
-	var prev_state := locomotion_state
-	locomotion_state = _resolve_locomotion_state(on_floor, slide_pressed)
-	is_sliding = locomotion_state == LocomotionState.SLIDE
+	var prev_is_sliding := is_sliding
+	stance_state = _resolve_stance_state(slide_pressed)
+	locomotion_state = _resolve_locomotion_state(on_floor, stance_state)
+	is_sliding = on_floor and stance_state == StanceState.SLIDE
 	is_grinding = locomotion_state == LocomotionState.GRIND
 
-	if prev_state != locomotion_state:
-		if prev_state == LocomotionState.SLIDE:
-			slide_ended.emit()
-		if locomotion_state == LocomotionState.SLIDE:
+	if prev_is_sliding != is_sliding:
+		if is_sliding:
 			var slide_speed := Vector2(velocity.x, velocity.z).length()
 			slide_started.emit(slide_speed)
+		else:
+			slide_ended.emit()
 
 	if locomotion_state == LocomotionState.RAGDOLL:
 		_process_ragdoll_motion(delta, on_floor)
@@ -698,7 +725,7 @@ func _physics_process(delta: float) -> void:
 	if not on_floor and was_on_floor and locomotion_state == LocomotionState.AIR:
 		airborne_started.emit()
 
-	if locomotion_state == LocomotionState.SLIDE and not on_floor and rail_cooldown_timer <= 0.0:
+	if stance_state == StanceState.SLIDE and not on_floor and rail_cooldown_timer <= 0.0:
 		request_grind_entry.emit(board_node.global_position)
 
 	if jump_pressed and locomotion_state == LocomotionState.GRIND:
@@ -729,12 +756,17 @@ func _physics_process(delta: float) -> void:
 	if on_floor and not was_on_floor:
 		landing_grace_timer = landing_grace_time
 		var rail_landing := _is_rail_landing_surface()
-		var landing_success := check_landing_alignment()
+		var landing_result := check_landing_alignment()
+		var landing_success: bool = bool(landing_result["success"])
 		_reset_trick_staleness()
 		if landing_success and live_overlay:
 			live_overlay.on_player_landed()
 		if not is_ragdolling:
 			landed.emit(landing_success, rail_landing)
+		if not landing_success:
+			_start_ragdoll_buffer(float(landing_result["bail_severity"]))
+		else:
+			_clear_ragdoll_buffer()
 		visual.scale = Vector3(1.2, 0.6, 1.2) * default_visual_scale
 		if is_ragdolling:
 			_process_ragdoll_motion(delta, on_floor)
@@ -769,6 +801,13 @@ func _physics_process(delta: float) -> void:
 	update_speed_effects(delta)
 	update_outline_color()
 	was_on_floor = on_floor
+
+func _on_grind_requested(rail: GrindRail) -> void:
+	if not rail or is_grinding or is_ragdolling:
+		return
+	if rail_cooldown_timer > 0.0:
+		return
+	enter_rail(rail)
 
 func _update_camera_pivot(delta: float) -> void:
 	if not spring_arm:
@@ -1104,7 +1143,7 @@ func _set_body_outline(active: bool) -> void:
 		else:
 			material.next_pass = null
 	
-func check_landing_alignment() -> bool:
+func check_landing_alignment() -> Dictionary:
 	# Check if rotation is a multiple of 180 degrees (PI radians)
 	# We use a small epsilon (0.2) to be forgiving
 	var total_spin := _get_total_spin_radians()
@@ -1127,8 +1166,10 @@ func check_landing_alignment() -> bool:
 			if trick:
 				trick.on_landing(false)
 		_reset_trick_staleness()
-		start_ragdoll(bail_severity)
-		return false
+		return {
+			"success": false,
+			"bail_severity": bail_severity
+		}
 	else:
 		for trick in trick_resources:
 			if trick:
@@ -1136,7 +1177,10 @@ func check_landing_alignment() -> bool:
 		_reset_trick_staleness()
 		# Landed successfully: Snap board to nearest 180 and reset counter
 		board_node.rotation.y = default_board_rotation.y # Or snap to PI if facing backward
-		return true
+		return {
+			"success": true,
+			"bail_severity": 0.0
+		}
 		
 func is_falling_on_rail() -> bool:
 	return is_sliding and _find_rail_from_sphere_cast(board_node.global_position) != null
@@ -1144,6 +1188,7 @@ func is_falling_on_rail() -> bool:
 func start_ragdoll(bail_severity: float = 1.0) -> void:
 	if is_ragdolling:
 		return
+	_clear_ragdoll_buffer()
 	# TRIGGER OVERLAY for bails
 	if live_overlay:
 		live_overlay.trigger_bail_reaction()
@@ -1461,6 +1506,7 @@ func check_for_rails() -> void:
 		enter_rail(target)
 
 func enter_rail(rail: Node) -> void:
+	_clear_ragdoll_buffer()
 	is_grinding = true
 	# TRIGGER OVERLAY for grind start
 	if live_overlay:

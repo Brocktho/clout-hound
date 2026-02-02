@@ -15,6 +15,8 @@ class_name GrindRail
 @export var collision_segments: int = 8 # Number of sides for the cylinder approximation
 @export var rail_material: Material # Material for the visible rail
 
+signal grind_requested(rail: GrindRail)
+
 @export var generate_rail_button: bool:
 	set(value):
 		# We use print_rich for more visible logging in editor
@@ -30,6 +32,43 @@ var _cached_point_count: int = -1
 var _cached_bake_interval: float = -1.0
 var _cached_baked_length: float = -1.0
 var _cached_transform: Transform3D = Transform3D.IDENTITY
+
+func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
+	_connect_players()
+
+func _connect_players() -> void:
+	if not get_tree():
+		print("no tree")
+		return
+	for node in get_tree().get_nodes_in_group("player"):
+		print(node)
+		var player := node as Player
+		if not player:
+			print("not player")
+			continue
+		
+		var request_callable := Callable(self, "_on_player_request_grind_entry").bind(player)
+		if not player.request_grind_entry.is_connected(request_callable):
+			player.request_grind_entry.connect(request_callable)
+		var grind_callable := Callable(player, "_on_grind_requested")
+		if not grind_requested.is_connected(grind_callable):
+			grind_requested.connect(grind_callable)
+
+func _on_player_request_grind_entry(origin: Vector3, player: Player) -> void:
+	if not player or player.is_grinding or player.is_ragdolling:
+		return
+	if player.rail_cooldown_timer > 0.0:
+		return
+	var snap_distance : float = max(0.1, player.grind_snap_distance * player.grind_cast_radius_multiplier)
+	if _is_origin_within_snap(origin, snap_distance):
+		grind_requested.emit(self)
+
+func _is_origin_within_snap(origin: Vector3, snap_distance: float) -> bool:
+	var offset := get_closest_offset(origin)
+	var closest := get_pos_at_offset(offset)
+	return origin.distance_to(closest) <= snap_distance
 
 
 func generate_rail() -> void:

@@ -27,6 +27,10 @@ Global="*res://global.gd"
 window/size/viewport_width=2400
 window/size/viewport_height=1020
 
+[global_group]
+
+player=""
+
 [input]
 
 ui_cancel={
