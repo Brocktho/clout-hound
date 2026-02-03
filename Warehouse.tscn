@@ -1,4 +1,4 @@
-[gd_scene load_steps=0 format=3 uid="uid://cvk6i6g5s61c"]
+[gd_scene format=3 uid="uid://cvk6i6g5s61c"]
 
 [ext_resource type="PackedScene" uid="uid://bsk8mbhvd2lp8" path="res://Assets/models/warehouse.glb" id="1_vudxo"]
 [ext_resource type="PackedScene" uid="uid://dtlxuyo830w2f" path="res://player.tscn" id="2_25wl0"]
@@ -446,6 +446,15 @@ script = ExtResource("2_hxk2g")
 
 [node name="SM_Barrel_02" parent="warehouse" index="150" unique_id=1282000857]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.915897, 0.6, 25)
+
+[node name="SM_Neon_SKATE" parent="warehouse" index="155" unique_id=402518620]
+visible = false
+
+[node name="SM_Neon_JUNGLE" parent="warehouse" index="156" unique_id=1953273500]
+visible = false
+
+[node name="SM_Column_05" parent="warehouse" index="166" unique_id=65158256]
+visible = false
 
 [node name="GR_T2_Center_Rail_-1_Path3D" type="Path3D" parent="warehouse" unique_id=1644309165]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -5.8, 10.58, -5.661513)

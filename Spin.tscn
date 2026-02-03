@@ -1,0 +1,71 @@
+[gd_scene format=3 uid="uid://01jf65uw1fuk"]
+
+[ext_resource type="Script" uid="uid://gul8xxpwld80" path="res://basic_tricks.gd" id="1_hnu5l"]
+[ext_resource type="PackedScene" uid="uid://c50ts8ughbpj1" path="res://Assets/models/Basic.glb" id="2_hayog"]
+[ext_resource type="PackedScene" uid="uid://dtlxuyo830w2f" path="res://player.tscn" id="3_4a18e"]
+[ext_resource type="PackedScene" uid="uid://h8ebndewl7xp" path="res://Scenes/HelpText.tscn" id="4_v0dg1"]
+[ext_resource type="Script" uid="uid://bd04sjsa2b2jk" path="res://Scripts/HelpText.gd" id="5_ioach"]
+
+[node name="Spin" type="Node3D" unique_id=714113253]
+script = ExtResource("1_hnu5l")
+
+[node name="Basic" parent="." unique_id=549035655 instance=ExtResource("2_hayog")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+
+[node name="OmniLight3D" type="OmniLight3D" parent="." unique_id=2060984949]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1802502, 0)
+omni_range = 4096.0
+
+[node name="Node3D" parent="." unique_id=1491564708 instance=ExtResource("3_4a18e")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.81119204, 0)
+
+[node name="HelpText" parent="." unique_id=1233687243 instance=ExtResource("4_v0dg1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.227873, 1.8543034, -9.700331)
+
+[node name="HelpLabel" parent="HelpText/Sign/FaceTarget" parent_id_path=PackedInt32Array(1233687243, 1705188296) index="0" unique_id=246840923]
+transform = Transform3D(0.9292358, 1.7763568e-15, 0.36948726, 0.36948726, -4.371139e-08, -0.9292357, 1.61508e-08, 0.9999999, -4.0618183e-08, -2.5351713, -0.023714066, 0.059999943)
+text = "Press E twice while in the air
+to preform a Shove-it"
+
+[node name="Sign2" type="Node3D" parent="HelpText" unique_id=1980199014]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 9.7780285, 1.4000001, 0)
+script = ExtResource("5_ioach")
+
+[node name="FaceTarget" type="Node3D" parent="HelpText/Sign2" unique_id=227205036]
+
+[node name="HelpLabel" type="Label3D" parent="HelpText/Sign2/FaceTarget" unique_id=1624950433]
+transform = Transform3D(0.7731212, 0, -0.6342583, -0.6342583, -4.3711385e-08, -0.77312106, -2.772431e-08, 0.9999999, -3.3794194e-08, 0.00038909912, 0, 0.059999943)
+pixel_size = 0.01
+modulate = Color(0.9, 0.98, 1, 1)
+text = "Press R 4x in the air
+to preform a Kickflip"
+font_size = 40
+
+[node name="SignLight" type="OmniLight3D" parent="HelpText/Sign2/FaceTarget" unique_id=1644580703]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.4)
+light_energy = 1.2
+omni_range = 6.0
+omni_attenuation = 2.0
+
+[node name="Sign3" type="Node3D" parent="HelpText" unique_id=19033884]
+transform = Transform3D(0.8760291, -0.48225832, -2.1080181e-08, 0, -4.371139e-08, 1, -0.48225832, -0.8760291, -3.829245e-08, 3.4389393, 1.9044485, -0.5848799)
+script = ExtResource("5_ioach")
+
+[node name="FaceTarget" type="Node3D" parent="HelpText/Sign3" unique_id=910391105]
+
+[node name="HelpLabel" type="Label3D" parent="HelpText/Sign3/FaceTarget" unique_id=1277844645]
+transform = Transform3D(0.7731212, 0, -0.6342583, -0.6342583, -4.3711385e-08, -0.77312106, -2.772431e-08, 0.9999999, -3.3794194e-08, 0.00038909912, 0, 0.059999943)
+pixel_size = 0.01
+modulate = Color(0.9, 0.98, 1, 1)
+text = "Perform both tricks
+to complete this tutorial"
+font_size = 40
+
+[node name="SignLight" type="OmniLight3D" parent="HelpText/Sign3/FaceTarget" unique_id=1401120805]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.4)
+light_energy = 1.2
+omni_range = 6.0
+omni_attenuation = 2.0
+
+[editable path="Node3D"]
+[editable path="HelpText"]

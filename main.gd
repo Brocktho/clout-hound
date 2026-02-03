@@ -203,6 +203,8 @@ func _on_ui_change() -> void:
 	if not is_inside_tree():
 		return
 	if ui_change_sfx and ui_change_sfx.is_inside_tree():
+		ui_change_sfx.set_meta("sfx_base_db", 0.0)
+		ui_change_sfx.volume_db = Global.get_sfx_volume_db(0.0)
 		ui_change_sfx.pitch_scale = _rng.randf_range(0.94, 1.06)
 		ui_change_sfx.play()
 

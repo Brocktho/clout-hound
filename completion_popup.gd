@@ -34,8 +34,10 @@ func _on_return_pressed() -> void:
 	var current_scene := get_tree().current_scene
 	if current_scene and current_scene.has_method("return_to_menu"):
 		current_scene.call_deferred("return_to_menu")
+		queue_free()
 		return
 	get_tree().change_scene_to_file("res://Main.tscn")
+	queue_free()
 
 func _exit_tree() -> void:
 	if Global.completion_popup_active:

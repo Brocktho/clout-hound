@@ -5,4 +5,5 @@
 [resource]
 script = ExtResource("1_x8g3o")
 scene_path = "res://grinding1.tscn"
-level_name = "Grinding"
+preview_image_path = "res://Assets/Pics/Grinding.tres"
+level_name = "Grind Mayhem"

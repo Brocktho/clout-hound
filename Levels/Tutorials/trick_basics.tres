@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="LevelInformation" format=3 uid="uid://bo8b2e71dnipe"]
+
+[ext_resource type="Script" path="res://level_information.gd" id="1_5axkk"]
+
+[resource]
+script = ExtResource("1_5axkk")
+scene_path = "res://Spin.tscn"
+level_name = "Trick Basics"

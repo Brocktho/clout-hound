@@ -97,6 +97,8 @@ func _register_ui_change(control: Control) -> void:
 
 func _on_ui_change() -> void:
 	if ui_change_sfx:
+		ui_change_sfx.set_meta("sfx_base_db", 0.0)
+		ui_change_sfx.volume_db = Global.get_sfx_volume_db(0.0)
 		ui_change_sfx.pitch_scale = _ui_rng.randf_range(0.94, 1.06)
 		ui_change_sfx.play()
 

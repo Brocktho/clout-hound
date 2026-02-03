@@ -7,6 +7,7 @@
 [ext_resource type="AudioStream" uid="uid://cisx6puhqr4rg" path="res://Assets/Audio/Music/ElectronicLoop.wav" id="5_fos0i"]
 [ext_resource type="PackedScene" uid="uid://bap42v8u55v5r" path="res://Credits.tscn" id="6_credits"]
 
+
 [sub_resource type="Environment" id="Environment_main_menu"]
 background_mode = 1
 background_color = Color(0.02, 0.02, 0.03, 1)
@@ -139,3 +140,4 @@ stream = ExtResource("5_fos0i")
 [connection signal="pressed" from="UI/MainMenu/VBoxContainer/ControlsButton" to="." method="_on_controls_button_pressed"]
 [connection signal="pressed" from="UI/MainMenu/VBoxContainer/CreditsButton" to="." method="_on_credits_button_pressed"]
 [connection signal="pressed" from="UI/AudioUnlock/CenterContainer/VBoxContainer/EnableAudioButton" to="." method="_on_audio_unlock_pressed"]
+

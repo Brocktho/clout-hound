@@ -5,10 +5,13 @@
 [ext_resource type="Script" path="res://level_information.gd" id="3_il1aw"]
 [ext_resource type="AudioStream" uid="uid://em6vk6wpdssa" path="res://Assets/Audio/SFX/UI_Change.wav" id="3_ui_change"]
 [ext_resource type="Texture2D" uid="uid://xk57pdhstjlh" path="res://Assets/UI/star_filled.svg" id="4_star_filled"]
+[ext_resource type="Resource" uid="uid://oy0puae5t1e4" path="res://Levels/Tutorials/double_jump.tres" id="5_0a771"]
 [ext_resource type="Resource" uid="uid://761nw4fgaaxn" path="res://Levels/Challenges/advanced_tricks.tres" id="5_hvlej"]
 [ext_resource type="Texture2D" uid="uid://fyuac8njjf71" path="res://Assets/UI/star_empty.svg" id="5_star_empty"]
+[ext_resource type="Resource" uid="uid://bo8b2e71dnipe" path="res://Levels/Tutorials/trick_basics.tres" id="6_7o85a"]
 [ext_resource type="Texture2D" uid="uid://bn43wwwp8o0f" path="res://Assets/UI/clock.svg" id="6_clock"]
 [ext_resource type="Resource" uid="uid://tvv0aa6khesq" path="res://Levels/FreeSkate/Grinding.tres" id="6_il1aw"]
+[ext_resource type="Resource" uid="uid://ba8abf3dot2vc" path="res://Levels/FreeSkate/Warehouse.tres" id="7_clf2l"]
 [ext_resource type="Texture2D" uid="uid://cwgnfsni01sit" path="res://Assets/UI/score.svg" id="7_score"]
 [ext_resource type="Texture2D" uid="uid://bhjcjueejs1ql" path="res://Assets/UI/preview_placeholder.svg" id="8_preview_placeholder"]
 [ext_resource type="Resource" path="res://Levels/Tutorials/rail_tutorial.tres" id="9_rail_tutorial"]
@@ -55,9 +58,9 @@ corner_radius_bottom_left = 8
 layer = 150
 script = ExtResource("1_level_select")
 level_row_scene = ExtResource("2_level_row")
-tutorial_levels = Array[ExtResource("3_il1aw")]([ExtResource("9_rail_tutorial")])
+tutorial_levels = Array[ExtResource("3_il1aw")]([ExtResource("9_rail_tutorial"), ExtResource("5_0a771"), ExtResource("6_7o85a")])
 challenge_levels = Array[ExtResource("3_il1aw")]([ExtResource("5_hvlej")])
-free_skate_levels = Array[ExtResource("3_il1aw")]([ExtResource("6_il1aw")])
+free_skate_levels = Array[ExtResource("3_il1aw")]([ExtResource("6_il1aw"), ExtResource("7_clf2l")])
 star_filled = ExtResource("4_star_filled")
 star_empty = ExtResource("5_star_empty")
 clock_icon = ExtResource("6_clock")
