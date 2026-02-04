@@ -1,0 +1,6 @@
+[gd_resource type="CanvasTexture" format=3 uid="uid://cmylw4iab3jk6"]
+
+[ext_resource type="Texture2D" uid="uid://53ip5sha3nu4" path="res://stages/playable/free_skate/warehouse/art/warehouse.png" id="1_8p4io"]
+
+[resource]
+diffuse_texture = ExtResource("1_8p4io")

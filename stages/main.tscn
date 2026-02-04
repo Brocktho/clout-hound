@@ -1,0 +1,183 @@
+[gd_scene format=3 uid="uid://o8r5uvc2o6hy"]
+
+[ext_resource type="Script" uid="uid://dnas1bh428a6j" path="res://stages/main.gd" id="1_7mycd"]
+[ext_resource type="PackedScene" uid="uid://gess2apgxsa3" path="res://entities/ui/menus/level_select/level_select.tscn" id="2_272bh"]
+[ext_resource type="PackedScene" uid="uid://bap42v8u55v5r" path="res://stages/informative/credits/credits.tscn" id="3_5vw27"]
+[ext_resource type="AudioStream" uid="uid://em6vk6wpdssa" path="res://entities/ui/sound/UI_Change.wav" id="4_kek77"]
+[ext_resource type="Shader" uid="uid://bsrludiireds1" path="res://common/shaders/ui/starfield_spatial.gdshader" id="5_4c57u"]
+[ext_resource type="AudioStream" uid="uid://cisx6puhqr4rg" path="res://assets/Audio/ElectronicLoop.wav" id="6_efxa6"]
+
+[sub_resource type="Environment" id="Environment_main_menu"]
+background_mode = 1
+background_color = Color(0.02, 0.02, 0.03, 1)
+ambient_light_color = Color(1, 1, 1, 1)
+ambient_light_energy = 5.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_starfield_spatial"]
+render_priority = 0
+shader = ExtResource("5_4c57u")
+shader_parameter/star_density = 0.035
+shader_parameter/star_scale = 140.0
+shader_parameter/drift_speed = 0.01
+shader_parameter/base_color = Vector3(0.02, 0.03, 0.05)
+shader_parameter/star_color = Vector3(0.9, 0.95, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_starfield"]
+radius = 50.0
+height = 100.0
+radial_segments = 32
+rings = 16
+
+[sub_resource type="Gradient" id="Gradient_title_pulse_particles"]
+offsets = PackedFloat32Array(0, 0.7, 1)
+colors = PackedColorArray(1, 0.9, 0.7, 0.9, 1, 0.6, 0.2, 0.7, 1, 0.2, 0, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_title_pulse_particles"]
+gradient = SubResource("Gradient_title_pulse_particles")
+width = 8
+height = 8
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_title_pulse_particles"]
+direction = Vector3(0, -1, 0)
+spread = 180.0
+initial_velocity_min = 70.0
+initial_velocity_max = 140.0
+gravity = Vector3(0, 0, 0)
+scale_min = 0.45
+
+[node name="Main" type="Node3D" unique_id=2026450890]
+script = ExtResource("1_7mycd")
+play_scene = ExtResource("2_272bh")
+credits_scene = ExtResource("3_5vw27")
+floater_min_interval = null
+floater_max_interval = null
+floater_min_duration = null
+floater_max_duration = null
+floater_min_height = null
+floater_max_height = null
+floater_vertical_drift = null
+floater_min_z = null
+floater_max_z = null
+floater_min_scale = null
+floater_max_scale = null
+title_pulse_bpm = 135.0
+title_pulse_scale = null
+title_pulse_attack = null
+title_pulse_release = null
+title_pulse_particles_enabled = null
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1066168966]
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=716778484]
+environment = SubResource("Environment_main_menu")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1676542903]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 4)
+
+[node name="UIChangeSfx" type="AudioStreamPlayer" parent="." unique_id=275141104]
+stream = ExtResource("4_kek77")
+
+[node name="StarfieldSphere" type="MeshInstance3D" parent="." unique_id=451918549]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.007083893, 0.1175518, -0.06419563)
+material_override = SubResource("ShaderMaterial_starfield_spatial")
+cast_shadow = 0
+mesh = SubResource("SphereMesh_starfield")
+
+[node name="BackgroundFloaters" type="Node3D" parent="." unique_id=773910275]
+
+[node name="SceneHost" type="Node3D" parent="." unique_id=1956380560]
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=550003550]
+
+[node name="MainMenu" type="Control" parent="UI" unique_id=365032458]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/MainMenu" unique_id=111415742]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -110.0
+offset_top = -120.0
+offset_right = 110.0
+offset_bottom = 120.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="TitleLabel" type="Label" parent="UI/MainMenu/VBoxContainer" unique_id=464276768]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "CloutHound"
+horizontal_alignment = 1
+
+[node name="TitlePulseParticles" type="GPUParticles2D" parent="UI/MainMenu/VBoxContainer/TitleLabel" unique_id=1542245385]
+emitting = false
+amount = 18
+texture = SubResource("GradientTexture2D_title_pulse_particles")
+lifetime = 0.4
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("ParticleProcessMaterial_title_pulse_particles")
+
+[node name="PlayButton" type="Button" parent="UI/MainMenu/VBoxContainer" unique_id=704174821]
+layout_mode = 2
+text = "Play"
+
+[node name="SettingsButton" type="Button" parent="UI/MainMenu/VBoxContainer" unique_id=457875138]
+layout_mode = 2
+text = "Settings"
+
+[node name="ControlsButton" type="Button" parent="UI/MainMenu/VBoxContainer" unique_id=336512808]
+layout_mode = 2
+text = "Controls"
+
+[node name="CreditsButton" type="Button" parent="UI/MainMenu/VBoxContainer" unique_id=1825921713]
+layout_mode = 2
+text = "Credits"
+
+[node name="AudioUnlock" type="Control" parent="UI" unique_id=715852729]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="UI/AudioUnlock" unique_id=585246919]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/AudioUnlock/CenterContainer" unique_id=282666286]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="AudioUnlockLabel" type="Label" parent="UI/AudioUnlock/CenterContainer/VBoxContainer" unique_id=1761757167]
+layout_mode = 2
+text = "Click or press any key to enable audio"
+horizontal_alignment = 1
+
+[node name="EnableAudioButton" type="Button" parent="UI/AudioUnlock/CenterContainer/VBoxContainer" unique_id=518154938]
+layout_mode = 2
+text = "Enable Audio"
+
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="." unique_id=112858342]
+stream = ExtResource("6_efxa6")
+
+[connection signal="pressed" from="UI/MainMenu/VBoxContainer/PlayButton" to="." method="_on_play_button_pressed"]
+[connection signal="pressed" from="UI/MainMenu/VBoxContainer/SettingsButton" to="." method="_on_settings_button_pressed"]
+[connection signal="pressed" from="UI/MainMenu/VBoxContainer/ControlsButton" to="." method="_on_controls_button_pressed"]
+[connection signal="pressed" from="UI/MainMenu/VBoxContainer/CreditsButton" to="." method="_on_credits_button_pressed"]
+[connection signal="pressed" from="UI/AudioUnlock/CenterContainer/VBoxContainer/EnableAudioButton" to="." method="_on_audio_unlock_pressed"]
