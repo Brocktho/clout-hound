@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bap42v8u55v5r"]
 
-[ext_resource type="Script" uid="uid://dkvbacu2rvyrd" path="res://stages/informative/credits/credits.gd" id="1_credits_script"]
+[ext_resource type="Script" uid="uid://dkvbacu2rvyrd" path="res://stages/ui/credits/credits.gd" id="1_credits_script"]
 [ext_resource type="AudioStream" uid="uid://em6vk6wpdssa" path="res://entities/ui/sound/UI_Change.wav" id="2_sfx_click"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_credit_row"]
