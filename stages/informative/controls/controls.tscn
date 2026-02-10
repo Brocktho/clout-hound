@@ -1,0 +1,290 @@
+[gd_scene format=3 uid="uid://dp7n6x23g8dl4"]
+
+[ext_resource type="Script" uid="uid://omrt0qn81s7s" path="res://stages/informative/controls/controls.gd" id="1_qo8cm"]
+[ext_resource type="AudioStream" uid="uid://em6vk6wpdssa" path="res://entities/ui/sound/UI_Change.wav" id="2_xwvqn"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_row"]
+content_margin_left = 6.0
+content_margin_top = 4.0
+content_margin_right = 6.0
+content_margin_bottom = 4.0
+bg_color = Color(1, 1, 1, 0.08)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_row"]
+content_margin_left = 6.0
+content_margin_top = 4.0
+content_margin_right = 6.0
+content_margin_bottom = 4.0
+
+[node name="Controls" type="CanvasLayer" unique_id=1989406200]
+layer = 100
+script = ExtResource("1_qo8cm")
+
+[node name="UIChangeSfx" type="AudioStreamPlayer" parent="." unique_id=189803009]
+stream = ExtResource("2_xwvqn")
+
+[node name="Control" type="Control" parent="." unique_id=454488792]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PointerLockHint" type="Label" parent="Control" unique_id=2095247117]
+visible = false
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 24.0
+offset_bottom = 56.0
+grow_horizontal = 2
+text = "Pointer unlocked. Press Esc to resume."
+horizontal_alignment = 1
+
+[node name="ColorRect" type="ColorRect" parent="Control" unique_id=1961628172]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="Control" unique_id=1071546083]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/CenterContainer" unique_id=511021505]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 20
+
+[node name="Label" type="Label" parent="Control/CenterContainer/VBoxContainer" unique_id=291738157]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Controls"
+horizontal_alignment = 1
+
+[node name="ControlsScroll" type="ScrollContainer" parent="Control/CenterContainer/VBoxContainer" unique_id=1349557634]
+custom_minimum_size = Vector2(520, 280)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ControlsContent" type="VBoxContainer" parent="Control/CenterContainer/VBoxContainer/ControlsScroll" unique_id=1096602008]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="CoreMovementLabel" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent" unique_id=1619311481]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Core Movement"
+horizontal_alignment = 1
+
+[node name="CoreMovementTable" type="GridContainer" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent" unique_id=1694084758]
+layout_mode = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/v_separation = 6
+columns = 2
+
+[node name="CoreMovementHeaderCommand" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/CoreMovementTable" unique_id=1630772225]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Command Name"
+
+[node name="CoreMovementHeaderButton" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/CoreMovementTable" unique_id=1645638525]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Button to Press"
+horizontal_alignment = 2
+
+[node name="CoreMovementRowMove" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/CoreMovementTable" unique_id=866687041]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_row")
+text = "Move"
+
+[node name="CoreMovementRowMoveKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/CoreMovementTable" unique_id=129712699]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_row")
+text = "WASD"
+horizontal_alignment = 2
+
+[node name="CoreMovementRowJump" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/CoreMovementTable" unique_id=1710753596]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxEmpty_row")
+text = "Jump"
+
+[node name="CoreMovementRowJumpKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/CoreMovementTable" unique_id=460265569]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxEmpty_row")
+text = "Space"
+horizontal_alignment = 2
+
+[node name="CoreMovementRowSlide" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/CoreMovementTable" unique_id=2042811541]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_row")
+text = "Slide"
+
+[node name="CoreMovementRowSlideKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/CoreMovementTable" unique_id=1061253689]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_row")
+text = "Left Click (Hold)"
+horizontal_alignment = 2
+
+[node name="CoreMovementRowSlowMo" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/CoreMovementTable" unique_id=1921175084]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxEmpty_row")
+text = "Slow Motion"
+
+[node name="CoreMovementRowSlowMoKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/CoreMovementTable" unique_id=1301532497]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxEmpty_row")
+text = "Right Click"
+horizontal_alignment = 2
+
+[node name="TrickControlsLabel" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent" unique_id=1191991059]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Trick Controls"
+horizontal_alignment = 1
+
+[node name="TrickControlsTable" type="GridContainer" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent" unique_id=119584025]
+layout_mode = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/v_separation = 6
+columns = 2
+
+[node name="TrickControlsHeaderCommand" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/TrickControlsTable" unique_id=126431107]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Command Name"
+
+[node name="TrickControlsHeaderButton" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/TrickControlsTable" unique_id=467505713]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Button to Press"
+horizontal_alignment = 2
+
+[node name="TrickControlsRowKickflip" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/TrickControlsTable" unique_id=1783879617]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_row")
+text = "Kickflip"
+
+[node name="TrickControlsRowKickflipKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/TrickControlsTable" unique_id=491128480]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_row")
+text = "R"
+horizontal_alignment = 2
+
+[node name="TrickControlsRowSpinRight" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/TrickControlsTable" unique_id=1786115332]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxEmpty_row")
+text = "Spin"
+
+[node name="TrickControlsRowSpinRightKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/TrickControlsTable" unique_id=1299865045]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxEmpty_row")
+text = "E"
+horizontal_alignment = 2
+
+[node name="TrickControlsRowBoost" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/TrickControlsTable" unique_id=969382553]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_row")
+text = "Spin + Kickflip"
+
+[node name="TrickControlsRowBoostKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/TrickControlsTable" unique_id=1351109034]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_row")
+text = "Speed Boost"
+horizontal_alignment = 2
+
+[node name="TrickControlsRowGrind" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/TrickControlsTable" unique_id=226538743]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxEmpty_row")
+text = "Grind Rails"
+
+[node name="TrickControlsRowGrindKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/TrickControlsTable" unique_id=103513118]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxEmpty_row")
+text = "Slide to Start Grinding"
+horizontal_alignment = 2
+
+[node name="UiControlsLabel" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent" unique_id=191264679]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "UI Controls"
+horizontal_alignment = 1
+
+[node name="UiControlsTable" type="GridContainer" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent" unique_id=804460639]
+layout_mode = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/v_separation = 6
+columns = 2
+
+[node name="UiControlsHeaderCommand" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/UiControlsTable" unique_id=256227283]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Command Name"
+
+[node name="UiControlsHeaderButton" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/UiControlsTable" unique_id=835782730]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Button to Press"
+horizontal_alignment = 2
+
+[node name="UiControlsRowMenu" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/UiControlsTable" unique_id=1738020032]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_row")
+text = "Toggle Menu / Show Cursor"
+
+[node name="UiControlsRowMenuKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/UiControlsTable" unique_id=887154574]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_row")
+text = "Escape"
+horizontal_alignment = 2
+
+[node name="UiControlsRowHideChat" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/UiControlsTable" unique_id=485048670]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxEmpty_row")
+text = "Hide Stream Chat"
+
+[node name="UiControlsRowHideChatKey" type="Label" parent="Control/CenterContainer/VBoxContainer/ControlsScroll/ControlsContent/UiControlsTable" unique_id=472772593]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxEmpty_row")
+text = "Tab"
+horizontal_alignment = 2
+
+[node name="CloseButton" type="Button" parent="Control/CenterContainer/VBoxContainer" unique_id=401162442]
+layout_mode = 2
+text = "Close"
+
+[connection signal="pressed" from="Control/CenterContainer/VBoxContainer/CloseButton" to="." method="_on_close_button_pressed"]

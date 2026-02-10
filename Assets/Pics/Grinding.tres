@@ -1,6 +1,0 @@
-[gd_resource type="CanvasTexture" format=3 uid="uid://rprfcaamf4a3"]
-
-[ext_resource type="Texture2D" uid="uid://dprruggyn4vco" path="res://Assets/Pics/Grinding.png" id="1_ptr7e"]
-
-[resource]
-diffuse_texture = ExtResource("1_ptr7e")

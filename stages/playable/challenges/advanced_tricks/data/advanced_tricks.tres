@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="LevelInformation" format=3 uid="uid://761nw4fgaaxn"]
+
+[ext_resource type="PackedScene" uid="uid://b0ogdlpricd0m" path="res://stages/playable/challenges/advanced_tricks/advanced_tricks.tscn" id="1_kr3pg"]
+[ext_resource type="Script" uid="uid://dbya48fmfgkj0" path="res://stages/playable/level_information.gd" id="1_level_information"]
+
+[resource]
+script = ExtResource("1_level_information")
+scene = ExtResource("1_kr3pg")
+level_name = "Advanced Tricks"

@@ -20,12 +20,16 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-Global="*res://global.gd"
+Global="*res://utilities/global.gd"
 
 [display]
 
 window/size/viewport_width=2400
 window/size/viewport_height=1020
+
+[global_group]
+
+player=""
 
 [input]
 

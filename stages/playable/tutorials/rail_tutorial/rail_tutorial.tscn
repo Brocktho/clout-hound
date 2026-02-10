@@ -1,0 +1,71 @@
+[gd_scene format=3 uid="uid://b1ew2yfjml5hb"]
+
+[ext_resource type="PackedScene" uid="uid://dtlxuyo830w2f" path="res://entities/player/player.tscn" id="1_g3qwm"]
+[ext_resource type="PackedScene" uid="uid://dkut2wue10bvv" path="res://common/kill_zone/kill_zone.tscn" id="2_2l4cu"]
+[ext_resource type="PackedScene" path="res://entities/environment/hazards/chasm/chasm_dither.tscn" id="3_jb0o8"]
+[ext_resource type="PackedScene" uid="uid://xpasq87ntmij" path="res://entities/triggers/completion_zone/completion_zone.tscn" id="4_7yq18"]
+[ext_resource type="PackedScene" uid="uid://hctlcc47o306" path="res://stages/playable/tutorials/rail_tutorial/rail_teaching.glb" id="5_v2mln"]
+[ext_resource type="PackedScene" uid="uid://h8ebndewl7xp" path="res://entities/ui/spacial/help_text.tscn" id="6_ynuxy"]
+[ext_resource type="Script" uid="uid://bd04sjsa2b2jk" path="res://entities/ui/spacial/help_text.gd" id="7_a4yw6"]
+
+[node name="RailTutorial" type="Node3D" unique_id=1703072201]
+
+[node name="Node3D" parent="." unique_id=170758959 instance=ExtResource("1_g3qwm")]
+transform = Transform3D(-0.09780866, 0, 0.9952052, 0, 1, 0, -0.9952052, 0, -0.09780866, 0, 0.35443056, 0)
+
+[node name="KillZone" parent="." unique_id=1195876588 instance=ExtResource("2_2l4cu")]
+transform = Transform3D(4838.311, 0, 0, 0, 1, 0, 0, 0, 5706.0024, -31.776888, -10.103203, 0)
+
+[node name="ChasmDither" parent="." unique_id=93618548 instance=ExtResource("3_jb0o8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -39.177544, -4.937605, -4.7440567)
+corner_a_path = NodePath("../ChasmCornerA")
+corner_b_path = NodePath("../ChasmCornerB")
+bottom_depth = 24.0
+
+[node name="ChasmCornerA" type="Node3D" parent="." unique_id=1783321078]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -51.193, -5, -11.640469)
+
+[node name="ChasmCornerB" type="Node3D" parent="." unique_id=671991199]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.549, -5, 13.614329)
+
+[node name="CompletionZone" parent="." unique_id=1844977314 instance=ExtResource("4_7yq18")]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, -75.45049, 0, 2.106553)
+
+[node name="RailTeaching2" parent="." unique_id=896303828 instance=ExtResource("5_v2mln")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+
+[node name="HelpText" parent="." unique_id=722429432 instance=ExtResource("6_ynuxy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.118036, 3.3203866, -4.659713)
+
+[node name="Sign" parent="HelpText" index="0" unique_id=1909502759]
+transform = Transform3D(0.35262573, -0.93576443, -4.090356e-08, 0, -4.371139e-08, 1, -0.93576443, -0.35262573, -1.5413761e-08, 0, 1.3999999, 0.6185751)
+
+[node name="HelpLabel" parent="HelpText/Sign/FaceTarget" parent_id_path=PackedInt32Array(722429432, 1705188296) index="0" unique_id=246840923]
+transform = Transform3D(1.0000002, -1.2976518e-15, 0, 0, -4.3711392e-08, -1.0000001, 3.5527137e-15, 0.99999994, -4.3711392e-08, 0.10372114, 0.03908348, 0.059999943)
+text = "LEFT CLICK ABOVE A PIPE
+TO START GRINDING"
+
+[node name="Sign2" type="Node3D" parent="HelpText" unique_id=1307285337]
+transform = Transform3D(-0.29053518, -0.9568645, -4.1825864e-08, 2.9150298e-15, -4.3711392e-08, 1, -0.9568645, 0.29053518, 1.26996955e-08, -25.277334, 1.3999999, 12.69538)
+script = ExtResource("7_a4yw6")
+
+[node name="FaceTarget" type="Node3D" parent="HelpText/Sign2" unique_id=909382003]
+
+[node name="HelpLabel" type="Label3D" parent="HelpText/Sign2/FaceTarget" unique_id=1574498615]
+transform = Transform3D(1.0000002, -1.2976518e-15, 0, 0, -4.3711392e-08, -1.0000001, 3.5527137e-15, 0.99999994, -4.3711392e-08, 0.10372114, 0.03908348, 0.059999943)
+pixel_size = 0.01
+modulate = Color(0.9, 0.98, 1, 1)
+text = "YOU CAN PERFORM TRICKS
+WHILE GRINDING ON RAILS!
+"
+font_size = 40
+
+[node name="SignLight" type="OmniLight3D" parent="HelpText/Sign2/FaceTarget" unique_id=1200068138]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.4)
+light_energy = 1.2
+omni_range = 6.0
+omni_attenuation = 2.0
+
+[editable path="CompletionZone"]
+[editable path="RailTeaching2"]
+[editable path="HelpText"]
