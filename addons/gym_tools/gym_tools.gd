@@ -1,13 +1,14 @@
 @tool
 extends EditorPlugin
 
-enum ToolMode { NONE, PAINT_MATERIAL, PLACE_LABEL, DELETE_MESH, PLACE_MESH }
+enum ToolMode { NONE, PAINT_MATERIAL, PLACE_LABEL, DELETE_MESH, PLACE_MESH, PLACE_SLOPE }
 
 const RAY_LENGTH := 5000.0
 const GRID_SIZE := 0.5
 const DRAG_SCREEN_THRESHOLD := 8.0
 const DRAG_AXIS_DOMINANCE := 1.3
 const DRAG_RETARGET_THRESHOLD := 60.0
+const PREVIEW_NODE_NAME := "GymSlopePreview"
 
 var _dock: VBoxContainer
 var _left_action_picker: OptionButton
@@ -15,6 +16,7 @@ var _right_action_picker: OptionButton
 var _material_picker: EditorResourcePicker
 var _mesh_picker: EditorResourcePicker
 var _place_material_picker: EditorResourcePicker
+var _slope_angle: SpinBox
 var _place_offset_x: SpinBox
 var _place_offset_y: SpinBox
 var _place_offset_z: SpinBox
@@ -29,6 +31,7 @@ var _drag_locked_y := 0.0
 var _drag_last_cell := Vector3i.ZERO
 var _drag_start_screen := Vector2.ZERO
 var _drag_anchor_screen := Vector2.ZERO
+var _slope_rotation := 0
 
 
 func _enter_tree() -> void:
@@ -63,6 +66,7 @@ func _build_dock() -> void:
 	_left_action_picker.add_item("Place Label", ToolMode.PLACE_LABEL)
 	_left_action_picker.add_item("Delete Mesh", ToolMode.DELETE_MESH)
 	_left_action_picker.add_item("Place Mesh", ToolMode.PLACE_MESH)
+	_left_action_picker.add_item("Place Slope", ToolMode.PLACE_SLOPE)
 	_left_action_picker.selected = 1
 	_dock.add_child(_left_action_picker)
 
@@ -76,6 +80,7 @@ func _build_dock() -> void:
 	_right_action_picker.add_item("Place Label", ToolMode.PLACE_LABEL)
 	_right_action_picker.add_item("Delete Mesh", ToolMode.DELETE_MESH)
 	_right_action_picker.add_item("Place Mesh", ToolMode.PLACE_MESH)
+	_right_action_picker.add_item("Place Slope", ToolMode.PLACE_SLOPE)
 	_right_action_picker.selected = 2
 	_dock.add_child(_right_action_picker)
 
@@ -105,6 +110,18 @@ func _build_dock() -> void:
 	_place_material_picker.base_type = "Material"
 	_place_material_picker.editable = true
 	_dock.add_child(_place_material_picker)
+
+	var slope_label := Label.new()
+	slope_label.text = "Slope Angle"
+	_dock.add_child(slope_label)
+
+	_slope_angle = SpinBox.new()
+	_slope_angle.min_value = 5.0
+	_slope_angle.max_value = 85.0
+	_slope_angle.step = 0.5
+	_slope_angle.value = 30.0
+	_slope_angle.suffix = " deg"
+	_dock.add_child(_slope_angle)
 
 	var offset_label := Label.new()
 	offset_label.text = "Place Mesh Grid Offset"
@@ -173,6 +190,10 @@ func _forward_3d_gui_input(camera: Camera3D, event: InputEvent) -> int:
 		return EditorPlugin.AFTER_GUI_INPUT_PASS
 
 	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_R and _is_slope_mode_active():
+			_slope_rotation = (_slope_rotation + 1) % 4
+			print("Gym Tools: slope rotation %d." % _slope_rotation)
+			return EditorPlugin.AFTER_GUI_INPUT_STOP
 		if _try_handle_left_action_keybind(event):
 			return EditorPlugin.AFTER_GUI_INPUT_STOP
 
@@ -196,6 +217,10 @@ func _forward_3d_gui_input(camera: Camera3D, event: InputEvent) -> int:
 			print("Gym Tools: place mesh started.")
 			if _begin_place_mesh_drag(camera, event):
 				return EditorPlugin.AFTER_GUI_INPUT_STOP
+		elif action == ToolMode.PLACE_SLOPE:
+			print("Gym Tools: place slope started.")
+			if _try_place_slope(camera, event.position):
+				return EditorPlugin.AFTER_GUI_INPUT_STOP
 
 	if event is InputEventMouseButton and not event.pressed:
 		if _dragging and event.button_index == _drag_button:
@@ -207,6 +232,10 @@ func _forward_3d_gui_input(camera: Camera3D, event: InputEvent) -> int:
 		if _dragging:
 			if _continue_place_mesh_drag(camera, event.position):
 				return EditorPlugin.AFTER_GUI_INPUT_STOP
+		if _is_slope_mode_active():
+			_update_slope_preview(camera, event.position)
+		else:
+			_clear_slope_preview()
 
 	return EditorPlugin.AFTER_GUI_INPUT_PASS
 
@@ -431,6 +460,45 @@ func _place_mesh_at(root: Node, place_pos: Vector3, cell_key: Vector3i) -> bool:
 	return true
 
 
+func _try_place_slope(camera: Camera3D, screen_pos: Vector2) -> bool:
+	var root := get_editor_interface().get_edited_scene_root()
+	if root == null:
+		print("Gym Tools: place slope skipped (no edited scene root).")
+		return false
+
+	var place_pos := _compute_place_position(camera, screen_pos, null)
+	if place_pos == null:
+		print("Gym Tools: place slope skipped (no hit).")
+		return false
+
+	var anchor_cell := _grid_cell_key(place_pos as Vector3)
+	var length_cells := _slope_length_cells()
+	var cells := _slope_cells_from(anchor_cell, length_cells)
+	if _are_cells_occupied(root, cells):
+		print("Gym Tools: place slope skipped (cell occupied).")
+		return false
+
+	var slope := _build_slope(length_cells)
+	if slope is Node3D:
+		slope.position = _slope_placement_center(anchor_cell, length_cells)
+		slope.rotation.y = _slope_rotation_yaw()
+
+	_apply_place_material(slope)
+
+	var undo_redo := get_undo_redo()
+	undo_redo.create_action("Place Slope")
+	undo_redo.add_do_method(root, "add_child", slope)
+	undo_redo.add_do_method(self, "_set_owner_recursive", slope, root)
+	undo_redo.add_do_method(slope, "add_to_group", "gym_tools_placeable")
+	undo_redo.add_do_method(slope, "set_meta", "gym_tools_grid_cells", cells)
+	undo_redo.add_undo_method(root, "remove_child", slope)
+	undo_redo.add_undo_method(slope, "remove_from_group", "gym_tools_placeable")
+	undo_redo.add_undo_method(slope, "remove_meta", "gym_tools_grid_cells")
+	undo_redo.commit_action()
+	print("Gym Tools: placed slope %s." % slope.name)
+	return true
+
+
 func _raycast_from_camera(camera: Camera3D, screen_pos: Vector2) -> Dictionary:
 	var from := camera.project_ray_origin(screen_pos)
 	var dir := camera.project_ray_normal(screen_pos)
@@ -497,6 +565,100 @@ func _apply_material_recursive(node: Node, material: Material) -> void:
 			node.material_override = material
 	for child in node.get_children():
 		_apply_material_recursive(child, material)
+
+
+func _build_slope(length_cells: int) -> StaticBody3D:
+	var length := float(length_cells) * GRID_SIZE
+	var height := GRID_SIZE
+	var width := GRID_SIZE
+	var ramp_length := _slope_ramp_length()
+	var mesh := _build_slope_mesh(min(ramp_length, length), width, height)
+
+	var body := StaticBody3D.new()
+	body.name = "PlacedSlope"
+
+	var mesh_instance := MeshInstance3D.new()
+	mesh_instance.mesh = mesh
+	body.add_child(mesh_instance)
+
+	var shape := ConvexPolygonShape3D.new()
+	shape.set_points(mesh.get_faces())
+	var collider := CollisionShape3D.new()
+	collider.shape = shape
+	body.add_child(collider)
+
+	var remainder := length - ramp_length
+	if remainder > 0.001:
+		var filler_mesh := BoxMesh.new()
+		filler_mesh.size = Vector3(width, height, remainder)
+		var filler_instance := MeshInstance3D.new()
+		filler_instance.mesh = filler_mesh
+		filler_instance.position = Vector3(0.0, 0.0, ramp_length * 0.5 + remainder * 0.5)
+		body.add_child(filler_instance)
+
+		var filler_shape := BoxShape3D.new()
+		filler_shape.size = Vector3(width, height, remainder)
+		var filler_collider := CollisionShape3D.new()
+		filler_collider.shape = filler_shape
+		filler_collider.position = filler_instance.position
+		body.add_child(filler_collider)
+
+	return body
+
+
+func _build_slope_mesh(length: float, width: float, height: float) -> ArrayMesh:
+	var w := width * 0.5
+	var h := height * 0.5
+	var l := length * 0.5
+
+	var a := Vector3(-w, -h, -l)
+	var b := Vector3(w, -h, -l)
+	var c := Vector3(-w, -h, l)
+	var d := Vector3(w, -h, l)
+	var e := Vector3(-w, h, l)
+	var f := Vector3(w, h, l)
+
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+
+	# Bottom
+	st.add_vertex(a)
+	st.add_vertex(b)
+	st.add_vertex(d)
+	st.add_vertex(a)
+	st.add_vertex(d)
+	st.add_vertex(c)
+
+	# Slope
+	st.add_vertex(a)
+	st.add_vertex(b)
+	st.add_vertex(f)
+	st.add_vertex(a)
+	st.add_vertex(f)
+	st.add_vertex(e)
+
+	# Front
+	st.add_vertex(c)
+	st.add_vertex(d)
+	st.add_vertex(f)
+	st.add_vertex(c)
+	st.add_vertex(f)
+	st.add_vertex(e)
+
+	# Right
+	st.add_vertex(b)
+	st.add_vertex(d)
+	st.add_vertex(f)
+
+	# Left
+	st.add_vertex(a)
+	st.add_vertex(e)
+	st.add_vertex(c)
+
+	st.generate_normals()
+	var mesh := ArrayMesh.new()
+	st.commit(mesh)
+	return mesh
 
 
 func _prepare_placeable(node: Node) -> Node:
@@ -604,13 +766,26 @@ func _is_cell_occupied(root: Node, cell_key: Vector3i) -> bool:
 	var nodes := root.get_tree().get_nodes_in_group("gym_tools_placeable")
 	for node in nodes:
 		if node is Node3D:
-			var existing_key := Vector3i.ZERO
-			if node.has_meta("gym_tools_grid_cell"):
-				existing_key = node.get_meta("gym_tools_grid_cell")
+			if node.has_meta("gym_tools_grid_cells"):
+				var cells := node.get_meta("gym_tools_grid_cells")
+				for cell in cells:
+					if cell == cell_key:
+						return true
 			else:
-				existing_key = _grid_cell_key(node.global_position)
-			if existing_key == cell_key:
-				return true
+				var existing_key := Vector3i.ZERO
+				if node.has_meta("gym_tools_grid_cell"):
+					existing_key = node.get_meta("gym_tools_grid_cell")
+				else:
+					existing_key = _grid_cell_key(node.global_position)
+				if existing_key == cell_key:
+					return true
+	return false
+
+
+func _are_cells_occupied(root: Node, cells: Array) -> bool:
+	for cell in cells:
+		if _is_cell_occupied(root, cell):
+			return true
 	return false
 
 
@@ -624,6 +799,110 @@ func _grid_offset() -> Vector3:
 
 func _screen_for_position(camera: Camera3D, position: Vector3) -> Vector2:
 	return camera.unproject_position(position)
+
+
+func _slope_ramp_length() -> float:
+	var angle := deg_to_rad(_slope_angle.value)
+	var height := GRID_SIZE
+	var length :float = height / max(0.01, tan(angle))
+	return max(0.01, length)
+
+
+func _slope_length_cells() -> int:
+	return int(ceil(_slope_ramp_length() / GRID_SIZE))
+
+
+func _slope_direction() -> Vector3:
+	match _slope_rotation:
+		1:
+			return Vector3.RIGHT
+		2:
+			return Vector3.BACK
+		3:
+			return Vector3.LEFT
+		_:
+			return Vector3.FORWARD
+
+
+func _slope_rotation_yaw() -> float:
+	return _slope_rotation * (PI * 0.5)
+
+
+func _slope_cells_from(anchor_cell: Vector3i, length_cells: int) -> Array:
+	var cells := []
+	cells.resize(length_cells)
+	var dir := _slope_direction()
+	var step := Vector3i(int(dir.x), 0, int(dir.z))
+	for i in range(length_cells):
+		cells[i] = anchor_cell + step * i
+	return cells
+
+
+func _slope_placement_center(anchor_cell: Vector3i, length_cells: int) -> Vector3:
+	var anchor_center := _cell_center(anchor_cell)
+	var total_length := float(length_cells) * GRID_SIZE
+	var offset := _slope_direction() * (total_length * 0.5 - GRID_SIZE * 0.5)
+	return anchor_center + offset
+
+
+func _is_slope_mode_active() -> bool:
+	return _left_action_picker.get_selected_id() == ToolMode.PLACE_SLOPE \
+		or _right_action_picker.get_selected_id() == ToolMode.PLACE_SLOPE
+
+
+func _update_slope_preview(camera: Camera3D, screen_pos: Vector2) -> void:
+	var root := get_editor_interface().get_edited_scene_root()
+	if root == null:
+		return
+
+	var place_pos := _compute_place_position(camera, screen_pos, null)
+	if place_pos == null:
+		return
+
+	var anchor_cell := _grid_cell_key(place_pos as Vector3)
+	var length_cells := _slope_length_cells()
+	var preview := _ensure_slope_preview(root, length_cells)
+	preview.position = _slope_placement_center(anchor_cell, length_cells)
+	preview.rotation.y = _slope_rotation_yaw()
+
+
+func _ensure_slope_preview(root: Node, length_cells: int) -> Node3D:
+	var existing := root.get_node_or_null(PREVIEW_NODE_NAME)
+	if existing and existing is Node3D:
+		var meta_cells := existing.get_meta("gym_tools_slope_cells", -1)
+		if meta_cells == length_cells:
+			return existing
+		existing.queue_free()
+
+	var preview := _build_slope(length_cells)
+	preview.name = PREVIEW_NODE_NAME
+	preview.set_meta("gym_tools_slope_cells", length_cells)
+	preview.set_meta("gym_tools_preview", true)
+	preview.visible = true
+	preview.owner = null
+	if preview is StaticBody3D:
+		preview.collision_layer = 0
+		preview.collision_mask = 0
+	_apply_preview_material(preview)
+	root.add_child(preview)
+	return preview
+
+
+func _clear_slope_preview() -> void:
+	var root := get_editor_interface().get_edited_scene_root()
+	if root == null:
+		return
+	var existing := root.get_node_or_null(PREVIEW_NODE_NAME)
+	if existing:
+		existing.queue_free()
+
+
+func _apply_preview_material(node: Node) -> void:
+	var material := StandardMaterial3D.new()
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.albedo_color = Color(0.2, 0.8, 1.0, 0.35)
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	_apply_material_recursive(node, material)
 
 
 func _action_for_button(event: InputEventMouseButton) -> int:
@@ -642,6 +921,8 @@ func _try_handle_left_action_keybind(event: InputEventKey) -> bool:
 			_left_action_picker.select(_left_action_picker.get_item_index(ToolMode.DELETE_MESH))
 		KEY_4:
 			_left_action_picker.select(_left_action_picker.get_item_index(ToolMode.PLACE_MESH))
+		KEY_5:
+			_left_action_picker.select(_left_action_picker.get_item_index(ToolMode.PLACE_SLOPE))
 		KEY_0:
 			_left_action_picker.select(_left_action_picker.get_item_index(ToolMode.NONE))
 		_:
