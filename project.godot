@@ -27,6 +27,10 @@ Global="*res://utilities/global.gd"
 window/size/viewport_width=2400
 window/size/viewport_height=1020
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/gym_tools/plugin.cfg")
+
 [global_group]
 
 player=""
