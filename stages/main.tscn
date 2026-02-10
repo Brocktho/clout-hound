@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dnas1bh428a6j" path="res://stages/main.gd" id="1_7mycd"]
 [ext_resource type="PackedScene" uid="uid://gess2apgxsa3" path="res://entities/ui/menus/level_select/level_select.tscn" id="2_272bh"]
-[ext_resource type="PackedScene" uid="uid://bap42v8u55v5r" path="res://stages/informative/credits/credits.tscn" id="3_5vw27"]
+[ext_resource type="PackedScene" uid="uid://bap42v8u55v5r" path="res://stages/ui/credits/credits.tscn" id="3_5vw27"]
 [ext_resource type="AudioStream" uid="uid://em6vk6wpdssa" path="res://entities/ui/sound/UI_Change.wav" id="4_kek77"]
 [ext_resource type="Shader" uid="uid://bsrludiireds1" path="res://common/shaders/ui/starfield_spatial.gdshader" id="5_4c57u"]
 [ext_resource type="AudioStream" uid="uid://cisx6puhqr4rg" path="res://assets/Audio/ElectronicLoop.wav" id="6_efxa6"]

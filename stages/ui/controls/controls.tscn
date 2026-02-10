@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dp7n6x23g8dl4"]
 
-[ext_resource type="Script" uid="uid://omrt0qn81s7s" path="res://stages/informative/controls/controls.gd" id="1_qo8cm"]
+[ext_resource type="Script" uid="uid://omrt0qn81s7s" path="res://stages/ui/controls/controls.gd" id="1_qo8cm"]
 [ext_resource type="AudioStream" uid="uid://em6vk6wpdssa" path="res://entities/ui/sound/UI_Change.wav" id="2_xwvqn"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_row"]
