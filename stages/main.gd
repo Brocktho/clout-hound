@@ -13,6 +13,9 @@ extends Node3D
 @onready var scene_host: Node3D = $SceneHost
 @onready var menu_root: Control = $UI/MainMenu
 @onready var audio_unlock_overlay: Control = $UI/AudioUnlock
+@onready var steam_profile_widget: Control = $UI/SteamProfileWidget
+@onready var steam_profile_name: Label = $UI/SteamProfileWidget/MarginContainer/HBoxContainer/UsernameLabel
+@onready var steam_profile_avatar: TextureRect = $UI/SteamProfileWidget/MarginContainer/HBoxContainer/Avatar
 @onready var background_floaters: Node3D = $BackgroundFloaters
 @onready var main_camera: Camera3D = $Camera3D
 @onready var starfield_sphere: MeshInstance3D = $StarfieldSphere
@@ -82,6 +85,7 @@ func _ready():
 		music_player.stream_paused = false
 		if _audio_unlocked:
 			_start_music()
+	call_deferred("_refresh_steam_profile")
 
 func _process(_delta: float) -> void:
 	if menu_root and menu_root.visible and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
@@ -254,6 +258,10 @@ func _start_music() -> void:
 func _set_menu_visible(new_visible: bool) -> void:
 	if menu_root:
 		menu_root.visible = new_visible
+	if steam_profile_widget:
+		steam_profile_widget.visible = new_visible
+	if new_visible:
+		_refresh_steam_profile()
 	_set_title_pulse_active(new_visible)
 	if new_visible:
 		play_button.grab_focus()
@@ -272,6 +280,25 @@ func _set_menu_visible(new_visible: bool) -> void:
 				floater.queue_free()
 		_floaters.clear()
 		_reset_title_pulse()
+
+func _refresh_steam_profile() -> void:
+	if not steam_profile_name or not steam_profile_avatar:
+		return
+	var steamworks := get_node_or_null("/root/Steamworks")
+	if not steamworks:
+		steam_profile_name.text = "Steam offline"
+		steam_profile_avatar.texture = null
+		steam_profile_avatar.visible = false
+		return
+	var name := ""
+	if steamworks.has_method("get_current_player_name"):
+		name = steamworks.get_current_player_name()
+	steam_profile_name.text = name if name != "" else "Steam offline"
+	var avatar: Texture2D
+	if steamworks.has_method("get_current_player_avatar"):
+		avatar = steamworks.get_current_player_avatar()
+	steam_profile_avatar.texture = avatar
+	steam_profile_avatar.visible = avatar != null
 
 func _set_title_pulse_active(active: bool) -> void:
 	if not title_label:

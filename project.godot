@@ -21,6 +21,11 @@ config/icon="res://icon.svg"
 [autoload]
 
 Global="*res://utilities/global.gd"
+Steamworks="*uid://rmfkgcd7shmj"
+
+[debug]
+
+file_logging/enable_file_logging=true
 
 [display]
 
@@ -138,3 +143,7 @@ toggle_overlay={
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+
+[steam]
+
+initialization/app_id=480

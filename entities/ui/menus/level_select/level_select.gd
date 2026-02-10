@@ -127,6 +127,8 @@ func _clear_rows(container: VBoxContainer) -> void:
 func _on_play_requested(level_info: LevelInformation) -> void:
 	if not level_info or not level_info.scene:
 		return
+	if _is_free_skate_level(level_info):
+		_start_free_skate_lobby(level_info)
 	Global.set_current_level(level_info)
 	var current_scene := get_tree().current_scene
 	if current_scene and current_scene.has_method("start_level"):
@@ -153,6 +155,20 @@ func _get_preview_texture_rect() -> TextureRect:
 		&"FreeSkate":
 			return free_skate_preview_texture_rect
 	return tutorials_preview_texture_rect
+
+func _is_free_skate_level(level_info: LevelInformation) -> bool:
+	return free_skate_levels.has(level_info)
+
+func _start_free_skate_lobby(level_info: LevelInformation) -> void:
+	var steamworks := get_node_or_null("/root/Steamworks")
+	if not steamworks or not steamworks.has_method("start_multiplayer"):
+		return
+	var level_name := level_info.level_name
+	if level_name == "":
+		level_name = level_info.scene.resource_path.get_file().get_basename()
+	if level_name == "":
+		level_name = "Free Skate"
+	steamworks.start_multiplayer(level_name)
 
 func _update_tab_labels() -> void:
 	var tutorials_active := _tabs[_current_tab_index] == &"Tutorials"
