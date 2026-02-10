@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://xpasq87ntmij"]
+
+[ext_resource type="Script" uid="uid://cumrjwj3ism56" path="res://entities/triggers/completion_zone/completion_zone.gd" id="1_8csxx"]
+[ext_resource type="PackedScene" path="res://common/ui/completion_popup.tscn" id="2_ljc8y"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_qlg5i"]
+size = Vector3(6, 3, 6)
+
+[node name="CompletionZone" type="Area3D" unique_id=872566676]
+script = ExtResource("1_8csxx")
+popup_path = NodePath("")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=769343339]
+shape = SubResource("BoxShape3D_qlg5i")
+
+[node name="CompletionPopup" parent="." unique_id=1835844602 instance=ExtResource("2_ljc8y")]

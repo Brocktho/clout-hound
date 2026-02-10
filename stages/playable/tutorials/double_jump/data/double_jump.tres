@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="LevelInformation" format=3 uid="uid://oy0puae5t1e4"]
+
+[ext_resource type="PackedScene" uid="uid://cqqh51fhpqk13" path="res://stages/playable/tutorials/double_jump/double_jump.tscn" id="1_hx13i"]
+[ext_resource type="Script" uid="uid://dbya48fmfgkj0" path="res://stages/playable/level_information.gd" id="1_qjdcy"]
+
+[resource]
+script = ExtResource("1_qjdcy")
+scene = ExtResource("1_hx13i")
+level_name = "Double Jump"

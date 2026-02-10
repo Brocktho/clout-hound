@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="LevelInformation" format=3 uid="uid://o44ptgibcs4r"]
+
+[ext_resource type="PackedScene" uid="uid://b1ew2yfjml5hb" path="res://stages/playable/tutorials/rail_tutorial/rail_tutorial.tscn" id="1_0d3rq"]
+[ext_resource type="Script" uid="uid://dbya48fmfgkj0" path="res://stages/playable/level_information.gd" id="1_level_information"]
+
+[resource]
+script = ExtResource("1_level_information")
+scene = ExtResource("1_0d3rq")
+level_name = "Rail Tutorial"

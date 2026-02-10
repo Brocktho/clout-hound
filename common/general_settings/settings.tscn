@@ -1,0 +1,215 @@
+[gd_scene format=3 uid="uid://be50rwf3yw6y"]
+
+[ext_resource type="Script" uid="uid://byc3y4u86o8mg" path="res://common/general_settings/settings.gd" id="1_6txuk"]
+[ext_resource type="AudioStream" uid="uid://em6vk6wpdssa" path="res://entities/ui/sound/UI_Change.wav" id="2_jddjj"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2fv1l"]
+bg_color = Color(0.07, 0.07, 0.07, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1"]
+content_margin_left = 14.0
+content_margin_top = 6.0
+content_margin_right = 14.0
+content_margin_bottom = 6.0
+bg_color = Color(0.9, 0.9, 0.9, 0.12)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.2)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2"]
+bg_color = Color(1, 1, 1, 0.15)
+
+[node name="Settings" type="CanvasLayer" unique_id=889884325]
+layer = 150
+script = ExtResource("1_6txuk")
+
+[node name="UIChangeSfx" type="AudioStreamPlayer" parent="." unique_id=1738481800]
+stream = ExtResource("2_jddjj")
+
+[node name="Control" type="Control" parent="." unique_id=633124477]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Control" unique_id=969243520]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 60.0
+offset_top = 40.0
+offset_right = -60.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_2fv1l")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/Panel" unique_id=224712608]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TabsRow" type="HBoxContainer" parent="Control/Panel/VBoxContainer" unique_id=922652921]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="QHintLabel" type="Label" parent="Control/Panel/VBoxContainer/TabsRow" unique_id=586651204]
+custom_minimum_size = Vector2(36, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Q"
+horizontal_alignment = 1
+
+[node name="GeneralTab" type="PanelContainer" parent="Control/Panel/VBoxContainer/TabsRow" unique_id=1717910274]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_1")
+
+[node name="GeneralTabLabel" type="Label" parent="Control/Panel/VBoxContainer/TabsRow/GeneralTab" unique_id=1517046192]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "General"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ControlsTab" type="PanelContainer" parent="Control/Panel/VBoxContainer/TabsRow" unique_id=1546426547]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_1")
+
+[node name="ControlsTabLabel" type="Label" parent="Control/Panel/VBoxContainer/TabsRow/ControlsTab" unique_id=1535669920]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Controls"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EHintLabel" type="Label" parent="Control/Panel/VBoxContainer/TabsRow" unique_id=1792724430]
+custom_minimum_size = Vector2(36, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "E"
+horizontal_alignment = 1
+
+[node name="CloseButtonTop" type="Button" parent="Control/Panel/VBoxContainer/TabsRow" unique_id=421180390]
+z_index = 10
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+text = "X"
+
+[node name="TabDivider" type="Panel" parent="Control/Panel/VBoxContainer" unique_id=1881149125]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_2")
+
+[node name="ContentArea" type="Control" parent="Control/Panel/VBoxContainer" unique_id=1478356339]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="GeneralPanel" type="Control" parent="Control/Panel/VBoxContainer/ContentArea" unique_id=1530713017]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GeneralContent" type="VBoxContainer" parent="Control/Panel/VBoxContainer/ContentArea/GeneralPanel" unique_id=1961208408]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -180.0
+offset_top = -70.0
+offset_right = 180.0
+offset_bottom = 110.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 14
+
+[node name="SfxLabel" type="Label" parent="Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent" unique_id=396682635]
+layout_mode = 2
+text = "SFX"
+horizontal_alignment = 1
+
+[node name="SfxSlider" type="HSlider" parent="Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent" unique_id=118782555]
+layout_mode = 2
+max_value = 2.0
+step = 0.01
+value = 1.0
+
+[node name="MusicLabel" type="Label" parent="Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent" unique_id=543828170]
+layout_mode = 2
+text = "Music"
+horizontal_alignment = 1
+
+[node name="MusicSlider" type="HSlider" parent="Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent" unique_id=1501587483]
+layout_mode = 2
+max_value = 2.0
+step = 0.01
+value = 1.0
+
+[node name="SensitivityLabel" type="Label" parent="Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent" unique_id=1807093652]
+layout_mode = 2
+text = "Mouse Sensitivity"
+horizontal_alignment = 1
+
+[node name="SensitivitySlider" type="HSlider" parent="Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent" unique_id=1481247562]
+layout_mode = 2
+max_value = 0.5
+step = 0.005
+
+[node name="DisableGrindSfxCheck" type="CheckBox" parent="Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent" unique_id=972486810]
+layout_mode = 2
+text = "Disable Grind Rail SFX"
+
+[node name="BottomButtons" type="HBoxContainer" parent="Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent" unique_id=267836927]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="MainMenuButton" type="Button" parent="Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent/BottomButtons" unique_id=99399090]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Main Menu"
+
+[node name="CloseButton" type="Button" parent="Control/Panel/VBoxContainer/ContentArea/GeneralPanel/GeneralContent/BottomButtons" unique_id=804591539]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Close"
+
+[node name="ControlsPanel" type="Control" parent="Control/Panel/VBoxContainer/ContentArea" unique_id=1967364831]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BottomHint" type="Label" parent="Control" unique_id=630437812]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -220.0
+offset_top = -40.0
+offset_right = 220.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Spacebar to select | ESC to go back"
+horizontal_alignment = 1

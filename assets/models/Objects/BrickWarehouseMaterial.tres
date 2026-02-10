@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://dcuh1v3a7gvg8"]
+
+[ext_resource type="Texture2D" uid="uid://w0f8s2ubgr7j" path="res://assets/models/Objects/windowless_wall_BrickTexture_Baked.png" id="1_0spf3"]
+
+[resource]
+resource_name = "BrickWarehouseMaterial"
+cull_mode = 2
+albedo_texture = ExtResource("1_0spf3")
+roughness = 0.9

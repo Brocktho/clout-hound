@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="LevelInformation" format=3 uid="uid://ba8abf3dot2vc"]
+
+[ext_resource type="Script" uid="uid://dbya48fmfgkj0" path="res://stages/playable/level_information.gd" id="1_dw5x7"]
+[ext_resource type="Texture2D" uid="uid://53ip5sha3nu4" path="res://stages/playable/free_skate/warehouse/art/warehouse.png" id="1_xiol1"]
+[ext_resource type="PackedScene" uid="uid://cvk6i6g5s61c" path="res://stages/playable/free_skate/warehouse/warehouse.tscn" id="2_yddc6"]
+
+[resource]
+script = ExtResource("1_dw5x7")
+scene = ExtResource("2_yddc6")
+preview_image = ExtResource("1_xiol1")
+level_name = "The Warehouse (Prototype)"

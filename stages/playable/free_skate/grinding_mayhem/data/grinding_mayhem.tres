@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="LevelInformation" format=3 uid="uid://tvv0aa6khesq"]
+
+[ext_resource type="Texture2D" uid="uid://dprruggyn4vco" path="res://stages/playable/free_skate/grinding_mayhem/art/grinding_mayhem.png" id="1_train"]
+[ext_resource type="Script" uid="uid://dbya48fmfgkj0" path="res://stages/playable/level_information.gd" id="1_x8g3o"]
+[ext_resource type="PackedScene" uid="uid://l82dcowaeh2w" path="res://stages/playable/free_skate/grinding_mayhem/grinding_mayhem.tscn" id="2_p6orb"]
+
+[resource]
+script = ExtResource("1_x8g3o")
+scene = ExtResource("2_p6orb")
+preview_image = ExtResource("1_train")
+level_name = "Grind Mayhem"
