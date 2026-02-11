@@ -39,16 +39,20 @@ func _ready() -> void:
 
 func start_session(new_lobby_id: int, host_id: int = 0) -> void:
 	if active:
+		print("MultiplayerSession: start_session ignored (already active)")
 		return
 	lobby_id = new_lobby_id
 	if not _steamworks:
+		print("MultiplayerSession: start_session failed (no Steamworks)")
 		return
 	local_steam_id = int(_steamworks.get("steam_id"))
 	host_steam_id = host_id
 	if host_steam_id == 0:
 		host_steam_id = _get_lobby_owner(new_lobby_id)
 	is_host = local_steam_id == host_steam_id
+	print("MultiplayerSession: start_session lobby_id=%s local_id=%s host_id=%s is_host=%s" % [lobby_id, local_steam_id, host_steam_id, is_host])
 	var members := _get_lobby_members(new_lobby_id)
+	print("MultiplayerSession: lobby_members=%s" % members)
 	peer = SteamP2PMultiplayerPeer.new()
 	peer.configure(local_steam_id, host_steam_id, members)
 	var api := get_tree().get_multiplayer()
@@ -60,6 +64,7 @@ func start_session(new_lobby_id: int, host_id: int = 0) -> void:
 func stop_session() -> void:
 	if not active:
 		return
+	print("MultiplayerSession: stop_session")
 	active = false
 	local_player = null
 	players.clear()
@@ -88,6 +93,7 @@ func queue_local_action(action: StringName, tick: int) -> void:
 		"player_id": local_steam_id,
 		"action": StringName(action)
 	}
+	print("MultiplayerSession: send action=%s tick=%s" % [action, tick])
 	_record_action(local_steam_id, packet)
 	_send_to_host(packet)
 
@@ -100,6 +106,7 @@ func notify_local_buffered_trick(trick_name: String) -> void:
 		"player_id": local_steam_id,
 		"trick": trick_name
 	}
+	print("MultiplayerSession: send buffered_trick=%s" % trick_name)
 	_record_action(local_steam_id, packet)
 	_send_to_host(packet)
 
@@ -163,6 +170,7 @@ func _send_local_input_state() -> void:
 		"slide": slide_pressed,
 		"yaw": yaw
 	}
+	print("MultiplayerSession: send input_state move=%s slide=%s" % [move_input, slide_pressed])
 	_record_action(local_steam_id, packet)
 	_send_to_host(packet)
 
@@ -173,6 +181,7 @@ func _poll_packets() -> void:
 		var raw := peer.pop_packet()
 		if raw.is_empty():
 			continue
+		print("MultiplayerSession: recv raw from=%s" % raw.get("peer_id", 0))
 		var payload: PackedByteArray = raw.get("payload", PackedByteArray())
 		if payload.is_empty():
 			continue
@@ -187,6 +196,7 @@ func _handle_packet(packet: Dictionary, sender_id: int) -> void:
 		player_id = sender_id
 	last_heard_msec[player_id] = Time.get_ticks_msec()
 	timed_out[player_id] = false
+	print("MultiplayerSession: handle packet type=%s from=%s player_id=%s" % [packet_type, sender_id, player_id])
 	match packet_type:
 		ACTION_SPAWN_REQUEST:
 			if is_host:
@@ -214,6 +224,7 @@ func _handle_spawn_request(packet: Dictionary, player_id: int) -> void:
 		_send_existing_spawns(player_id)
 		return
 	var spawn_pos: Vector3 = packet.get("initial_position", Vector3.ZERO)
+	print("MultiplayerSession: spawn_request player_id=%s pos=%s" % [player_id, spawn_pos])
 	_spawn_remote_player(player_id, spawn_pos)
 	_send_existing_spawns(player_id)
 	_broadcast_spawn(player_id, spawn_pos)
@@ -225,9 +236,11 @@ func _handle_spawn(packet: Dictionary) -> void:
 	if players.has(player_id):
 		return
 	var spawn_pos: Vector3 = packet.get("initial_position", Vector3.ZERO)
+	print("MultiplayerSession: spawn player_id=%s pos=%s" % [player_id, spawn_pos])
 	_spawn_remote_player(player_id, spawn_pos)
 
 func _handle_despawn_request(_packet: Dictionary, player_id: int) -> void:
+	print("MultiplayerSession: despawn_request player_id=%s" % player_id)
 	_remove_player(player_id)
 	_broadcast_packet({
 		"type": ACTION_DESPAWN,
@@ -236,6 +249,7 @@ func _handle_despawn_request(_packet: Dictionary, player_id: int) -> void:
 
 func _handle_despawn(packet: Dictionary) -> void:
 	var player_id := int(packet.get("player_id", 0))
+	print("MultiplayerSession: despawn player_id=%s" % player_id)
 	_remove_player(player_id)
 
 func _handle_input_state(packet: Dictionary, player_id: int, sender_id: int) -> void:
@@ -299,13 +313,16 @@ func _send_to_host(packet: Dictionary) -> void:
 		return
 	var payload := var_to_bytes(packet)
 	if is_host:
+		print("MultiplayerSession: host relay type=%s" % packet.get("type", ""))
 		peer.broadcast_bytes(payload, local_steam_id)
 	else:
+		print("MultiplayerSession: send_to_host type=%s host_id=%s" % [packet.get("type", ""), host_steam_id])
 		peer.send_bytes_to(host_steam_id, payload)
 
 func _broadcast_packet(packet: Dictionary, except_peer: int = 0, reliable: bool = false) -> void:
 	if not peer:
 		return
+	print("MultiplayerSession: broadcast type=%s except=%s reliable=%s" % [packet.get("type", ""), except_peer, reliable])
 	var payload := var_to_bytes(packet)
 	peer.broadcast_bytes(payload, except_peer, reliable)
 
@@ -340,6 +357,7 @@ func _broadcast_spawn(player_id: int, spawn_pos: Vector3) -> void:
 func _request_spawn() -> void:
 	if not local_player:
 		return
+	print("MultiplayerSession: request_spawn local_id=%s" % local_steam_id)
 	var packet := {
 		"type": ACTION_SPAWN_REQUEST,
 		"player_id": local_steam_id,
@@ -350,15 +368,18 @@ func _request_spawn() -> void:
 func _spawn_remote_player(player_id: int, spawn_pos: Vector3) -> void:
 	var parent := _get_player_parent()
 	if not parent:
+		print("MultiplayerSession: spawn_remote_player failed (no parent)")
 		return
 	var instance := NETWORK_PLAYER_SCENE.instantiate() as NetworkPlayer
 	if not instance:
+		print("MultiplayerSession: spawn_remote_player failed (no instance)")
 		return
 	instance.configure(player_id, false)
 	instance.global_position = spawn_pos
 	instance.remove_from_group("player")
 	parent.add_child(instance)
 	players[player_id] = instance
+	print("MultiplayerSession: spawned remote player_id=%s" % player_id)
 
 func _remove_player(player_id: int) -> void:
 	if player_id == local_steam_id:

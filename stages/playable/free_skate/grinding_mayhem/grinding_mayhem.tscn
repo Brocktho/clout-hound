@@ -920,7 +920,6 @@ mesh = SubResource("BoxMesh_oto1h")
 
 [node name="KillZone" parent="." unique_id=365226044 instance=ExtResource("7_yojso")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60.46442, 0, 0)
-visible = false
 
 [node name="CollisionShape3D" parent="KillZone" index="0"]
 transform = Transform3D(1, 0, 0, 0, 500, 0, 0, 0, 100, -21.908562, 0, 0)
@@ -939,14 +938,12 @@ transform = Transform3D(1, 0, 0, 0, 500, 0, 0, 0, 100, -21.908562, 0, 0)
 
 [node name="KillZone2" parent="." unique_id=1626943265 instance=ExtResource("7_yojso")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -43.549606, 0, 0)
-visible = false
 
 [node name="CollisionShape3D" parent="KillZone2" index="0"]
 transform = Transform3D(1, 0, 0, 0, 500, 0, 0, 0, 100, -21.908562, 0, 0)
 
 [node name="KillZone3" parent="." unique_id=1874942749 instance=ExtResource("7_yojso")]
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, -11.21904, 2.728489, -1.9633026)
-visible = false
 
 [node name="CollisionShape3D" parent="KillZone3" index="0"]
 transform = Transform3D(1, 0, 0, 0, 500, 0, 0, 0, 100, -21.908562, 0, 0)
