@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://entities/player/player.tscn" id="1"]
+[ext_resource type="Script" path="res://entities/player/network_player.gd" id="2"]
+
+[node name="NetworkPlayer" instance=ExtResource("1")]
+script = ExtResource("2")

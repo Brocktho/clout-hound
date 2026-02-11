@@ -22,6 +22,7 @@ config/icon="res://icon.svg"
 
 Global="*res://utilities/global.gd"
 Steamworks="*uid://rmfkgcd7shmj"
+MultiplayerSession="*res://utilities/network/multiplayer_session.gd"
 
 [debug]
 

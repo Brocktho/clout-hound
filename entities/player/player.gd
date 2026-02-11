@@ -14,6 +14,7 @@ signal ragdoll_ended
 signal slide_started(speed: float)
 signal slide_ended
 signal locomotion_state_updated(state: int, speed: float)
+signal buffered_trick_completed(trick_name: String)
 
 
 @export_group("Movement")
@@ -154,6 +155,21 @@ signal locomotion_state_updated(state: int, speed: float)
 # Add the overlay variable
 var live_overlay: LiveOverlay
 var feedback: PlayerFeedback
+var player_id: int = 0
+var use_network_input: bool = false
+
+var _network_move_input: Vector2 = Vector2.ZERO
+var _network_action_pressed: Dictionary = {}
+var _network_action_just_pressed: Dictionary = {}
+var _network_yaw: float = 0.0
+var _multiplayer_session: Node
+
+const _NETWORK_ACTIONS := {
+	&"jump": true,
+	&"spin_left": true,
+	&"spin_right": true,
+	&"kickflip": true
+}
 
 var is_third_person: bool = true
 var is_sliding: bool = false
@@ -266,7 +282,9 @@ var trick_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 func _ready() -> void:
-	add_to_group("player")
+	if not use_network_input:
+		add_to_group("player")
+	_multiplayer_session = get_node_or_null("/root/MultiplayerSession")
 	if not Global.kill_zone_triggered.is_connected(_on_kill_zone_triggered):
 		Global.kill_zone_triggered.connect(_on_kill_zone_triggered)
 	if not Global.level_record_achieved.is_connected(_on_level_record_achieved):
@@ -279,14 +297,14 @@ func _ready() -> void:
 	ragdoll_reset_timer.timeout.connect(_on_ragdoll_reset_timeout)
 	add_child(ragdoll_reset_timer)
 	
-	# Instantiate our new Overlay
-	live_overlay = load("uid://bdjy1dxxtvran").new()
-	add_child(live_overlay)
-	
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	_was_mouse_captured = Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
-	_has_captured_once = _was_mouse_captured
-	call_deferred("_enable_settings_on_mouse_release")
+	if not use_network_input:
+		# Instantiate our new Overlay
+		live_overlay = load("uid://bdjy1dxxtvran").new()
+		add_child(live_overlay)
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		_was_mouse_captured = Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
+		_has_captured_once = _was_mouse_captured
+		call_deferred("_enable_settings_on_mouse_release")
 	mouse_sensitivity = Global.mouse_sensitivity
 	initial_spawn_pos = global_position
 	default_body_rotation = body_mesh.rotation
@@ -319,9 +337,10 @@ func _ready() -> void:
 			KickflipTrick.new(),
 			BarrelRollBufferedTrick.new()
 		]
-	feedback = load("uid://cnknk2quywevg").new()
-	feedback.player = self
-	add_child(feedback)
+	if not use_network_input:
+		feedback = load("uid://cnknk2quywevg").new()
+		feedback.player = self
+		add_child(feedback)
 	
 	_set_state(AnimState.IDLE)
 	
@@ -360,7 +379,63 @@ func _init_camera_pivot() -> void:
 	spring_arm.top_level = true
 	_camera_pivot_pos = spring_arm.global_position
 
+func set_player_id(new_id: int) -> void:
+	player_id = new_id
+
+func set_network_input_enabled(enabled: bool) -> void:
+	use_network_input = enabled
+
+func set_network_input_state(move_input: Vector2, slide_pressed: bool, yaw: float) -> void:
+	use_network_input = true
+	_network_move_input = move_input
+	_network_action_pressed[&"slide"] = slide_pressed
+	_network_yaw = yaw
+
+func queue_network_action(action: StringName) -> void:
+	_network_action_just_pressed[action] = true
+
+func apply_buffered_trick_completion(trick_name: String) -> void:
+	for trick in trick_resources:
+		if trick and trick.display_name == trick_name and trick is BufferedTrick:
+			trick.grant_reward(self)
+			trick_completed.emit(trick.display_name)
+			return
+
+func set_remote_mode(remote: bool) -> void:
+	if remote:
+		if camera:
+			camera.current = false
+			camera.process_mode = Node.PROCESS_MODE_DISABLED
+		if speed_lines:
+			speed_lines.visible = false
+		if slowmo_waves:
+			slowmo_waves.visible = false
+		if slowmo_container:
+			slowmo_container.visible = false
+		if live_overlay:
+			live_overlay.visible = false
+
+func get_move_vector() -> Vector2:
+	if use_network_input:
+		return _network_move_input
+	return Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
+
+func is_action_pressed(action: StringName) -> bool:
+	if use_network_input:
+		return bool(_network_action_pressed.get(action, false))
+	return Input.is_action_pressed(action)
+
+func is_action_just_pressed(action: StringName) -> bool:
+	if use_network_input:
+		return bool(_network_action_just_pressed.get(action, false))
+	var pressed := Input.is_action_just_pressed(action)
+	if pressed and _multiplayer_session and _NETWORK_ACTIONS.has(action):
+		_multiplayer_session.call("queue_local_action", action, Engine.get_physics_frames())
+	return pressed
+
 func _get_movement_basis() -> Basis:
+	if use_network_input:
+		return Basis(Vector3.UP, _network_yaw)
 	if spring_arm:
 		return Basis(Vector3.UP, spring_arm.global_rotation.y)
 	return global_basis
@@ -532,6 +607,8 @@ func setup_outline() -> void:
 	material.next_pass = outline_material
 
 func _unhandled_input(event: InputEvent) -> void:
+	if use_network_input:
+		return
 	if event is InputEventMouseMotion:
 		# Rotate the player horizontally (yaw)
 		rotate_y(-event.relative.x * mouse_sensitivity)
@@ -608,12 +685,13 @@ func update_camera_position() -> void:
 			camera.position = Vector3(0, 0, -camera_distance)	
 			
 func _process(delta: float) -> void:
-	var is_captured := Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
-	if is_captured:
-		_has_captured_once = true
-	if _allow_settings_on_mouse_release and _has_captured_once and _was_mouse_captured and not is_captured and not _is_settings_open() and not _is_completion_popup_open():
-		show_settings(true)
-	_was_mouse_captured = is_captured
+	if not use_network_input:
+		var is_captured := Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
+		if is_captured:
+			_has_captured_once = true
+		if _allow_settings_on_mouse_release and _has_captured_once and _was_mouse_captured and not is_captured and not _is_settings_open() and not _is_completion_popup_open():
+			show_settings(true)
+		_was_mouse_captured = is_captured
 
 	if trick_pose_active:
 		if Time.get_ticks_usec() < trick_pose_end_us:
@@ -624,7 +702,7 @@ func _process(delta: float) -> void:
 		_set_body_outline(false)
 
 	# 1) Decide which animation should be active based on input
-	var input_dir: Vector2 = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
+	var input_dir: Vector2 = get_move_vector()
 	var wants_walk := input_dir.length() > 0.1
 
 	_set_state(AnimState.WALK if wants_walk && !is_grinding && !is_sliding else AnimState.IDLE)
@@ -682,9 +760,9 @@ func _clear_ragdoll_buffer() -> void:
 
 func _physics_process(delta: float) -> void:
 	_update_slowmo(delta)
-	var jump_pressed := Input.is_action_just_pressed("jump")
-	var slide_pressed := Input.is_action_pressed("slide")
-	var input_dir_2d: Vector2 = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
+	var jump_pressed := is_action_just_pressed(&"jump")
+	var slide_pressed := is_action_pressed(&"slide")
+	var input_dir_2d: Vector2 = get_move_vector()
 	var on_floor := is_on_floor()
 
 	if rail_cooldown_timer > 0.0:
@@ -801,6 +879,8 @@ func _physics_process(delta: float) -> void:
 	update_speed_effects(delta)
 	update_outline_color()
 	was_on_floor = on_floor
+	if use_network_input:
+		_network_action_just_pressed.clear()
 
 func _on_grind_requested(rail: GrindRail) -> void:
 	if not rail or is_grinding or is_ragdolling:
@@ -906,7 +986,7 @@ func update_visual_alignment(delta: float) -> void:
 	if is_grinding and current_rail:
 		target_fwd = rail_fwd_dir
 	else:
-		var input_dir: Vector2 = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
+		var input_dir: Vector2 = get_move_vector()
 		if input_dir.length() > 0.1:
 			# Map the 2D input to the player's 3D orientation
 			var world_input := (_get_movement_basis() * Vector3(input_dir.x, 0, input_dir.y)).normalized()
@@ -952,7 +1032,7 @@ func update_visual_alignment(delta: float) -> void:
 #
 #		camera.global_basis = camera_basis.slerp(cam_target, lerp_speed * delta).orthonormalized()
 
-	var input_x: float = Input.get_action_strength("move_right") - Input.get_action_strength("move_left")
+	var input_x: float = get_move_vector().x
 	
 	# If we're sliding, we might want to invert or dampen the lean, 
 	# but for standard movement, tilting into the turn feels best.
@@ -1051,6 +1131,8 @@ func handle_trick_input(_delta: float) -> void:
 		if trick and trick.check_completion(self, _delta):
 			trick.grant_reward(self)
 			trick_completed.emit(trick.display_name)
+			if trick is BufferedTrick:
+				buffered_trick_completed.emit(trick.display_name)
 
 	for trick in trick_resources:
 		if trick:
@@ -1522,7 +1604,7 @@ func enter_rail(rail: Node) -> void:
 	
 	# Determine speed and direction
 	var rail_dir_vec = current_rail.get_direction_at_offset(rail_offset).normalized()
-	var input_dir: Vector2 = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
+	var input_dir: Vector2 = get_move_vector()
 	var has_input: bool = input_dir.length() > 0.1
 	var input_world_dir: Vector3 = Vector3.ZERO
 	if has_input:
@@ -1659,7 +1741,7 @@ func jump_exit_rail() -> void:
 		exit_velocity += Vector3.UP * rail_jump_force
 		
 		# 3. Add Directional Control (Left/Right)
-		var input_dir: Vector2 = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
+		var input_dir: Vector2 = get_move_vector()
 		var lateral_dir: Vector3 = (_get_movement_basis() * Vector3(input_dir.x, 0, 0)).normalized()
 		exit_velocity += lateral_dir * rail_jump_force * 0.5
 		
@@ -1686,7 +1768,7 @@ func _update_slowmo(delta: float) -> void:
 	if real_delta < 0.0 or real_delta > 0.5:
 		real_delta = delta
 
-	if Input.is_action_just_pressed("slow_mo"):
+	if is_action_just_pressed(&"slow_mo"):
 		if slowmo_active:
 			slowmo_active = false
 		elif slowmo_time_left > 0.0:

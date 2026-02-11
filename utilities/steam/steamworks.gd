@@ -52,6 +52,10 @@ func leave_lobby() -> void:
 		return
 	var lobby_id := current_lobby_id
 	current_lobby_id = 0
+	var session := get_node_or_null("/root/MultiplayerSession")
+	if session:
+		session.call("request_despawn")
+		session.call("stop_session")
 	Steam.leaveLobby(lobby_id)
 	emit_signal("lobby_left", lobby_id)
 
@@ -97,6 +101,9 @@ func _on_lobby_joined(lobby_id: int, _permissions: int, _locked: bool, response:
 	current_lobby_id = lobby_id
 	emit_signal("lobby_joined", lobby_id)
 	_print_current_members(lobby_id)
+	var session := get_node_or_null("/root/MultiplayerSession")
+	if session:
+		session.call("start_session", lobby_id)
 
 
 func _on_lobby_chat_update(lobby_id: int, changed_id: int, _making_change_id: int, chat_state: int) -> void:

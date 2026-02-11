@@ -10,7 +10,7 @@ func _init() -> void:
     base_score = 150.0
 
 func process_input(player: Player, _delta: float) -> void:
-    if Input.is_action_just_pressed("kickflip"):
+    if player.is_action_just_pressed("kickflip"):
         started_spin = true
         current_flip += deg_to_rad(player.spin_increment_deg)
 
