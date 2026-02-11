@@ -10,6 +10,7 @@ var player_avatar: Texture2D
 
 var current_lobby_id: int = 0
 var target_level_name := ""
+var lobby_host_id: int = 0
 
 const DEFAULT_APP_ID := 480
 const DEFAULT_LOBBY_SIZE := 16
@@ -89,9 +90,13 @@ func _on_lobby_created(connect_type: int, lobby_id: int) -> void:
 		print("Steam lobby create failed: %s" % connect_type)
 		return
 	current_lobby_id = lobby_id
+	lobby_host_id = steam_id
 	if target_level_name != "":
 		Steam.setLobbyData(lobby_id, "level", target_level_name)
 	emit_signal("lobby_joined", lobby_id)
+	var session := get_node_or_null("/root/MultiplayerSession")
+	if session:
+		session.call("start_session", lobby_id, lobby_host_id)
 
 
 func _on_lobby_joined(lobby_id: int, _permissions: int, _locked: bool, response: int) -> void:
@@ -99,11 +104,12 @@ func _on_lobby_joined(lobby_id: int, _permissions: int, _locked: bool, response:
 		print("Steam lobby join failed: %s" % response)
 		return
 	current_lobby_id = lobby_id
+	lobby_host_id = int(Steam.getLobbyOwner(lobby_id))
 	emit_signal("lobby_joined", lobby_id)
 	_print_current_members(lobby_id)
 	var session := get_node_or_null("/root/MultiplayerSession")
 	if session:
-		session.call("start_session", lobby_id)
+		session.call("start_session", lobby_id, lobby_host_id)
 
 
 func _on_lobby_chat_update(lobby_id: int, changed_id: int, _making_change_id: int, chat_state: int) -> void:

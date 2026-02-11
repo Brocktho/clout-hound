@@ -10,6 +10,8 @@ var _connection_status: int = MultiplayerPeer.CONNECTION_DISCONNECTED
 var _incoming_packets: Array[Dictionary] = []
 var _packet_peer: int = 0
 var _packet_channel: int = DEFAULT_CHANNEL
+var _packet_mode: int = MultiplayerPeer.TRANSFER_MODE_UNRELIABLE
+var _last_payload: PackedByteArray = PackedByteArray()
 var _target_peer: int = 0
 var _transfer_mode: int = MultiplayerPeer.TRANSFER_MODE_UNRELIABLE
 var _transfer_channel: int = DEFAULT_CHANNEL
@@ -72,7 +74,8 @@ func _poll() -> void:
 					_incoming_packets.append({
 						"peer_id": sender_id,
 						"payload": payload,
-						"channel": _steam_channel
+						"channel": _steam_channel,
+						"mode": MultiplayerPeer.TRANSFER_MODE_UNRELIABLE
 					})
 
 func _get_available_packet_count() -> int:
@@ -81,22 +84,31 @@ func _get_available_packet_count() -> int:
 func _get_packet(r_buffer, r_channel) -> Error:
 	if _incoming_packets.is_empty():
 		return ERR_UNAVAILABLE
-	var packet : Dictionary = _incoming_packets.pop_front()
+	var packet: Dictionary = _incoming_packets.pop_front()
 	_packet_peer = int(packet.get("peer_id", 0))
 	_packet_channel = int(packet.get("channel", DEFAULT_CHANNEL))
-	r_channel = _packet_channel
-	var payload: PackedByteArray = packet.get("payload", PackedByteArray())
-	r_buffer.resize(0)
-	r_buffer.append_array(payload)
+	_packet_mode = int(packet.get("mode", MultiplayerPeer.TRANSFER_MODE_UNRELIABLE))
+	_last_payload = packet.get("payload", PackedByteArray())
+	if r_buffer is PackedByteArray:
+		r_buffer.resize(0)
+		r_buffer.append_array(_last_payload)
 	return OK
 
 func _put_packet(p_buffer, p_channel) -> Error:
+	if not (p_buffer is PackedByteArray):
+		return ERR_INVALID_PARAMETER
 	if p_buffer.is_empty():
 		return ERR_INVALID_PARAMETER
 	if _target_peer == 0:
-		broadcast_bytes(p_buffer, 0, _transfer_mode == MultiplayerPeer.TRANSFER_MODE_RELIABLE, p_channel)
+		var channel := _transfer_channel
+		if p_channel is int and p_channel != 0:
+			channel = p_channel
+		broadcast_bytes(p_buffer, 0, _transfer_mode == MultiplayerPeer.TRANSFER_MODE_RELIABLE, channel)
 	else:
-		send_bytes_to(_target_peer, p_buffer, _transfer_mode == MultiplayerPeer.TRANSFER_MODE_RELIABLE, p_channel)
+		var channel := _transfer_channel
+		if p_channel is int and p_channel != 0:
+			channel = p_channel
+		send_bytes_to(_target_peer, p_buffer, _transfer_mode == MultiplayerPeer.TRANSFER_MODE_RELIABLE, channel)
 	return OK
 
 func _set_transfer_channel(channel: int) -> void:
@@ -122,6 +134,24 @@ func _get_packet_peer() -> int:
 
 func _get_packet_channel() -> int:
 	return _packet_channel
+
+func _get_packet_mode() -> int:
+	return _packet_mode
+
+func pop_packet() -> Dictionary:
+	if _incoming_packets.is_empty():
+		return {}
+	var packet: Dictionary = _incoming_packets.pop_front()
+	_packet_peer = int(packet.get("peer_id", 0))
+	_packet_channel = int(packet.get("channel", DEFAULT_CHANNEL))
+	_packet_mode = int(packet.get("mode", MultiplayerPeer.TRANSFER_MODE_UNRELIABLE))
+	_last_payload = packet.get("payload", PackedByteArray())
+	return {
+		"peer_id": _packet_peer,
+		"channel": _packet_channel,
+		"mode": _packet_mode,
+		"payload": _last_payload
+	}
 
 func _get_unique_id() -> int:
 	return _unique_id

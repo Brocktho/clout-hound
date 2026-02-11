@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dtlxuyo830w2f"]
 
-[ext_resource type="Script" uid="uid://b34qrfkbx43q5" path="res://entities/player/player.gd" id="1_bls4j"]
+[ext_resource type="Script" uid="uid://ba7ojktevgo8s" path="res://entities/player/network_player.gd" id="1_bls4j"]
 [ext_resource type="ArrayMesh" uid="uid://djvoga0acqib2" path="res://entities/player/boards/meshes/Board.res" id="2_fkugw"]
 [ext_resource type="ArrayMesh" uid="uid://bhjvh3vj2grbx" path="res://entities/player/characters/pug/meshes/pug_default.res" id="3_8fjmc"]
 [ext_resource type="Script" uid="uid://db7g2h7xv0eui" path="res://entities/ui/web_utils/capture_cursor_button.gd" id="4_qiwj3"]
@@ -266,72 +266,7 @@ script = ExtResource("1_bls4j")
 max_speed = 5.0
 acceleration = 10.0
 friction = 60.0
-air_resistance = null
-jump_velocity = null
-ramp_jump_boost = null
-ramp_jump_min_speed = null
-ramp_jump_max_boost = null
-diagonal_boost = null
-jump_buffer_time = null
-landing_grace_time = null
-slide_friction = null
-slide_control = null
-steering_weight = null
-slope_slide_gravity_modifier = null
-slope_regular_gravity_modifier = null
-slide_visual_z_scale = null
-slide_collider_height_ratio = null
-grind_snap_distance = null
-grind_min_speed = null
-grind_cast_radius_multiplier = null
-mouse_sensitivity = null
-camera_height = null
-camera_distance = null
-base_fov = null
-max_fov_boost = null
-speed_for_max_fov = null
-camera_follow_speed = null
-camera_vertical_speed = null
-third_person_distance = null
-third_person_offset = null
-spin_increment_deg = null
-flip_speed = null
-spin_boost_amount = null
-lean_intensity_player = null
-lean_intensity_board = null
-lean_speed = null
-ragdoll_friction = null
-reset_speed_threshold = null
-ragdoll_buffer_time = null
-trick_resources = null
-trick_stale_factor = null
-ragdoll_bail_sfx = null
-jump_sfx = null
-landing_sfx = null
-land_rail_sfx = null
-airborne_sfx = null
-moving_sfx = null
-grind_sfx = null
-trick_completion_sfx = null
-slowmo_time_scale = null
-slowmo_max_time = null
-slowmo_recharge_rate = null
-slowmo_ui_fade_speed = null
-slowmo_ui_inset_ratio = null
-slowmo_fov_zoom = null
-slowmo_wave_fade_speed = null
-stand_height = null
-slide_height = null
 stand_offset = 0.6
-slide_offset = null
-grind_visual_offset = null
-ragdoll_reset_seconds = null
-rail_jump_force = null
-rail_reacquisition_time = null
-fps = null
-idle_frames = null
-walk_frames = null
-trick_frames = null
 
 [node name="BodyCollision" type="CollisionShape3D" parent="CharacterBody3D" unique_id=1925358547]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.0287746e-08, 0.75587094, 0.68961143)

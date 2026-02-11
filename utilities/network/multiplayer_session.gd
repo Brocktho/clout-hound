@@ -37,14 +37,16 @@ var _local_spawn_sent: bool = false
 func _ready() -> void:
 	_steamworks = get_node_or_null("/root/Steamworks")
 
-func start_session(new_lobby_id: int) -> void:
+func start_session(new_lobby_id: int, host_id: int = 0) -> void:
 	if active:
 		return
 	lobby_id = new_lobby_id
 	if not _steamworks:
 		return
 	local_steam_id = int(_steamworks.get("steam_id"))
-	host_steam_id = _get_lobby_owner(new_lobby_id)
+	host_steam_id = host_id
+	if host_steam_id == 0:
+		host_steam_id = _get_lobby_owner(new_lobby_id)
 	is_host = local_steam_id == host_steam_id
 	var members := _get_lobby_members(new_lobby_id)
 	peer = SteamP2PMultiplayerPeer.new()
@@ -168,12 +170,15 @@ func _poll_packets() -> void:
 	if not peer:
 		return
 	while peer.get_available_packet_count() > 0:
-		var payload : PackedByteArray = peer.get_packet()
+		var raw := peer.pop_packet()
+		if raw.is_empty():
+			continue
+		var payload: PackedByteArray = raw.get("payload", PackedByteArray())
 		if payload.is_empty():
 			continue
 		var packet = bytes_to_var(payload)
 		if packet is Dictionary:
-			_handle_packet(packet, peer.get_packet_peer())
+			_handle_packet(packet, int(raw.get("peer_id", 0)))
 
 func _handle_packet(packet: Dictionary, sender_id: int) -> void:
 	var packet_type := String(packet.get("type", ""))
