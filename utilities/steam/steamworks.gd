@@ -74,6 +74,12 @@ func _register_callbacks() -> void:
 	Steam.lobby_joined.connect(_on_lobby_joined)
 	Steam.lobby_match_list.connect(_on_lobby_match_list)
 	Steam.lobby_chat_update.connect(_on_lobby_chat_update)
+	if Steam.has_signal("p2p_session_request"):
+		Steam.p2p_session_request.connect(_on_p2p_session_request)
+	if Steam.has_signal("p2p_session_connect_fail"):
+		Steam.p2p_session_connect_fail.connect(_on_p2p_session_connect_fail)
+	if Steam.has_method("allowP2PPacketRelay"):
+		Steam.allowP2PPacketRelay(true)
 
 
 func _on_lobby_match_list(lobbies: Array) -> void:
@@ -121,6 +127,16 @@ func _on_lobby_chat_update(lobby_id: int, changed_id: int, _making_change_id: in
 		print("Player left lobby: %s" % Steam.getFriendPersonaName(changed_id))
 	elif (chat_state & Steam.CHAT_MEMBER_STATE_CHANGE_DISCONNECTED) != 0:
 		print("Player disconnected lobby: %s" % Steam.getFriendPersonaName(changed_id))
+
+func _on_p2p_session_request(steam_id_requesting: int) -> void:
+	print("Steamworks: p2p_session_request from %s" % steam_id_requesting)
+	if Steam.has_method("acceptSessionWithUser"):
+		Steam.acceptSessionWithUser(steam_id_requesting)
+	elif Steam.has_method("acceptP2PSessionWithUser"):
+		Steam.acceptP2PSessionWithUser(steam_id_requesting)
+
+func _on_p2p_session_connect_fail(steam_id_failed: int, error_code: int) -> void:
+	print("Steamworks: p2p_session_connect_fail id=%s err=%s" % [steam_id_failed, error_code])
 
 
 func _print_current_members(lobby_id: int) -> void:
