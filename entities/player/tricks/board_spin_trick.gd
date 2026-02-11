@@ -11,9 +11,9 @@ func _init() -> void:
 
 func process_input(player: Player, _delta: float) -> void:
     var spin_input := 0.0
-    if Input.is_action_just_pressed("spin_left"):
+    if player.is_action_just_pressed("spin_left"):
         spin_input += 1.0
-    if Input.is_action_just_pressed("spin_right"):
+    if player.is_action_just_pressed("spin_right"):
         spin_input -= 1.0
 
     if spin_input != 0.0:

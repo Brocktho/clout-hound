@@ -10,7 +10,7 @@ var _input_buffer: Array[Dictionary] = []
 func process_input(_player: Player, _delta: float) -> void:
 	var now := _now_seconds()
 	for action in watched_actions:
-		if Input.is_action_just_pressed(action):
+		if _player.is_action_just_pressed(action):
 			_input_buffer.append({"action": action, "time": now})
 	_prune_buffer(now)
 
