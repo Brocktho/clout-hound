@@ -20,9 +20,6 @@ func _ready() -> void:
 	initialize_steam()
 	if steam_initialized:
 		_register_callbacks()
-		print("Steamworks: initialized steam_id=%s" % steam_id)
-	else:
-		print("Steamworks: Steam singleton not initialized")
 
 
 func _process(_delta: float) -> void:
@@ -45,9 +42,7 @@ func initialize_steam() -> void:
 
 func start_multiplayer(level_name: String) -> void:
 	if not steam_initialized:
-		print("Steamworks: start_multiplayer skipped (steam not initialized)")
 		return
-	print("Steamworks: start_multiplayer level=%s" % level_name)
 	target_level_name = level_name
 	Steam.addRequestLobbyListStringFilter("level", level_name, Steam.LOBBY_COMPARISON_EQUAL)
 	Steam.requestLobbyList()
@@ -56,7 +51,6 @@ func start_multiplayer(level_name: String) -> void:
 func leave_lobby() -> void:
 	if current_lobby_id == 0:
 		return
-	print("Steamworks: leave_lobby lobby_id=%s" % current_lobby_id)
 	var lobby_id := current_lobby_id
 	current_lobby_id = 0
 	var session := get_node_or_null("/root/MultiplayerSession")
@@ -83,14 +77,11 @@ func _register_callbacks() -> void:
 
 
 func _on_lobby_match_list(lobbies: Array) -> void:
-	print("Steamworks: lobby_match_list count=%s" % lobbies.size())
 	if lobbies.is_empty():
-		print("Steamworks: creating lobby")
 		Steam.createLobby(Steam.LOBBY_TYPE_PUBLIC, DEFAULT_LOBBY_SIZE)
 		return
 
 	var lobby_id := int(lobbies[0])
-	print("Steamworks: joining lobby_id=%s" % lobby_id)
 	Steam.joinLobby(lobby_id)
 
 
@@ -100,13 +91,11 @@ func _on_lobby_created(connect_type: int, lobby_id: int) -> void:
 		return
 	current_lobby_id = lobby_id
 	lobby_host_id = steam_id
-	print("Steamworks: lobby_created lobby_id=%s host_id=%s" % [lobby_id, lobby_host_id])
 	if target_level_name != "":
 		Steam.setLobbyData(lobby_id, "level", target_level_name)
 	emit_signal("lobby_joined", lobby_id)
 	var session := get_node_or_null("/root/MultiplayerSession")
 	if session:
-		print("Steamworks: start_session (host)")
 		session.call("start_session", lobby_id, lobby_host_id)
 
 
@@ -116,12 +105,10 @@ func _on_lobby_joined(lobby_id: int, _permissions: int, _locked: bool, response:
 		return
 	current_lobby_id = lobby_id
 	lobby_host_id = int(Steam.getLobbyOwner(lobby_id))
-	print("Steamworks: lobby_joined lobby_id=%s host_id=%s" % [lobby_id, lobby_host_id])
 	emit_signal("lobby_joined", lobby_id)
 	_print_current_members(lobby_id)
 	var session := get_node_or_null("/root/MultiplayerSession")
 	if session:
-		print("Steamworks: start_session (client)")
 		session.call("start_session", lobby_id, lobby_host_id)
 
 
