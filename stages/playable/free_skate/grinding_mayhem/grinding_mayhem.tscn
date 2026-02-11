@@ -688,155 +688,152 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0)
 light_energy = 1.5
 omni_range = 60.0
 
-[node name="CharacterBody3D" parent="." unique_id=1021992033 instance=ExtResource("1_3qja6")]
-transform = Transform3D(0.008220473, 0, -0.9999662, 0, 1, 0, 0.9999662, 0, 0.008220473, -47.838844, -2.067783, 16.626297)
-
 [node name="Grinding2" parent="." unique_id=452767851 instance=ExtResource("2_dvos3")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.878413, 0, 0)
 script = ExtResource("3_iqcoj")
 
-[node name="GR-Staircase-Rail_002" parent="Grinding2/SM_Staircase_Support_04_Post_004" parent_id_path=PackedInt32Array(452767851, 1293413577) index="0" unique_id=2059954100]
+[node name="GR-Staircase-Rail_002" parent="Grinding2/SM_Staircase_Support_04_Post_004" parent_id_path=PackedInt32Array(452767851, 1627618047) index="0" unique_id=334644660]
 script = SubResource("GDScript_thtp8")
 path_suffix = "_Path3D"
 
-[node name="GR-Staircase-Rail_002__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post_004" parent_id_path=PackedInt32Array(452767851, 1293413577) index="2" unique_id=1177566743]
+[node name="GR-Staircase-Rail_002__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post_004" parent_id_path=PackedInt32Array(452767851, 1627618047) index="2" unique_id=1177566743]
 curve = SubResource("Curve3D_tahvt")
 script = ExtResource("5_nbqb7")
 
-[node name="GR-Staircase-Rail" parent="Grinding2/SM_Staircase_Support_04_Post" parent_id_path=PackedInt32Array(452767851, 834706107) index="0" unique_id=1590132064]
+[node name="GR-Staircase-Rail" parent="Grinding2/SM_Staircase_Support_04_Post" parent_id_path=PackedInt32Array(452767851, 1862553987) index="0" unique_id=809729595]
 script = SubResource("GDScript_thtp8")
 path_suffix = "_Path3D"
 
-[node name="GR-Staircase-Rail__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post" parent_id_path=PackedInt32Array(452767851, 834706107) index="2" unique_id=450036659]
+[node name="GR-Staircase-Rail__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post" parent_id_path=PackedInt32Array(452767851, 1862553987) index="2" unique_id=450036659]
 curve = SubResource("Curve3D_7ejmv")
 script = ExtResource("5_nbqb7")
 
-[node name="SM_Floor" parent="Grinding2" index="4" unique_id=735324396]
+[node name="SM_Floor" parent="Grinding2" index="4" unique_id=1281460663]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.4031401, -2.5865035, -0.6544064)
 
-[node name="GR_CoolantLoop_Rail" parent="Grinding2/SM_CoolantLoop_Support_01" parent_id_path=PackedInt32Array(452767851, 2111914859) index="0" unique_id=836605968]
+[node name="GR_CoolantLoop_Rail" parent="Grinding2/SM_CoolantLoop_Support_01" parent_id_path=PackedInt32Array(452767851, 1399764005) index="0" unique_id=804445394]
 script = SubResource("GDScript_thtp8")
 
-[node name="GR_CoolantLoop_Rail_Path3D" type="Path3D" parent="Grinding2/SM_CoolantLoop_Support_01" parent_id_path=PackedInt32Array(452767851, 2111914859) index="2" unique_id=1413337468]
+[node name="GR_CoolantLoop_Rail_Path3D" type="Path3D" parent="Grinding2/SM_CoolantLoop_Support_01" parent_id_path=PackedInt32Array(452767851, 1399764005) index="2" unique_id=1413337468]
 transform = Transform3D(1, 0, 0, 0, 0.8629535, 0, 0, 0, 0.8591319, 0, 0.776, 0)
 curve = SubResource("Curve3D_ysfy7")
 script = ExtResource("5_nbqb7")
 
-[node name="GR-Rail-L" parent="Grinding2/SM_Catwalk_Hanger_01" parent_id_path=PackedInt32Array(452767851, 1029365015) index="0" unique_id=978522118]
+[node name="GR-Rail-L" parent="Grinding2/SM_Catwalk_Hanger_01" parent_id_path=PackedInt32Array(452767851, 1238393230) index="0" unique_id=1589204399]
 script = SubResource("GDScript_thtp8")
 
-[node name="GR-Rail-R" parent="Grinding2/SM_Catwalk_Hanger_01" parent_id_path=PackedInt32Array(452767851, 1029365015) index="1" unique_id=1217760197]
+[node name="GR-Rail-R" parent="Grinding2/SM_Catwalk_Hanger_01" parent_id_path=PackedInt32Array(452767851, 1238393230) index="1" unique_id=1186098014]
 script = SubResource("GDScript_thtp8")
 
-[node name="GR_Catwalk_UtilitySecondary" parent="Grinding2/SM_Catwalk_Hanger_01" parent_id_path=PackedInt32Array(452767851, 1029365015) index="2" unique_id=856484225]
+[node name="GR_Catwalk_UtilitySecondary" parent="Grinding2/SM_Catwalk_Hanger_01" parent_id_path=PackedInt32Array(452767851, 1238393230) index="2" unique_id=1785983282]
 script = SubResource("GDScript_thtp8")
 path_suffix = "_Path3D"
 
-[node name="GR_Catwalk_UtilitySecondary__Path3D" type="Path3D" parent="Grinding2/SM_Catwalk_Hanger_01" parent_id_path=PackedInt32Array(452767851, 1029365015) index="4" unique_id=8432682]
+[node name="GR_Catwalk_UtilitySecondary__Path3D" type="Path3D" parent="Grinding2/SM_Catwalk_Hanger_01" parent_id_path=PackedInt32Array(452767851, 1238393230) index="4" unique_id=8432682]
 transform = Transform3D(-1.1920929e-07, 0.99999994, 0, -0.99999994, -1.1920929e-07, 0, 0, 0, 1, 14.025, -0.37257767, 3.807002)
 curve = SubResource("Curve3D_oto1h")
 script = ExtResource("5_nbqb7")
 
-[node name="GR-Rail-L_Path3D" type="Path3D" parent="Grinding2/SM_Catwalk_Hanger_01" parent_id_path=PackedInt32Array(452767851, 1029365015) index="5" unique_id=1019991836]
+[node name="GR-Rail-L_Path3D" type="Path3D" parent="Grinding2/SM_Catwalk_Hanger_01" parent_id_path=PackedInt32Array(452767851, 1238393230) index="5" unique_id=1019991836]
 transform = Transform3D(-0.6861597, 0.6861599, -7.462e-08, 0.68615973, 0.68615985, 3.0908613e-08, 7.2409485e-08, -2.9993004e-08, -1, -10.4628105, -0.96410084, 1.0568743)
 curve = SubResource("Curve3D_4y11c")
 script = ExtResource("5_nbqb7")
 
-[node name="GR-Rail-R_Path3D" type="Path3D" parent="Grinding2/SM_Catwalk_Hanger_01" parent_id_path=PackedInt32Array(452767851, 1029365015) index="6" unique_id=1260389365]
+[node name="GR-Rail-R_Path3D" type="Path3D" parent="Grinding2/SM_Catwalk_Hanger_01" parent_id_path=PackedInt32Array(452767851, 1238393230) index="6" unique_id=1260389365]
 transform = Transform3D(-0.6861597, 0.6861599, -7.462e-08, 0.68615973, 0.68615985, 3.0908613e-08, 7.2409485e-08, -2.9993004e-08, -1, -10.451355, -0.71327233, 1.0568743)
 curve = SubResource("Curve3D_1u2xm")
 script = ExtResource("5_nbqb7")
 
-[node name="GR_Overhead_Landing" parent="Grinding2/SM_Overhead_LandingSupport_Bracket" parent_id_path=PackedInt32Array(452767851, 1205332938) index="0" unique_id=1682548950]
+[node name="GR_Overhead_Landing" parent="Grinding2/SM_Overhead_LandingSupport_Bracket" parent_id_path=PackedInt32Array(452767851, 1444934641) index="0" unique_id=1662492485]
 script = SubResource("GDScript_thtp8")
 path_suffix = "_Path3D"
 
-[node name="GR_Overhead_Landing__Path3D" type="Path3D" parent="Grinding2/SM_Overhead_LandingSupport_Bracket" parent_id_path=PackedInt32Array(452767851, 1205332938) index="2" unique_id=1350921806]
+[node name="GR_Overhead_Landing__Path3D" type="Path3D" parent="Grinding2/SM_Overhead_LandingSupport_Bracket" parent_id_path=PackedInt32Array(452767851, 1444934641) index="2" unique_id=1350921806]
 transform = Transform3D(1, 0, 0, 0, -3.5762787e-07, -0.99999994, 0, 0.99999994, -3.5762787e-07, 0, 0.121815205, -2.4749985)
 curve = SubResource("Curve3D_pl4po")
 script = ExtResource("5_nbqb7")
 
-[node name="GR-Chandelier-Spiral" parent="Grinding2/SM_HangingSquare_Cable_SE" parent_id_path=PackedInt32Array(452767851, 1723030179) index="0" unique_id=1105185198]
+[node name="GR-Chandelier-Spiral" parent="Grinding2/SM_HangingSquare_Cable_SE" parent_id_path=PackedInt32Array(452767851, 315904266) index="0" unique_id=753717461]
 script = SubResource("GDScript_thtp8")
 path_suffix = "_Path3D"
 path_mode = 1
 
-[node name="GR-Chandelier-Spiral__Path3D" type="Path3D" parent="Grinding2/SM_HangingSquare_Cable_SE" parent_id_path=PackedInt32Array(452767851, 1723030179) index="2" unique_id=1074670780]
+[node name="GR-Chandelier-Spiral__Path3D" type="Path3D" parent="Grinding2/SM_HangingSquare_Cable_SE" parent_id_path=PackedInt32Array(452767851, 315904266) index="2" unique_id=1074670780]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.593647, -6.91626, -6.544154)
 curve = SubResource("Curve3D_djx17")
 script = ExtResource("5_nbqb7")
 
-[node name="GR_Manifold_Pipe_01" parent="Grinding2" index="42" unique_id=1050044302]
+[node name="GR_Manifold_Pipe_01" parent="Grinding2" index="42" unique_id=66227699]
 script = SubResource("GDScript_thtp8")
 
-[node name="GR_Manifold_Pipe_02" parent="Grinding2" index="43" unique_id=1202131998]
+[node name="GR_Manifold_Pipe_02" parent="Grinding2" index="43" unique_id=746851678]
 script = SubResource("GDScript_thtp8")
 
-[node name="GR_Manifold_Pipe_03" parent="Grinding2" index="44" unique_id=844132578]
+[node name="GR_Manifold_Pipe_03" parent="Grinding2" index="44" unique_id=1957455349]
 script = SubResource("GDScript_thtp8")
 
-[node name="GR_Manifold_Pipe_04" parent="Grinding2" index="45" unique_id=107579411]
+[node name="GR_Manifold_Pipe_04" parent="Grinding2" index="45" unique_id=1063153588]
 script = SubResource("GDScript_thtp8")
 
-[node name="GR_Manifold_Pipe_06" parent="Grinding2" index="46" unique_id=1361629925]
+[node name="GR_Manifold_Pipe_06" parent="Grinding2" index="46" unique_id=1601409050]
 script = SubResource("GDScript_thtp8")
 
-[node name="GR_Manifold_Pipe_07" parent="Grinding2" index="47" unique_id=1877246528]
+[node name="GR_Manifold_Pipe_07" parent="Grinding2" index="47" unique_id=1247361136]
 script = SubResource("GDScript_thtp8")
 
-[node name="GR_Drainage_Upper" parent="Grinding2" index="48" unique_id=243720764]
+[node name="GR_Drainage_Upper" parent="Grinding2" index="48" unique_id=46880984]
 script = SubResource("GDScript_thtp8")
 
-[node name="GR_Drainage_Lower" parent="Grinding2" index="49" unique_id=1963403436]
+[node name="GR_Drainage_Lower" parent="Grinding2" index="49" unique_id=61633627]
 script = SubResource("GDScript_thtp8")
 
-[node name="GR_WallHighline_Main" parent="Grinding2" index="50" unique_id=546720674]
+[node name="GR_WallHighline_Main" parent="Grinding2" index="50" unique_id=1478003851]
 script = SubResource("GDScript_thtp8")
 
-[node name="GR_HangingSquare_AccessPipe" parent="Grinding2" index="51" unique_id=323332663]
+[node name="GR_HangingSquare_AccessPipe" parent="Grinding2" index="51" unique_id=217002598]
 script = SubResource("GDScript_thtp8")
 
-[node name="GR-Staircase-Rail_001" parent="Grinding2/SM_Staircase_Support_04_Post_005" parent_id_path=PackedInt32Array(452767851, 1443524003) index="0" unique_id=658635561]
+[node name="GR-Staircase-Rail_001" parent="Grinding2/SM_Staircase_Support_04_Post_005" parent_id_path=PackedInt32Array(452767851, 1733431263) index="0" unique_id=559473556]
 script = SubResource("GDScript_thtp8")
 path_suffix = "_Path3D"
 
-[node name="GR-Staircase-Rail_001__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post_005" parent_id_path=PackedInt32Array(452767851, 1443524003) index="2" unique_id=918495886]
+[node name="GR-Staircase-Rail_001__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post_005" parent_id_path=PackedInt32Array(452767851, 1733431263) index="2" unique_id=918495886]
 curve = SubResource("Curve3D_bx768")
 script = ExtResource("5_nbqb7")
 
-[node name="GR-Staircase-Rail_003" parent="Grinding2/SM_Staircase_Support_04_Post_002" parent_id_path=PackedInt32Array(452767851, 1865222703) index="0" unique_id=1828609968]
+[node name="GR-Staircase-Rail_003" parent="Grinding2/SM_Staircase_Support_04_Post_002" parent_id_path=PackedInt32Array(452767851, 912233863) index="0" unique_id=484838342]
 script = SubResource("GDScript_thtp8")
 path_suffix = "_Path3D"
 
-[node name="GR-Staircase-Rail_003__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post_002" parent_id_path=PackedInt32Array(452767851, 1865222703) index="2" unique_id=60868896]
+[node name="GR-Staircase-Rail_003__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post_002" parent_id_path=PackedInt32Array(452767851, 912233863) index="2" unique_id=60868896]
 transform = Transform3D(0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0, 1, 0, 0, 0)
 curve = SubResource("Curve3D_yuwe1")
 script = ExtResource("5_nbqb7")
 
-[node name="GR_Staircase_Horiz_01" parent="Grinding2/SM_Staircase_Support_04_Post_001" parent_id_path=PackedInt32Array(452767851, 1391919607) index="0" unique_id=2031538155]
+[node name="GR_Staircase_Horiz_01" parent="Grinding2/SM_Staircase_Support_04_Post_001" parent_id_path=PackedInt32Array(452767851, 677676145) index="0" unique_id=280913533]
 script = SubResource("GDScript_thtp8")
 path_suffix = "_Path3D"
 
-[node name="GR_Staircase_Horiz_01__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post_001" parent_id_path=PackedInt32Array(452767851, 1391919607) index="2" unique_id=315200154]
+[node name="GR_Staircase_Horiz_01__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post_001" parent_id_path=PackedInt32Array(452767851, 677676145) index="2" unique_id=315200154]
 transform = Transform3D(0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0, 1, 0, -3.8146973e-06, 0)
 curve = SubResource("Curve3D_u34vq")
 script = ExtResource("5_nbqb7")
 
-[node name="GR_Staircase_Horiz_01_001" parent="Grinding2/SM_Staircase_Support_04_Post_003" parent_id_path=PackedInt32Array(452767851, 1672056942) index="0" unique_id=712046270]
+[node name="GR_Staircase_Horiz_01_001" parent="Grinding2/SM_Staircase_Support_04_Post_003" parent_id_path=PackedInt32Array(452767851, 2003742118) index="0" unique_id=30462040]
 script = SubResource("GDScript_thtp8")
 path_suffix = "_Path3D"
 
-[node name="GR_Staircase_Horiz_01_001__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post_003" parent_id_path=PackedInt32Array(452767851, 1672056942) index="2" unique_id=1103631048]
+[node name="GR_Staircase_Horiz_01_001__Path3D" type="Path3D" parent="Grinding2/SM_Staircase_Support_04_Post_003" parent_id_path=PackedInt32Array(452767851, 2003742118) index="2" unique_id=1103631048]
 transform = Transform3D(0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0, 1, -0.04378438, 0.008167267, 0)
 curve = SubResource("Curve3D_5fyg0")
 script = ExtResource("5_nbqb7")
 
-[node name="GR-Corkscrew-Spiral__Path3D" type="Path3D" parent="Grinding2/SM-Corkscrew_004" parent_id_path=PackedInt32Array(452767851, 1132495096) index="12" unique_id=160964974]
+[node name="GR-Corkscrew-Spiral__Path3D" type="Path3D" parent="Grinding2/SM-Corkscrew_004" parent_id_path=PackedInt32Array(452767851, 1775090807) index="12" unique_id=160964974]
 transform = Transform3D(-9.598828e-08, -1.0562499, 2.7458503e-08, 0.22987568, 7.45247e-09, 0.97322, -0.97322005, 1.5956762e-07, 0.22987565, 12.63964, -2.4998522, -0.2581005)
 curve = ExtResource("6_6ee5e")
 script = ExtResource("5_nbqb7")
 
-[node name="GR_CoolantRail" parent="Grinding2/Empty" parent_id_path=PackedInt32Array(452767851, 1786973488) index="0" unique_id=782892350]
+[node name="GR_CoolantRail" parent="Grinding2/Empty" parent_id_path=PackedInt32Array(452767851, 35796087) index="0" unique_id=1226638491]
 script = SubResource("GDScript_thtp8")
 path_suffix = "_Path3D"
 path_mode = 1
@@ -845,23 +842,23 @@ use_centerline_seed_y = true
 centerline_seed_y = 6.5
 pipe_radius = 0.375
 
-[node name="GR_CoolantRail__Path3D" type="Path3D" parent="Grinding2/Empty" parent_id_path=PackedInt32Array(452767851, 1786973488) index="4" unique_id=139188877]
+[node name="GR_CoolantRail__Path3D" type="Path3D" parent="Grinding2/Empty" parent_id_path=PackedInt32Array(452767851, 35796087) index="4" unique_id=139188877]
 transform = Transform3D(0, 1, 0, -0.77194935, 0, 0, 0, 0, 0.77194935, -22.590963, 0.20817757, -8.099123)
 curve = SubResource("Curve3D_nsqis")
 script = ExtResource("5_nbqb7")
 
-[node name="GR_Parallel_01_001" parent="Grinding2/Empty_001" parent_id_path=PackedInt32Array(452767851, 779686478) index="0" unique_id=952731297]
+[node name="GR_Parallel_01_001" parent="Grinding2/Empty_001" parent_id_path=PackedInt32Array(452767851, 1942335148) index="0" unique_id=2011535821]
 script = SubResource("GDScript_thtp8")
 
-[node name="GR_Parallel_01_001_Path3D" type="Path3D" parent="Grinding2/Empty_001" parent_id_path=PackedInt32Array(452767851, 779686478) index="4" unique_id=1177671554]
+[node name="GR_Parallel_01_001_Path3D" type="Path3D" parent="Grinding2/Empty_001" parent_id_path=PackedInt32Array(452767851, 1942335148) index="4" unique_id=1177671554]
 transform = Transform3D(1.1920929e-07, -0.01299721, 0.9999155, -0.99999994, 0, 8.940697e-08, 2.9802322e-08, -0.9999155, -0.01299715, -0.11439896, 0.36257625, 0.34641457)
 curve = SubResource("Curve3D_tpl54")
 script = ExtResource("5_nbqb7")
 
-[node name="GR_Parallel_01" parent="Grinding2/Empty_002" parent_id_path=PackedInt32Array(452767851, 43288723) index="0" unique_id=292338348]
+[node name="GR_Parallel_01" parent="Grinding2/Empty_002" parent_id_path=PackedInt32Array(452767851, 731105009) index="0" unique_id=41447317]
 script = SubResource("GDScript_thtp8")
 
-[node name="GR_Parallel_01_Path3D" type="Path3D" parent="Grinding2/Empty_002" parent_id_path=PackedInt32Array(452767851, 43288723) index="4" unique_id=283404472]
+[node name="GR_Parallel_01_Path3D" type="Path3D" parent="Grinding2/Empty_002" parent_id_path=PackedInt32Array(452767851, 731105009) index="4" unique_id=283404472]
 transform = Transform3D(1.1920929e-07, -0.01299721, 0.9999155, -0.99999994, 0, 8.940697e-08, 2.9802322e-08, -0.9999155, -0.01299715, -0.11819458, -0.020494223, 0.5734558)
 curve = SubResource("Curve3D_4dt6n")
 script = ExtResource("5_nbqb7")
@@ -953,6 +950,8 @@ visible = false
 
 [node name="CollisionShape3D" parent="KillZone3" index="0"]
 transform = Transform3D(1, 0, 0, 0, 500, 0, 0, 0, 100, -21.908562, 0, 0)
+
+[node name="Node3D" parent="." unique_id=1491564708 instance=ExtResource("1_3qja6")]
 
 [editable path="Grinding2"]
 [editable path="KillZone"]
