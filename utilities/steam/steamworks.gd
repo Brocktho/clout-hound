@@ -113,6 +113,7 @@ func _on_lobby_joined(lobby_id: int, _permissions: int, _locked: bool, response:
 	lobby_host_id = int(Steam.getLobbyOwner(lobby_id))
 	emit_signal("lobby_joined", lobby_id)
 	_print_current_members(lobby_id)
+	_accept_lobby_members(lobby_id)
 	var session := get_node_or_null("/root/MultiplayerSession")
 	if session:
 		session.call("start_session", lobby_id, lobby_host_id)
@@ -123,6 +124,7 @@ func _on_lobby_chat_update(lobby_id: int, changed_id: int, _making_change_id: in
 		return
 	if (chat_state & Steam.CHAT_MEMBER_STATE_CHANGE_ENTERED) != 0:
 		print("Player joined lobby: %s" % Steam.getFriendPersonaName(changed_id))
+		_accept_p2p_session(changed_id)
 	elif (chat_state & Steam.CHAT_MEMBER_STATE_CHANGE_LEFT) != 0:
 		print("Player left lobby: %s" % Steam.getFriendPersonaName(changed_id))
 	elif (chat_state & Steam.CHAT_MEMBER_STATE_CHANGE_DISCONNECTED) != 0:
@@ -130,13 +132,27 @@ func _on_lobby_chat_update(lobby_id: int, changed_id: int, _making_change_id: in
 
 func _on_p2p_session_request(steam_id_requesting: int) -> void:
 	print("Steamworks: p2p_session_request from %s" % steam_id_requesting)
-	if Steam.has_method("acceptSessionWithUser"):
-		Steam.acceptSessionWithUser(steam_id_requesting)
-	elif Steam.has_method("acceptP2PSessionWithUser"):
-		Steam.acceptP2PSessionWithUser(steam_id_requesting)
+	_accept_p2p_session(steam_id_requesting)
 
 func _on_p2p_session_connect_fail(steam_id_failed: int, error_code: int) -> void:
 	print("Steamworks: p2p_session_connect_fail id=%s err=%s" % [steam_id_failed, error_code])
+
+func _accept_lobby_members(lobby_id: int) -> void:
+	if not Steam:
+		return
+	var member_count := int(Steam.getNumLobbyMembers(lobby_id))
+	for i in range(member_count):
+		var member_id := int(Steam.getLobbyMemberByIndex(lobby_id, i))
+		if member_id != 0 and member_id != steam_id:
+			_accept_p2p_session(member_id)
+
+func _accept_p2p_session(target_id: int) -> void:
+	if not Steam:
+		return
+	if Steam.has_method("acceptSessionWithUser"):
+		Steam.acceptSessionWithUser(target_id)
+	elif Steam.has_method("acceptP2PSessionWithUser"):
+		Steam.acceptP2PSessionWithUser(target_id)
 
 
 func _print_current_members(lobby_id: int) -> void:
