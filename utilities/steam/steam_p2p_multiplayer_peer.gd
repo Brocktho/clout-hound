@@ -27,6 +27,7 @@ func configure(local_id: int, host_id: int, member_ids: Array[int]) -> void:
 		if member_id == local_id:
 			continue
 		_peers[member_id] = true
+	print("SteamP2PMultiplayerPeer: configure local_id=%s host_id=%s peers=%s" % [local_id, host_id, _peers.keys()])
 
 func add_peer(peer_id: int) -> void:
 	if peer_id == _unique_id:
@@ -44,6 +45,7 @@ func send_bytes_to(peer_id: int, payload: PackedByteArray, reliable: bool = fals
 		return
 	if not Steam or not Steam.has_method("sendMessageToUser"):
 		return
+	print("SteamP2PMultiplayerPeer: send to=%s bytes=%s reliable=%s channel=%s" % [peer_id, payload.size(), reliable, channel])
 	var flags := Steam.NETWORKING_SEND_UNRELIABLE
 	if reliable:
 		flags = Steam.NETWORKING_SEND_RELIABLE
@@ -77,6 +79,7 @@ func _poll() -> void:
 						"channel": _steam_channel,
 						"mode": MultiplayerPeer.TRANSFER_MODE_UNRELIABLE
 					})
+					print("SteamP2PMultiplayerPeer: recv from=%s bytes=%s" % [sender_id, payload.size()])
 
 func _get_available_packet_count() -> int:
 	return _incoming_packets.size()
@@ -92,6 +95,7 @@ func _get_packet(r_buffer, r_channel) -> Error:
 	if r_buffer is PackedByteArray:
 		r_buffer.resize(0)
 		r_buffer.append_array(_last_payload)
+	print("SteamP2PMultiplayerPeer: _get_packet peer=%s bytes=%s" % [_packet_peer, _last_payload.size()])
 	return OK
 
 func _put_packet(p_buffer, p_channel) -> Error:
@@ -109,6 +113,7 @@ func _put_packet(p_buffer, p_channel) -> Error:
 		if p_channel is int and p_channel != 0:
 			channel = p_channel
 		send_bytes_to(_target_peer, p_buffer, _transfer_mode == MultiplayerPeer.TRANSFER_MODE_RELIABLE, channel)
+	print("SteamP2PMultiplayerPeer: _put_packet target=%s bytes=%s" % [_target_peer, p_buffer.size()])
 	return OK
 
 func _set_transfer_channel(channel: int) -> void:
@@ -146,6 +151,7 @@ func pop_packet() -> Dictionary:
 	_packet_channel = int(packet.get("channel", DEFAULT_CHANNEL))
 	_packet_mode = int(packet.get("mode", MultiplayerPeer.TRANSFER_MODE_UNRELIABLE))
 	_last_payload = packet.get("payload", PackedByteArray())
+	print("SteamP2PMultiplayerPeer: pop_packet peer=%s bytes=%s" % [_packet_peer, _last_payload.size()])
 	return {
 		"peer_id": _packet_peer,
 		"channel": _packet_channel,
