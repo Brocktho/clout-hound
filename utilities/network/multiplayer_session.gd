@@ -179,47 +179,45 @@ func _poll_packets() -> void:
 			_handle_packet(packet, int(raw.get("peer_id", 0)))
 
 func _handle_packet(packet: Dictionary, sender_id: int) -> void:
-	var packet_type := String(packet.get("type", ""))
-	var player_id := int(packet.get("player_id", 0))
-	if player_id == 0:
-		player_id = sender_id
-	
-	# Diagnostic: log ALL packets (remove this after debugging)
-	if packet_type != ACTION_HEARTBEAT:
-		print("MultiplayerSession: recv type=%s from=%s player_id=%s" % [packet_type, sender_id, player_id])
-	
-	last_heard_msec[player_id] = Time.get_ticks_msec()
-	timed_out[player_id] = false
-	match packet_type:
-		"handshake":
-			print("MultiplayerSession: handshake from %s" % player_id)
-			# Accept their session back
-			Steam.acceptP2PSessionWithUser(player_id)
-			# Confirm our own handshake and send one back
-			peer.confirm_handshake()
-			var reply := {"type": "handshake", "player_id": local_steam_id}
-			var reply_payload := var_to_bytes(reply)
-			peer.send_bytes_to(player_id, reply_payload, true)
-		ACTION_SPAWN_REQUEST:
-			if is_host:
-				_handle_spawn_request(packet, player_id)
-		ACTION_SPAWN:
-			if not is_host:
-				_handle_spawn(packet)
-		ACTION_DESPAWN_REQUEST:
-			if is_host:
-				_handle_despawn_request(packet, player_id)
-		ACTION_DESPAWN:
-			if not is_host:
-				_handle_despawn(packet)
-		ACTION_INPUT_STATE:
-			_handle_input_state(packet, player_id, sender_id)
-		ACTION_EVENT:
-			_handle_action_event(packet, player_id, sender_id)
-		ACTION_BUFFERED_TRICK:
-			_handle_buffered_trick(packet, player_id, sender_id)
-		ACTION_HEARTBEAT:
-			pass
+    var packet_type := String(packet.get("type", ""))
+    var player_id := int(packet.get("player_id", 0))
+    if player_id == 0:
+        player_id = sender_id
+
+    if packet_type != ACTION_HEARTBEAT:
+        print("MultiplayerSession: recv type=%s from=%s player_id=%s" % [packet_type, sender_id, player_id])
+
+    last_heard_msec[player_id] = Time.get_ticks_msec()
+    timed_out[player_id] = false
+    match packet_type:
+        "handshake":
+            print("MultiplayerSession: handshake from %s" % player_id)
+            Steam.acceptP2PSessionWithUser(player_id)
+            if not peer._handshake_confirmed:
+                peer.confirm_handshake()
+                var reply := {"type": "handshake", "player_id": local_steam_id}
+                var reply_payload := var_to_bytes(reply)
+                peer.send_bytes_to(player_id, reply_payload, true)
+        ACTION_SPAWN_REQUEST:
+            if is_host:
+                _handle_spawn_request(packet, player_id)
+        ACTION_SPAWN:
+            if not is_host:
+                _handle_spawn(packet)
+        ACTION_DESPAWN_REQUEST:
+            if is_host:
+                _handle_despawn_request(packet, player_id)
+        ACTION_DESPAWN:
+            if not is_host:
+                _handle_despawn(packet)
+        ACTION_INPUT_STATE:
+            _handle_input_state(packet, player_id, sender_id)
+        ACTION_EVENT:
+            _handle_action_event(packet, player_id, sender_id)
+        ACTION_BUFFERED_TRICK:
+            _handle_buffered_trick(packet, player_id, sender_id)
+        ACTION_HEARTBEAT:
+            pass
 
 func _handle_spawn_request(packet: Dictionary, player_id: int) -> void:
 	if players.has(player_id):

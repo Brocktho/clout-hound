@@ -30,31 +30,32 @@ func configure(local_id: int, host_id: int, lobby_id: int) -> void:
 	_send_handshake()
 
 func _send_handshake() -> void:
-	var handshake := {"type": "handshake", "player_id": _unique_id}
-	var payload := var_to_bytes(handshake)
-	var members := _get_lobby_members()
-	for member_id in members:
-		if member_id == _unique_id:
-			continue
-		# Accept their session too (bidirectional)
-		Steam.acceptP2PSessionWithUser(member_id)
-		var success := Steam.sendP2PPacket(member_id, payload, Steam.P2P_SEND_RELIABLE, DEFAULT_CHANNEL)
-		print("SteamP2PMultiplayerPeer: sent handshake to %s success=%s" % [member_id, success])
-	_handshake_sent_time = Time.get_ticks_msec()
+    var handshake := {"type": "handshake", "player_id": _unique_id}
+    var payload := var_to_bytes(handshake)
+    var members := _get_lobby_members()
+    for member_id in members:
+        if member_id == _unique_id:
+            continue
+        # Accept their session too (bidirectional)
+        Steam.acceptP2PSessionWithUser(member_id)
+        var success := send_bytes_to(member_id, payload, true)
+        print("SteamP2PMultiplayerPeer: sent handshake to %s via send_bytes_to, success=%s" % [member_id, success])
+    _handshake_sent_time = Time.get_ticks_msec()
 
 func confirm_handshake() -> void:
 	_handshake_confirmed = true
 
-func send_bytes_to(peer_id: int, payload: PackedByteArray, reliable: bool = true, channel: int = DEFAULT_CHANNEL) -> void:
-	if peer_id == 0 or peer_id == _unique_id:
-		return
-	if not Steam:
-		print("SteamP2PMultiplayerPeer: No Steam singleton")
-		return
-	var send_type := Steam.P2P_SEND_RELIABLE if reliable else Steam.P2P_SEND_UNRELIABLE
-	var success := Steam.sendP2PPacket(peer_id, payload, send_type, channel)
-	if not success:
-		print("SteamP2PMultiplayerPeer: sendP2PPacket failed to peer %s" % peer_id)
+func send_bytes_to(peer_id: int, payload: PackedByteArray, reliable: bool = true, channel: int = DEFAULT_CHANNEL) -> bool:
+    if peer_id == 0 or peer_id == _unique_id:
+        return false
+    if not Steam:
+        print("SteamP2PMultiplayerPeer: No Steam singleton")
+        return false
+    var send_type := Steam.P2P_SEND_RELIABLE if reliable else Steam.P2P_SEND_UNRELIABLE
+    var success := Steam.sendP2PPacket(peer_id, payload, send_type, channel)
+    if not success:
+        print("SteamP2PMultiplayerPeer: sendP2PPacket failed to peer %s" % peer_id)
+    return success
 
 func broadcast_bytes(payload: PackedByteArray, except_peer: int = 0, reliable: bool = false, channel: int = DEFAULT_CHANNEL) -> void:
 	var members := _get_lobby_members()
