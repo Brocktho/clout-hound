@@ -1,175 +1,101 @@
-extends MultiplayerPeerExtension
 class_name SteamP2PMultiplayerPeer
 
 const DEFAULT_CHANNEL := 0
-const MAX_MESSAGES_PER_POLL := 64
+const PACKET_READ_LIMIT := 32
 
 var _unique_id: int = 0
+var _host_id: int = 0
 var _is_server: bool = false
-var _connection_status: int = MultiplayerPeer.CONNECTION_DISCONNECTED
+var _lobby_id: int = 0
 var _incoming_packets: Array[Dictionary] = []
-var _packet_peer: int = 0
-var _packet_channel: int = DEFAULT_CHANNEL
-var _packet_mode: int = MultiplayerPeer.TRANSFER_MODE_UNRELIABLE
-var _last_payload: PackedByteArray = PackedByteArray()
-var _target_peer: int = 0
-var _transfer_mode: int = MultiplayerPeer.TRANSFER_MODE_UNRELIABLE
-var _transfer_channel: int = DEFAULT_CHANNEL
-var _peers: Dictionary = {}
-var _steam_channel: int = DEFAULT_CHANNEL
 
-func configure(local_id: int, host_id: int, member_ids: Array[int]) -> void:
+func configure(local_id: int, host_id: int, lobby_id: int) -> void:
 	_unique_id = local_id
+	_host_id = host_id
 	_is_server = local_id == host_id
-	_connection_status = MultiplayerPeer.CONNECTION_CONNECTED
-	_peers.clear()
-	for member_id in member_ids:
-		if member_id == local_id:
+	_lobby_id = lobby_id
+	_incoming_packets.clear()
+
+	# Enable relay fallback
+	if Steam and Steam.has_method("allowP2PPacketRelay"):
+		Steam.allowP2PPacketRelay(true)
+
+	# Send handshake to all current lobby members so they accept our P2P session
+	_send_handshake()
+
+func _send_handshake() -> void:
+	var handshake := {"type": "handshake", "player_id": _unique_id}
+	var payload := var_to_bytes(handshake)
+	var members := _get_lobby_members()
+	for member_id in members:
+		if member_id == _unique_id:
 			continue
-		_peers[member_id] = true
-
-func add_peer(peer_id: int) -> void:
-	if peer_id == _unique_id:
-		return
-	_peers[peer_id] = true
-
-func remove_peer(peer_id: int) -> void:
-	_peers.erase(peer_id)
-
-func get_peer_ids() -> Array[int]:
-	return _peers.keys()
+		Steam.sendP2PPacket(member_id, payload, Steam.P2P_SEND_RELIABLE, DEFAULT_CHANNEL)
+		print("SteamP2PMultiplayerPeer: sent handshake to %s" % member_id)
 
 func send_bytes_to(peer_id: int, payload: PackedByteArray, reliable: bool = true, channel: int = DEFAULT_CHANNEL) -> void:
-	if peer_id == 0:
-		print("SteamP2PMultiplayerPeer: send_bytes_to() peer_id=0 Return")
+	if peer_id == 0 or peer_id == _unique_id:
 		return
-	if not Steam or not Steam.has_method("sendMessageToUser"):
-		print("No Steam.sendMessageToUser()")
+	if not Steam:
+		print("SteamP2PMultiplayerPeer: No Steam singleton")
 		return
-	var flags := Steam.NETWORKING_SEND_UNRELIABLE
-	if reliable:
-		flags = Steam.NETWORKING_SEND_RELIABLE
-	Steam.sendMessageToUser(peer_id, payload, flags, channel)
+	var send_type := Steam.P2P_SEND_RELIABLE if reliable else Steam.P2P_SEND_UNRELIABLE
+	var success := Steam.sendP2PPacket(peer_id, payload, send_type, channel)
+	if not success:
+		print("SteamP2PMultiplayerPeer: sendP2PPacket failed to peer %s" % peer_id)
 
 func broadcast_bytes(payload: PackedByteArray, except_peer: int = 0, reliable: bool = false, channel: int = DEFAULT_CHANNEL) -> void:
-	for peer_id in _peers.keys():
-		if peer_id == except_peer:
+	var members := _get_lobby_members()
+	for member_id in members:
+		if member_id == _unique_id:
 			continue
-		send_bytes_to(peer_id, payload, reliable, channel)
+		if member_id == except_peer:
+			continue
+		send_bytes_to(member_id, payload, reliable, channel)
 
 func _poll() -> void:
-	if not Steam or not Steam.has_method("receiveMessagesOnChannel"):
-		print("SteamP2PMultiplayerPeer: receiveMessagesOnChannel() not found")
+	if not Steam:
 		return
-	var messages = Steam.receiveMessagesOnChannel(_steam_channel, MAX_MESSAGES_PER_POLL)
-	if messages is Array:
-		for message in messages:
-			if message is Dictionary:
-				if _is_server:
-					print("SteamP2PMultiplayerPeer: recv message keys=%s" % message.keys())
-				var sender_id := 0
-				if message.has("steam_id"):
-					sender_id = int(message["steam_id"])
-				elif message.has("identity"):
-					sender_id = int(message["identity"])
-				elif message.has("peer_id"):
-					sender_id = int(message["peer_id"])
-				var payload: PackedByteArray = message.get("payload", PackedByteArray())
-				if payload.is_empty() and message.has("data"):
-					payload = message.get("data", PackedByteArray())
-				if payload.is_empty() and message.has("buffer"):
-					payload = message.get("buffer", PackedByteArray())
-				if sender_id != 0 and not payload.is_empty():
-					_incoming_packets.append({
-						"peer_id": sender_id,
-						"payload": payload,
-						"channel": _steam_channel,
-						"mode": MultiplayerPeer.TRANSFER_MODE_UNRELIABLE
-					})
+	var read_count := 0
+	while read_count < PACKET_READ_LIMIT:
+		var packet_size := Steam.getAvailableP2PPacketSize(DEFAULT_CHANNEL)
+		if packet_size <= 0:
+			break
+		var result: Dictionary = Steam.readP2PPacket(packet_size, DEFAULT_CHANNEL)
+		if result.is_empty():
+			break
+		# GodotSteam may use different key names depending on version
+		var sender_id: int = 0
+		if result.has("steam_id_remote"):
+			sender_id = int(result["steam_id_remote"])
+		elif result.has("steamIDRemote"):
+			sender_id = int(result["steamIDRemote"])
+		var payload: PackedByteArray = result.get("data", PackedByteArray())
+		if sender_id != 0 and not payload.is_empty():
+			_incoming_packets.append({
+				"peer_id": sender_id,
+				"payload": payload,
+			})
+		read_count += 1
 
-func _get_available_packet_count() -> int:
+func get_available_packet_count() -> int:
 	return _incoming_packets.size()
-
-func _get_packet(r_buffer, r_channel) -> Error:
-	if _incoming_packets.is_empty():
-		print("empty packets")
-		return ERR_UNAVAILABLE
-	var packet: Dictionary = _incoming_packets.pop_front()
-	_packet_peer = int(packet.get("peer_id", 0))
-	_packet_channel = int(packet.get("channel", DEFAULT_CHANNEL))
-	_packet_mode = int(packet.get("mode", MultiplayerPeer.TRANSFER_MODE_UNRELIABLE))
-	_last_payload = packet.get("payload", PackedByteArray())
-	if r_buffer is PackedByteArray:
-		r_buffer.resize(0)
-		r_buffer.append_array(_last_payload)
-	return OK
-
-func _put_packet(p_buffer, p_channel) -> Error:
-	if not (p_buffer is PackedByteArray):
-		return ERR_INVALID_PARAMETER
-	if p_buffer.is_empty():
-		return ERR_INVALID_PARAMETER
-	if _target_peer == 0:
-		var channel := _transfer_channel
-		if p_channel is int and p_channel != 0:
-			channel = p_channel
-		broadcast_bytes(p_buffer, 0, _transfer_mode == MultiplayerPeer.TRANSFER_MODE_RELIABLE, channel)
-	else:
-		var channel := _transfer_channel
-		if p_channel is int and p_channel != 0:
-			channel = p_channel
-		send_bytes_to(_target_peer, p_buffer, _transfer_mode == MultiplayerPeer.TRANSFER_MODE_RELIABLE, channel)
-	return OK
-
-func _set_transfer_channel(channel: int) -> void:
-	_transfer_channel = channel
-
-func _get_transfer_channel() -> int:
-	return _transfer_channel
-
-func _set_transfer_mode(mode: int) -> void:
-	_transfer_mode = mode
-
-func _get_transfer_mode() -> int:
-	return _transfer_mode
-
-func _set_target_peer(peer_id: int) -> void:
-	_target_peer = peer_id
-
-func _get_target_peer() -> int:
-	return _target_peer
-
-func _get_packet_peer() -> int:
-	return _packet_peer
-
-func _get_packet_channel() -> int:
-	return _packet_channel
-
-func _get_packet_mode() -> int:
-	return _packet_mode
 
 func pop_packet() -> Dictionary:
 	if _incoming_packets.is_empty():
 		return {}
-	var packet: Dictionary = _incoming_packets.pop_front()
-	_packet_peer = int(packet.get("peer_id", 0))
-	_packet_channel = int(packet.get("channel", DEFAULT_CHANNEL))
-	_packet_mode = int(packet.get("mode", MultiplayerPeer.TRANSFER_MODE_UNRELIABLE))
-	_last_payload = packet.get("payload", PackedByteArray())
-	return {
-		"peer_id": _packet_peer,
-		"channel": _packet_channel,
-		"mode": _packet_mode,
-		"payload": _last_payload
-	}
+	return _incoming_packets.pop_front()
 
-func _get_unique_id() -> int:
-	return _unique_id
-
-func _get_connection_status() -> int:
-	return _connection_status
-
-func _close() -> void:
-	_connection_status = MultiplayerPeer.CONNECTION_DISCONNECTED
-	_peers.clear()
+func close() -> void:
 	_incoming_packets.clear()
+	_lobby_id = 0
+
+func _get_lobby_members() -> Array[int]:
+	var members: Array[int] = []
+	if not Steam or _lobby_id == 0:
+		return members
+	var count := int(Steam.getNumLobbyMembers(_lobby_id))
+	for i in range(count):
+		var member_id := int(Steam.getLobbyMemberByIndex(_lobby_id, i))
+		members.append(member_id)
+	return members

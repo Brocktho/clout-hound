@@ -52,12 +52,8 @@ func start_session(new_lobby_id: int, host_id: int = 0) -> void:
 	is_host = local_steam_id == host_steam_id
 	if is_host:
 		print("MultiplayerSession: You are the host (local_id=%s lobby_id=%s)" % [local_steam_id, lobby_id])
-	var members := _get_lobby_members(new_lobby_id)
 	peer = SteamP2PMultiplayerPeer.new()
-	peer.configure(local_steam_id, host_steam_id, members)
-	var api := get_tree().get_multiplayer()
-	if api:
-		api.multiplayer_peer = peer
+	peer.configure(local_steam_id, host_steam_id, new_lobby_id)
 	active = true
 	_last_heartbeat_msec = Time.get_ticks_msec()
 
@@ -74,9 +70,6 @@ func stop_session() -> void:
 	_local_spawn_sent = false
 	if peer:
 		peer.close()
-	var api := get_tree().get_multiplayer()
-	if api:
-		api.multiplayer_peer = null
 	peer = null
 
 func queue_local_action(action: StringName, tick: int) -> void:
@@ -173,6 +166,7 @@ func _send_local_input_state() -> void:
 func _poll_packets() -> void:
 	if not peer:
 		return
+	peer._poll()
 	while peer.get_available_packet_count() > 0:
 		var raw := peer.pop_packet()
 		if raw.is_empty():
@@ -189,11 +183,18 @@ func _handle_packet(packet: Dictionary, sender_id: int) -> void:
 	var player_id := int(packet.get("player_id", 0))
 	if player_id == 0:
 		player_id = sender_id
+
+	# Diagnostic: log ALL packets (remove this after debugging)
+	if packet_type != ACTION_HEARTBEAT:
+		print("MultiplayerSession: recv type=%s from=%s player_id=%s" % [packet_type, sender_id, player_id])
+
 	last_heard_msec[player_id] = Time.get_ticks_msec()
 	timed_out[player_id] = false
-	if is_host and sender_id != local_steam_id:
-		print("MultiplayerSession: received packet type=%s from=%s player_id=%s" % [packet_type, sender_id, player_id])
 	match packet_type:
+		"handshake":
+			print("MultiplayerSession: handshake from %s" % player_id)
+			# Accept their session back
+			Steam.acceptP2PSessionWithUser(player_id)
 		ACTION_SPAWN_REQUEST:
 			if is_host:
 				_handle_spawn_request(packet, player_id)
