@@ -122,18 +122,24 @@ func _on_lobby_chat_update(lobby_id: int, changed_id: int, _making_change_id: in
 	if lobby_id != current_lobby_id:
 		return
 	if (chat_state & Steam.CHAT_MEMBER_STATE_CHANGE_ENTERED) != 0:
-		print("Player joined lobby: %s" % Steam.getFriendPersonaName(changed_id))
+		print("Player joined lobby: %s (id=%s)" % [Steam.getFriendPersonaName(changed_id), changed_id])
+		# Accept their P2P session proactively
+		Steam.acceptP2PSessionWithUser(changed_id)
 	elif (chat_state & Steam.CHAT_MEMBER_STATE_CHANGE_LEFT) != 0:
 		print("Player left lobby: %s" % Steam.getFriendPersonaName(changed_id))
+		var session := get_node_or_null("/root/MultiplayerSession")
+		if session and session.get("active"):
+			session.call("_remove_player", changed_id)
 	elif (chat_state & Steam.CHAT_MEMBER_STATE_CHANGE_DISCONNECTED) != 0:
 		print("Player disconnected lobby: %s" % Steam.getFriendPersonaName(changed_id))
+		var session := get_node_or_null("/root/MultiplayerSession")
+		if session and session.get("active"):
+			session.call("_remove_player", changed_id)
+
 
 func _on_p2p_session_request(steam_id_requesting: int) -> void:
 	print("Steamworks: p2p_session_request from %s" % steam_id_requesting)
-	if Steam.has_method("acceptSessionWithUser"):
-		Steam.acceptSessionWithUser(steam_id_requesting)
-	elif Steam.has_method("acceptP2PSessionWithUser"):
-		Steam.acceptP2PSessionWithUser(steam_id_requesting)
+	Steam.acceptP2PSessionWithUser(steam_id_requesting)
 
 func _on_p2p_session_connect_fail(steam_id_failed: int, error_code: int) -> void:
 	print("Steamworks: p2p_session_connect_fail id=%s err=%s" % [steam_id_failed, error_code])
