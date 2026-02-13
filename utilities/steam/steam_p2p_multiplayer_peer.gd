@@ -11,9 +11,7 @@ var _lobby_id: int = 0
 var _incoming_packets: Array[Dictionary] = []
 var _handshake_sent_time: int = 0
 var _handshake_confirmed: bool = false
-var _handshake_retries: int = 0
 const HANDSHAKE_RETRY_INTERVAL_MSEC := 500
-const HANDSHAKE_MAX_RETRIES := 10
 
 func configure(local_id: int, host_id: int, lobby_id: int) -> void:
 	_unique_id = local_id
@@ -23,7 +21,6 @@ func configure(local_id: int, host_id: int, lobby_id: int) -> void:
 	_incoming_packets.clear()
 	_handshake_sent_time = 0
 	_handshake_confirmed = false
-	_handshake_retries = 0
 
 	# Enable relay fallback
 	if Steam and Steam.has_method("allowP2PPacketRelay"):
@@ -36,7 +33,6 @@ func _send_handshake() -> void:
 	var handshake := {"type": "handshake", "player_id": _unique_id}
 	var payload := var_to_bytes(handshake)
 	var members := _get_lobby_members()
-	var sent_to_any := false
 	for member_id in members:
 		if member_id == _unique_id:
 			continue
@@ -44,9 +40,7 @@ func _send_handshake() -> void:
 		Steam.acceptP2PSessionWithUser(member_id)
 		var success := Steam.sendP2PPacket(member_id, payload, Steam.P2P_SEND_RELIABLE, DEFAULT_CHANNEL)
 		print("SteamP2PMultiplayerPeer: sent handshake to %s success=%s" % [member_id, success])
-		sent_to_any = true
 	_handshake_sent_time = Time.get_ticks_msec()
-	_handshake_retries += 1
 
 func confirm_handshake() -> void:
 	_handshake_confirmed = true
@@ -75,11 +69,11 @@ func _poll() -> void:
 	if not Steam:
 		return
 
-	# Retry handshake if not confirmed yet
-	if not _handshake_confirmed and _handshake_retries < HANDSHAKE_MAX_RETRIES:
+	# Retry handshake until confirmed
+	if not _handshake_confirmed:
 		var now := Time.get_ticks_msec()
 		if now - _handshake_sent_time >= HANDSHAKE_RETRY_INTERVAL_MSEC:
-			print("SteamP2PMultiplayerPeer: retrying handshake (attempt %s)" % (_handshake_retries + 1))
+			print("SteamP2PMultiplayerPeer: retrying handshake")
 			_send_handshake()
 
 	var read_count := 0
@@ -104,7 +98,7 @@ func _poll() -> void:
 			})
 		read_count += 1
 
-func get_packet_count() -> int:
+func get_available_packet_count() -> int:
 	return _incoming_packets.size()
 
 func pop_packet() -> Dictionary:
