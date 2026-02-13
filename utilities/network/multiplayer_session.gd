@@ -38,24 +38,24 @@ func _ready() -> void:
 	_steamworks = get_node_or_null("/root/Steamworks")
 
 func start_session(new_lobby_id: int, host_id: int = 0) -> void:
-    if active:
-        print("MultiplayerSession: Already active")
-        return
-    lobby_id = new_lobby_id
-    if not _steamworks:
-        print("No Steamworks node found. Cannot start session.")
-        return
-    local_steam_id = int(_steamworks.get("steam_id"))
-    host_steam_id = host_id
-    if host_steam_id == 0:
-        host_steam_id = _get_lobby_owner(new_lobby_id)
-    is_host = local_steam_id == host_steam_id
-    if is_host:
-        print("MultiplayerSession: You are the host (local_id=%s lobby_id=%s)" % [local_steam_id, lobby_id])
-    peer = SteamP2PMultiplayerPeer.new()
-    peer.configure(local_steam_id, host_steam_id, new_lobby_id)
-    active = true
-    _last_heartbeat_msec = Time.get_ticks_msec()
+	if active:
+		print("MultiplayerSession: Already active")
+		return
+	lobby_id = new_lobby_id
+	if not _steamworks:
+		print("No Steamworks node found. Cannot start session.")
+		return
+	local_steam_id = int(_steamworks.get("steam_id"))
+	host_steam_id = host_id
+	if host_steam_id == 0:
+		host_steam_id = _get_lobby_owner(new_lobby_id)
+	is_host = local_steam_id == host_steam_id
+	if is_host:
+		print("MultiplayerSession: You are the host (local_id=%s lobby_id=%s)" % [local_steam_id, lobby_id])
+	peer = SteamP2PMultiplayerPeer.new()
+	peer.configure(local_steam_id, host_steam_id, new_lobby_id)
+	active = true
+	_last_heartbeat_msec = Time.get_ticks_msec()
 
 func stop_session() -> void:
 	if not active:
@@ -179,37 +179,37 @@ func _poll_packets() -> void:
 			_handle_packet(packet, int(raw.get("peer_id", 0)))
 
 func _handle_packet(packet: Dictionary, sender_id: int) -> void:
-    var packet_type := String(packet.get("type", ""))
-    var player_id := int(packet.get("player_id", 0))
-    if player_id == 0:
-        player_id = sender_id
-    last_heard_msec[player_id] = Time.get_ticks_msec()
-    timed_out[player_id] = false
-    match packet_type:
-        "handshake":
-            print("MultiplayerSession: handshake from %s" % player_id)
-            # Accept their session back
-            Steam.acceptP2PSessionWithUser(player_id)
-        ACTION_SPAWN_REQUEST:
-            if is_host:
-                _handle_spawn_request(packet, player_id)
-        ACTION_SPAWN:
-            if not is_host:
-                _handle_spawn(packet)
-        ACTION_DESPAWN_REQUEST:
-            if is_host:
-                _handle_despawn_request(packet, player_id)
-        ACTION_DESPAWN:
-            if not is_host:
-                _handle_despawn(packet)
-        ACTION_INPUT_STATE:
-            _handle_input_state(packet, player_id, sender_id)
-        ACTION_EVENT:
-            _handle_action_event(packet, player_id, sender_id)
-        ACTION_BUFFERED_TRICK:
-            _handle_buffered_trick(packet, player_id, sender_id)
-        ACTION_HEARTBEAT:
-            pass
+	var packet_type := String(packet.get("type", ""))
+	var player_id := int(packet.get("player_id", 0))
+	if player_id == 0:
+		player_id = sender_id
+	last_heard_msec[player_id] = Time.get_ticks_msec()
+	timed_out[player_id] = false
+	match packet_type:
+		"handshake":
+			print("MultiplayerSession: handshake from %s" % player_id)
+			# Accept their session back
+			Steam.acceptP2PSessionWithUser(player_id)
+		ACTION_SPAWN_REQUEST:
+			if is_host:
+				_handle_spawn_request(packet, player_id)
+		ACTION_SPAWN:
+			if not is_host:
+				_handle_spawn(packet)
+		ACTION_DESPAWN_REQUEST:
+			if is_host:
+				_handle_despawn_request(packet, player_id)
+		ACTION_DESPAWN:
+			if not is_host:
+				_handle_despawn(packet)
+		ACTION_INPUT_STATE:
+			_handle_input_state(packet, player_id, sender_id)
+		ACTION_EVENT:
+			_handle_action_event(packet, player_id, sender_id)
+		ACTION_BUFFERED_TRICK:
+			_handle_buffered_trick(packet, player_id, sender_id)
+		ACTION_HEARTBEAT:
+			pass
 
 func _handle_spawn_request(packet: Dictionary, player_id: int) -> void:
 	if players.has(player_id):
