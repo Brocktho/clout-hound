@@ -179,13 +179,18 @@ func _poll_packets() -> void:
 			_handle_packet(packet, int(raw.get("peer_id", 0)))
 
 func _handle_packet(packet: Dictionary, sender_id: int) -> void:
-	var packet_type := String(packet.get("type", ""))
-	var player_id := int(packet.get("player_id", 0))
-	if player_id == 0:
-		player_id = sender_id
-	last_heard_msec[player_id] = Time.get_ticks_msec()
-	timed_out[player_id] = false
-	match packet_type:
+    var packet_type := String(packet.get("type", ""))
+    var player_id := int(packet.get("player_id", 0))
+    if player_id == 0:
+        player_id = sender_id
+    
+    # Diagnostic: log ALL packets (remove this after debugging)
+    if packet_type != ACTION_HEARTBEAT:
+        print("MultiplayerSession: recv type=%s from=%s player_id=%s" % [packet_type, sender_id, player_id])
+    
+    last_heard_msec[player_id] = Time.get_ticks_msec()
+    timed_out[player_id] = false
+    match packet_type:
 		"handshake":
 			print("MultiplayerSession: handshake from %s" % player_id)
 			# Accept their session back
